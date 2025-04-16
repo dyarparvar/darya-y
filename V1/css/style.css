@@ -1,0 +1,1055 @@
+/************************************************************************************************** Neutralisation of default styles */
+
+/*! normalize.css v8.0.1 | MIT License | github.com/necolas/normalize.css */
+
+/* Document
+   ========================================================================== */
+
+/**
+ * 1. Correct the line height in all browsers.
+ * 2. Prevent adjustments of font size after orientation changes in iOS.
+ */
+
+html {
+  line-height: 1.15; /* 1 */
+  -webkit-text-size-adjust: 100%; /* 2 */
+}
+
+/* Sections
+   ========================================================================== */
+
+/**
+ * Remove the margin in all browsers.
+ */
+
+body {
+  margin: 0;
+}
+
+/**
+ * Render the `main` element consistently in IE.
+ */
+
+main {
+  display: block;
+}
+
+/**
+ * Correct the font size and margin on `h1` elements within `section` and
+ * `article` contexts in Chrome, Firefox, and Safari.
+ */
+
+h1 {
+  font-size: 2em;
+  /*margin: 0.67em 0;*/
+}
+
+/* Grouping content
+   ========================================================================== */
+
+/**
+ * 1. Add the correct box sizing in Firefox.
+ * 2. Show the overflow in Edge and IE.
+ */
+
+hr {
+  -webkit-box-sizing: content-box;
+          box-sizing: content-box; /* 1 */
+  height: 0; /* 1 */
+  overflow: visible; /* 2 */
+}
+
+/**
+ * 1. Correct the inheritance and scaling of font size in all browsers.
+ * 2. Correct the odd `em` font sizing in all browsers.
+ */
+
+pre {
+  font-family: monospace, monospace; /* 1 */
+  font-size: 1em; /* 2 */
+}
+
+/* Text-level semantics
+   ========================================================================== */
+
+/**
+ * Remove the gray background on active links in IE 10.
+ */
+
+a {
+  background-color: transparent;
+}
+
+/**
+ * 1. Remove the bottom border in Chrome 57-
+ * 2. Add the correct text decoration in Chrome, Edge, IE, Opera, and Safari.
+ */
+
+abbr[title] {
+  border-bottom: none; /* 1 */
+  text-decoration: underline; /* 2 */
+  -webkit-text-decoration: underline dotted;
+          text-decoration: underline dotted; /* 2 */
+}
+
+/**
+ * Add the correct font weight in Chrome, Edge, and Safari.
+ */
+
+b,
+strong {
+  font-weight: bolder;
+}
+
+/**
+ * 1. Correct the inheritance and scaling of font size in all browsers.
+ * 2. Correct the odd `em` font sizing in all browsers.
+ */
+
+code,
+kbd,
+samp {
+  font-family: monospace, monospace; /* 1 */
+  font-size: 1em; /* 2 */
+}
+
+/**
+ * Add the correct font size in all browsers.
+ */
+
+small {
+  font-size: 80%;
+}
+
+/**
+ * Prevent `sub` and `sup` elements from affecting the line height in
+ * all browsers.
+ */
+
+sub,
+sup {
+  font-size: 75%;
+  line-height: 0;
+  position: relative;
+  vertical-align: baseline;
+}
+
+sub {
+  bottom: -0.25em;
+}
+
+sup {
+  top: -0.5em;
+}
+
+/* Embedded content
+   ========================================================================== */
+
+/**
+ * Remove the border on images inside links in IE 10.
+ */
+
+img {
+  border-style: none;
+}
+
+/* Forms
+   ========================================================================== */
+
+/**
+ * 1. Change the font styles in all browsers.
+ * 2. Remove the margin in Firefox and Safari.
+ */
+
+button,
+input,
+optgroup,
+select,
+textarea {
+  font-family: inherit; /* 1 */
+  font-size: 100%; /* 1 */
+  line-height: 1.15; /* 1 */
+  margin: 0; /* 2 */
+}
+
+/**
+ * Show the overflow in IE.
+ * 1. Show the overflow in Edge.
+ */
+
+button,
+input { /* 1 */
+  overflow: visible;
+}
+
+/**
+ * Remove the inheritance of text transform in Edge, Firefox, and IE.
+ * 1. Remove the inheritance of text transform in Firefox.
+ */
+
+button,
+select { /* 1 */
+  text-transform: none;
+}
+
+/**
+ * Correct the inability to style clickable types in iOS and Safari.
+ */
+
+button,
+[type="button"],
+[type="reset"],
+[type="submit"] {
+  -webkit-appearance: button;
+}
+
+/**
+ * Remove the inner border and padding in Firefox.
+ */
+
+button::-moz-focus-inner,
+[type="button"]::-moz-focus-inner,
+[type="reset"]::-moz-focus-inner,
+[type="submit"]::-moz-focus-inner {
+  border-style: none;
+  padding: 0;
+}
+
+/**
+ * Restore the focus styles unset by the previous rule.
+ */
+
+button:-moz-focusring,
+[type="button"]:-moz-focusring,
+[type="reset"]:-moz-focusring,
+[type="submit"]:-moz-focusring {
+  outline: 1px dotted ButtonText;
+}
+
+/**
+ * Correct the padding in Firefox.
+ */
+
+fieldset {
+  padding: 0.35em 0.75em 0.625em;
+}
+
+/**
+ * 1. Correct the text wrapping in Edge and IE.
+ * 2. Correct the color inheritance from `fieldset` elements in IE.
+ * 3. Remove the padding so developers are not caught out when they zero out
+ *    `fieldset` elements in all browsers.
+ */
+
+legend {
+  -webkit-box-sizing: border-box;
+          box-sizing: border-box; /* 1 */
+  color: inherit; /* 2 */
+  display: table; /* 1 */
+  max-width: 100%; /* 1 */
+  padding: 0; /* 3 */
+  white-space: normal; /* 1 */
+}
+
+/**
+ * Add the correct vertical alignment in Chrome, Firefox, and Opera.
+ */
+
+progress {
+  vertical-align: baseline;
+}
+
+/**
+ * Remove the default vertical scrollbar in IE 10+.
+ */
+
+textarea {
+  overflow: auto;
+}
+
+/**
+ * 1. Add the correct box sizing in IE 10.
+ * 2. Remove the padding in IE 10.
+ */
+
+[type="checkbox"],
+[type="radio"] {
+  -webkit-box-sizing: border-box;
+          box-sizing: border-box; /* 1 */
+  padding: 0; /* 2 */
+}
+
+/**
+ * Correct the cursor style of increment and decrement buttons in Chrome.
+ */
+
+[type="number"]::-webkit-inner-spin-button,
+[type="number"]::-webkit-outer-spin-button {
+  height: auto;
+}
+
+/**
+ * 1. Correct the odd appearance in Chrome and Safari.
+ * 2. Correct the outline style in Safari.
+ */
+
+[type="search"] {
+  -webkit-appearance: textfield; /* 1 */
+  outline-offset: -2px; /* 2 */
+}
+
+/**
+ * Remove the inner padding in Chrome and Safari on macOS.
+ */
+
+[type="search"]::-webkit-search-decoration {
+  -webkit-appearance: none;
+}
+
+/**
+ * 1. Correct the inability to style clickable types in iOS and Safari.
+ * 2. Change font properties to `inherit` in Safari.
+ */
+
+::-webkit-file-upload-button {
+  -webkit-appearance: button; /* 1 */
+  font: inherit; /* 2 */
+}
+
+/* Interactive
+   ========================================================================== */
+
+/*
+ * Add the correct display in Edge, IE 10+, and Firefox.
+ */
+
+details {
+  display: block;
+}
+
+/*
+ * Add the correct display in all browsers.
+ */
+
+summary {
+  display: list-item;
+}
+
+/* Misc
+   ========================================================================== */
+
+/**
+ * Add the correct display in IE 10+.
+ */
+
+template {
+  display: none;
+}
+
+/**
+ * Add the correct display in IE 10.
+ */
+
+[hidden] {
+  display: none;
+}
+
+
+
+
+/*********************************************************************************************************************************************
+**********************************************************************************************************************************************
+**********************************************************************************************************************************************
+**********************************************************************************************************************************************
+**********************************************************************************************************************************************
+**********************************************************************************************************************************************
+********************************************************************************************************************************************** 
+********************************************************************************************************************************************** my Style __ START */
+
+
+* {
+	margin: 0;
+	padding: 0;
+	-webkit-box-sizing: border-box;
+	        box-sizing: border-box;
+}
+
+a {
+	text-decoration: none;
+
+}
+
+
+
+
+/************************************************************************************************** Typeface & Font size */
+
+:root { 
+	font-family: hatch, serif;
+	font-weight: 300;
+	font-size: 18px; /*calc(0.15em + 2.5vmin);*/
+	line-height: 1.2;
+	color: var(--textblack);
+}
+
+/************************************************************************************************** Colour Palette */
+
+:root {
+
+	--purewhite: rgb(255, 255, 255);
+
+	--white: rgb(224, 223, 213);
+	--black: rgb(15, 15, 15);
+	--grey: rgb(197, 204, 197);
+	--darkgrey: rgb(147, 153, 147);
+
+	
+
+	--yellowLOGO: rgb(238, 203, 53);
+  	--orangeLOGO: rgb(239, 126, 69);
+  	--greenLOGO: rgb(133, 188, 56);
+	--blueLOGO: rgb(82, 182, 171);	
+	--blackLOGO: rgb(28, 29, 28);
+
+
+	--yellow: rgb(255, 218, 57);
+  	--red: rgb(255, 86, 0);
+  	--pink: rgb(239, 198, 178);
+  	--blue: rgb(82, 182, 171);
+  	--green: rgb(133, 188, 56);	
+  	--brightblue: rgb(0, 51, 237);
+  	--brightgreen: rgb(149, 255, 0);
+
+
+
+  	--textwhite: rgb(224, 223, 213);
+	--textblack: rgb(15, 15, 15);
+	--textgrey: rgb(197, 204, 197);
+	--textdarkgrey: rgb(147, 153, 147);
+	--textblackLOGO: rgb(28, 29, 28);
+
+
+	--textyellow: rgb(255, 218, 57);
+  	--textred: rgb(255, 86, 0);
+	--textpink: rgb(239, 198, 178);
+
+	
+	--textorange: rgb(239, 126, 69);
+  	--textgreen: rgb(133, 188, 56);
+	--textblue: rgb(82, 182, 171);
+
+  	--textbrightred: rgb(245, 40, 10);
+  	--textbrightgreen: rgb(149, 255, 0);
+  	
+	
+	--dot1: rgb(239, 126, 69);
+  	--dot2: rgb(133, 188, 56);
+  	--dot3: rgb(82, 182, 171);	
+
+
+	--shadow1: rgb(150, 182, 178); /*lightgreyblue*/
+	--shadow2: rgb(239, 198, 178);	/*lightpink*/
+
+	--shadow3: rgb(15, 15, 15); /*black*/
+	--shadow4: rgb(224, 223, 213); /*white*/
+
+
+	--shadow5: rgb(245 223 77);
+	--shadow6: rgb(115 156 97);
+	--shadow7: rgb(0 67 203);
+	--shadow8: rgb(226 124 98);
+
+
+	--shadowtext: rgb(15, 15, 15);
+
+	
+}
+
+
+/************************************************************************************************** Mouse & Display */
+
+
+
+.PointerCursor {cursor: pointer;}
+.NoCursor {cursor: none; }
+
+.unClickable {
+	pointer-events: none;
+}
+
+.hidden {
+	opacity: 0;
+}
+
+
+
+
+/************************************************************************************************** Wrapper & Container */
+
+
+#wrapper {
+	width: 100%;
+  background-color: WhiteSmoke;
+  padding: 0.5rem;
+
+
+}
+
+#container {
+	width: 98%;
+  /*height: 1000px;*/
+	margin: 0 auto 0 auto; /******************* this will successfully center your container inside body *******************/
+  padding: 0.5rem;
+	background-color: WhiteSmoke;
+  /*box-shadow: 0 0 2px DarkSeaGreen;*/
+	/*overflow: hidden;*/
+	/*text-align: center;  /****************** this will successfully center your content inside container.*******************/
+}
+
+/************************************************************************************************** Grid */
+
+.grid {
+  display: grid;
+  width: 100%;
+  grid-template-columns: repeat(30, 1fr);
+  grid-template-rows: auto;
+  grid-gap: 0.5rem;
+  justify-content: center;
+  align-content: center;
+  justify-items: stretch;
+  align-items: stretch;
+  grid-auto-columns: 1fr;
+
+} 
+
+
+#context, #userGuide, /*#legend,*/ #graphics, #file, #footnotes {
+  justify-self: stretch;
+  align-self: stretch;
+}
+
+#context {
+  grid-area: 1 / 1 / 2 / 31 ;
+}
+#userGuide {
+  grid-area: 2 / 1 / 4 / 18 ;
+}
+
+
+#graphics {
+  grid-area: 4 / 1 / 5 / 31 ;
+}
+
+
+
+#footnotes {
+  grid-area: 5 / 1 / 6 / 31 ;
+}
+
+
+
+/************************************************** 
+************************************************ 
+*********************************************
+******************************************** Context
+********************************************* 
+************************************************ 
+***************************************************/
+
+
+
+
+#context {
+  padding: 0.5rem;
+  background-color: WhiteSmoke; /*PaleGoldenRod;*/
+  border: 1px solid DarkSeaGreen;
+  border-radius: 3px;
+}
+
+
+h1#heading {
+  padding: 0.5rem;
+  font-size: 0.9rem;
+  font-weight: 500;
+}
+
+
+h3#intro {
+  padding: 0.5rem;
+  font-size: 0.8rem;
+  font-weight: 300;
+  font-style: italic;
+}
+
+h2 {
+  padding: 0.5rem;
+  font-size: 0.8rem;
+  font-weight: 400;
+}
+
+p {
+  padding: 0.25rem 0.5rem;
+  font-size: 0.8rem;
+  font-weight: 300;
+  display: block;
+}
+
+input {
+  display: block;
+  margin: 0 0.5rem 0.5rem 0.5rem;
+}
+
+label {
+  display: block;
+  padding: 0.5rem;
+  font-size: 0.7rem;
+  font-weight: 100;
+}
+
+
+
+#userGuide {
+  padding: 0.5rem;
+  background-color: WhiteSmoke; /*PaleGoldenRod;*/
+  /*align-self: start !important;*/
+}
+
+#userGuide {
+  border: 1px solid DarkSeaGreen;
+  border-radius: 3px;
+}
+
+
+
+#control-panel-1.grid {
+  grid-area: 2 / 18 / 3 / 31 ;
+  text-align: center;
+}
+
+      .slider, #output {
+        justify-self: stretch;
+        align-self: stretch;
+      }
+      #control-panel-1.grid .slider {
+        grid-area: 1 / 1 / 2 / 31 ;
+      }
+      
+      #output {
+        grid-area: 2 / 1 / 3 / 31 ;
+      }
+
+
+      .slider {
+        padding: 0.5rem;
+        background-color: WhiteSmoke; /*PaleGoldenRod;*/
+        /*align-self: start !important;*/
+      }
+
+      .slider input {
+        display: inline-block !important; 
+        cursor: grabbing;
+      }
+
+      .slider label {
+        display: inline-block !important;
+        display: block;
+        padding: 0.5rem;
+        font-size: 0.8rem;
+        font-weight: 300;
+      }
+
+      .slider span {
+        font-size: 0.8rem;
+        font-weight: 500;
+        margin-right: 1.5rem !important;
+        color: rgb(12,90,250);
+      }
+
+      
+      #output span {
+        font-size: 0.8rem;
+        font-weight: 300;
+        padding: 0.5rem;
+
+      }
+      #output span tspan {
+        font-size: 0.8rem;
+        font-weight: 500;
+        color: rgb(12,90,250);
+      }
+
+
+
+
+
+
+#control-panel-2.grid {
+  grid-area: 3 / 18 / 4 / 31 ;
+  padding: 0.5rem;
+  align-self: start;
+  text-align: center;
+}
+
+      #download {
+        justify-self: stretch;
+        align-self: stretch;
+      }
+      
+      #download {
+        grid-area: 3 / 1 / 4 / 31 ;
+      }
+
+
+      #download , #output {
+        padding: 0.5rem;
+        background-color: WhiteSmoke; /*PaleGoldenRod;*/
+        /*align-self: start !important;*/
+      }
+      
+      
+
+     
+
+      .button {
+        display: inline-block;
+        background-color: WhiteSmoke;
+        border-radius: 3px;
+        box-shadow:  0px 0px 3px grey;
+        cursor: pointer;
+        padding: 0.5rem;
+        font-size: 0.8rem;
+        font-weight: 500;
+        text-align: center;
+        color: rgb(12,90,250);
+      }
+
+
+
+
+
+#reset {
+        justify-self: stretch;
+        align-self: stretch;
+      }
+#reset {
+  grid-area: 7 / 1 / 8 / 31 ;
+}
+      
+#reset {
+  padding: 0.5rem;
+  background-color: WhiteSmoke; /*PaleGoldenRod;*/
+  /*align-self: start !important;*/
+}
+
+     
+
+#footnotes {
+  padding: 0.5rem;
+  background-color: WhiteSmoke; /*PaleGoldenRod;*/
+ 
+}
+
+
+
+
+
+
+/************************************************** 
+************************************************ 
+*********************************************
+******************************************** Data Visualisation
+********************************************* 
+************************************************ 
+***************************************************/
+
+#graphics.grid {
+  width: 100%;
+  padding: 0.5rem;
+  background-color: WhiteSmoke;
+  /*text-align: left;*/
+}
+
+
+
+
+
+#graphics .histogram {
+  grid-area:  1 / 1 / 2 / 18;
+  justify-self: stretch;
+  align-self: stretch;
+}
+
+      #graphics .histogram .extra tspan {
+        fill: Chocolate;
+        font-weight: 500;
+      }
+
+      
+
+      #graphics .histogram rect {
+        shape-rendering: crispEdges;
+      }
+
+
+      #graphics .histogram .extra svg text tspan {
+        fill: Chocolate;
+      }
+
+
+
+#graphics .heatmap {
+  grid-area:  1 / 18 / 2 / 31; /*2 / 1 / 3  / 11;*/
+  justify-self: stretch;
+  align-self: stretch;
+}
+
+      #graphics .heatmap rect {
+        shape-rendering: crispEdges;
+        cursor: pointer;
+      }
+
+      #graphics .heatmap g .tick text {
+        cursor: pointer;
+      }
+      #graphics .heatmap g .tick:hover {
+        color: black;
+        font-weight: 500;
+      }
+
+      #graphics .heatmap .tooltip text tspan {
+        fill: black;
+        font-weight: 500;
+      }
+
+
+#graphics .keyWords {
+  grid-area:  1 / 1 / 2 / 18;
+  width: 100%;
+  justify-self: stretch;
+  align-self: center;
+  display: block;
+  padding: 0 0.5rem;
+  background-color: Tomato;
+  text-align: center;
+  overflow: scroll;
+  position: relative;
+  border-radius: 6px;
+  border: 1px solid grey;
+
+}
+      #graphics .keyWords text {
+        display: block;
+        float: left;
+        padding: 0.5rem;
+        border: 1px solid grey;
+        border-radius: 3px;
+        background-color: WhiteSmoke;
+        margin: 0.5rem; /*1.2%;*/
+        font-size: 0.8rem;
+        font-weight: 400;
+        letter-spacing: 1px;
+        color: Tomato;
+      }
+
+      #graphics .keyWords .close {
+        position: sticky;
+        top: 0%;
+        right: 0%;
+        display: block;
+        background-color: Tomato;
+        padding: 0.5rem 0;
+      }
+      #graphics .keyWords .close a {
+        display: inline-block;
+        cursor: pointer;
+        /*background-color: WhiteSmoke;*/
+        box-shadow:  0px 0px 3px black ;
+        border-radius: 3px;
+        padding: 0.5rem;
+        font-size: 0.8rem;
+        text-align: center;
+        /*margin: 0.5rem;*/
+        color: black;
+        font-weight: 300;
+      }
+
+
+      #graphics .keyWords .info {
+        float: none !important;
+        color: black;
+        font-size: 0.8rem;
+        font-weight: 300;
+        background-color: none !important;
+      }
+      #graphics .keyWords span {
+        display: block;
+        float: left;
+        padding: 0.5rem;
+        border: 1px solid grey;
+        border-radius: 3px;
+        background-color: WhiteSmoke;
+        margin: 0.5rem; /*1.2%;*/
+        font-size: 0.8rem;
+        font-weight: 400;
+        letter-spacing: 1px;
+        color: Tomato;
+      }
+
+      #graphics .keyWords .info tspan {
+        fill: black;
+        font-weight: 500;
+      }
+
+
+
+
+
+
+#graphics .sankey {
+  grid-area:  3 / 1 / 6 / 31;
+  justify-self: stretch;
+  align-self: stretch;
+  /*min-height: 660px;*/
+}
+
+
+      #graphics .sankey .nodes {
+        cursor: pointer;
+      }
+
+      #graphics .sankey .links {
+        cursor: pointer;
+      }
+
+      #graphics .sankey .extra text tspan:first-of-type {
+        fill: SpringGreen;
+        font-weight: 500;
+      }
+      #graphics .sankey .extra text tspan:nth-of-type(2) {
+        fill: MediumVioletRed;
+        font-weight: 500;
+      }
+      #graphics .sankey .extra text tspan:nth-of-type(3){
+        fill: SpringGreen;
+        font-weight: 500;
+      }
+
+
+      #graphics .sankey .extra g {
+        cursor: pointer;
+      }
+
+
+
+#graphics .words { 
+  grid-area:  6 / 1 / 7 / 31; 
+  width: 100%;
+  justify-self: stretch;
+  align-self: stretch;
+  margin: 0 auto;
+  background-color: Plum ;
+  border-radius: 6px;
+  position: relative;
+  overflow-x: scroll;
+  overflow-y: hidden;
+  padding: 0.5rem;
+  display: flex;
+  flex-direction: row;
+  flex-wrap: nowrap;
+  align-content: stretch;
+  justify-content: flex-start;
+  align-items: baseline;
+}
+      #graphics .words text {
+        /*display: block;
+        float: left;*/
+        padding: 0.5rem;
+        border-radius: 3px;
+        background-color: WhiteSmoke;
+        margin-right: 1rem;
+        font-size: 0.8rem;
+        font-weight: 500;
+        letter-spacing: 1px;
+        color: RebeccaPurple;
+      }
+      
+      #graphics .words .close {
+        position: sticky;
+        top: 0%;
+        left: 0%;
+        display: block;
+        padding: 0.5rem;
+        height: 100%;
+      }
+      #graphics .words .close a {
+        display: inline-block;
+        cursor: pointer;
+        background-color: Plum ;
+        box-shadow:  0px 0px 3px black ;
+        border-radius: 3px;
+        padding: 0.5rem;
+        font-size: 0.8rem;
+        text-align: center;
+        color: black;
+        font-weight: 300;
+      }
+
+
+
+
+#graphics #special, #fake {
+  justify-self: center;
+  align-self: stretch;
+}
+
+#special, #fake {
+  grid-area: 2 / 1 / 3 / 31 ;
+}
+#special {
+  position: relative;
+  padding: 0.5rem;
+}
+
+      #special input {
+        display: inline-block !important; 
+        margin: 0 !important;
+      }
+
+      #special label {
+        display: inline-block !important; 
+        font-size: 0.8rem;
+        font-weight: 500;
+        margin-right: 1rem;
+        cursor: pointer;
+      }
+
+
+      #special div.factOn {
+        position: absolute;
+        top: 33%;
+        left: 3%;
+        display: inline-block;
+        width: 15px;
+        height: 15px;
+        background-color: #f2eded;
+        box-shadow:  0px 0px 4px grey;
+        border-radius: 100%;
+        cursor: pointer;
+        margin: 0.5rem;
+
+       }
+
+      #special div.factOff {
+        position: absolute;
+        top: 33%;
+        left: 47%;
+        display: inline-block;
+        width: 15px;
+        height: 15px;
+        background-color: rgb(12,90,250);
+        box-shadow:  0px 0px 4px grey;
+        border-radius: 100%;
+        cursor: pointer;
+        margin: 0.5rem;
+
+       }

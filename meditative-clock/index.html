@@ -1,0 +1,312 @@
+<!DOCTYPE html>
+<html lang="en">
+    <head>
+        <meta charset="utf-8">
+		<title>Meditative__Clock</title>
+		<meta name="description" content="Darya Yarparvar * Graphic Designer * Royston, UK * Open to work! ** Please visit my personal website and view my works. ** I would be more than happy to be of any help to your creative projects! **">
+		<meta name="author" content="© 2022 Darya Yarparvar. All rights reserved.">
+
+		<meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=no">
+
+		<link rel="preconnect" href="https://use.typekit.net/msx1qtx.css">
+		<link rel="stylesheet" href="https://use.typekit.net/msx1qtx.css">
+
+		<link rel="stylesheet" type="text/css" href="css/style.css">
+
+
+		<base target="_blank">
+
+
+
+        <script type="text/javascript" src="js/d3.js"></script>
+        <script type="text/javascript" src="js/chroma.js"></script>
+        <script type="text/javascript" src="js/chroma.palette-gen.js"></script>
+        
+        
+       	
+	</head>
+	<body>
+		
+		
+		<div id="wrapper">
+			<div id="container" class="grid">
+				<div id="graphics" class="grid">
+				</div>
+
+				<p class="info">I wanted to make a clock that makes you <strong>pause</strong> _____for a minute_____ in this busy, fast-paced world… So, this <strong>clock</strong> doesn’t show the exact time instantly (unless you click on it! But please don’t!).
+					 
+					<br><br>The clock explicitly displays each second to emphasise the gentle passage of time at the small scale that we usually ignore… Seconds passing like mini droplets… one by one… dripping slowly… and meaningfully… Therefore, a small circle is popping out of the main circle every second.
+					 
+					<br><br>And if you pause, stay patient, and wait (for maximum of 60 seconds), then you’ll see that when second=minute the popping out second hand will behave a bit differently!
+					 
+					<br>The position of the gradient’s centre shows the hour. The gradient fill itself gives a rough sense of minutes passed (same for every hour). I didn’t want to add a legend for the gradient patterns. As one checks the time and pauses, little by little, they get familiar with the gradient patterns. When it’s around 0-15min, the inner part of the gradient is more homogeneous. As time passes, from min=30 the outer part of the gradient becomes more homogeneous. Different colour palettes for the clock and also the background are based on the day light (6am-6pm), which I find more intuitive than am/pm categories...
+					
+				</p>
+
+				
+				<p class="extra"><strong>*Constraints:</strong> * no numeric display of time * only circles * learn how to use gooey effect (inpiration <a href="https://www.visualcinnamon.com/2016/06/fun-data-visualizations-svg-gooey-effect/">Nadieh Bremer</a>) *
+				</p>
+
+				
+				
+			</div>
+			
+
+		</div>
+			
+			
+
+<!--
+*****************************
+****************************
+***************************
+************************** JS Code __ START 
+***************************
+****************************
+******************************
+-->
+
+
+		<script type="text/javascript">
+			
+//////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+//////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+//////////////////////////////////////////////////////////// General Display Settings (width, height, margin, colours)
+//////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////// 
+
+
+			const width = screen.availWidth;
+			const height = screen.availHeight;
+
+			const margin = {top: 200, right: 0, bottom: 300, left: 0};
+
+			const r1 = width/4;
+			const r2 = r1/9;
+			const r3 = r1/1.618;
+			
+			const colours = {
+				am:[chroma("purple").desaturate(),chroma("red").desaturate(0.5),chroma("yellow").desaturate(0.5),chroma("white").desaturate(0.5)], //["navy", "violet", "yellow", "orange"],
+				pm:[chroma("green").desaturate(),chroma("blue").desaturate(),chroma("purple").desaturate(),chroma("black").desaturate()]//["orange", "red", "purple", "black"]
+			}
+			
+
+//////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+//////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+//////////////////////////////////////////////////////////// Graphics
+//////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+//////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+			let centre = {x: width/2 + margin.left - r1, y: margin.top};
+		
+
+		/**
+		 * main SVG
+		 * Do not set the filter on the visual elements themselves (such as the circles), but on the g or svg element that contains the circles. 
+		 */
+ 			let clockGraphics = d3.select("#graphics")
+			 						.append("svg")
+			 						.attr("viewBox", [0, 0, (width + margin.left + margin.right) , (height + margin.top + margin.bottom)])
+								    .append("g")
+								    .style("filter", "url(#gooey)") //Set the filter on the container
+								    .attr("transform", "translate(" + r1  +  "," + r1  + ")");
+		
+			let defs = clockGraphics.append('defs');
+
+		/**
+		 * The gooey filter
+		 */
+ 			let filterGooey = defs.append('filter')
+								.attr('id','gooey');
+
+			filterGooey.append('feGaussianBlur')
+					.attr('in','SourceGraphic')
+					.attr('stdDeviation',r2/4) // stdDeviation=0: no blur | stdDeviation>r1 : disappear. | stdDeviation=r1 the circle becomes diamond shape with too much blur effect. | the higher stdDeviation the higher blur and distruption to the initial shape. default = r1/2
+					.attr('result','blur');
+
+			filterGooey.append('feColorMatrix')
+					.attr("class","blurValues")
+					.attr('in','blur')
+					.attr('mode','matrix')
+					.attr('values','1 0 0 0 0  0 1 0 0 0  0 0 1 0 0  0 0 0 18 -8')
+					.attr('result','gooey');
+
+			filterGooey.append('feComposite')
+					.attr('in','SourceGraphic')
+					.attr('in2','gooey')
+					.attr('operator','atop');
+
+
+
+			let phi = -2*Math.PI/60; // 60 second per minute & 60 minutes per hour. negative sign is to reverse the rotation to clockwise.
+			let teta = -2*Math.PI/12;  // am/pm
+
+		/**
+		 * the scale determining second Hand's range of motion
+		 */
+			let shootScale = d3.scaleLinear()
+								.domain([0, 1])
+								.range([1, 3]);
+		/**
+		 * colour scales determining the background colour and also used to generate gradient pattern of main body of clock
+		 */
+
+			let amScale = chroma.bezier(colours.am)
+								.scale()
+								.domain([0, 89]);
+
+			let pmScale = chroma.bezier(colours.pm)
+								.scale()
+								.domain([0, 89]);
+
+
+
+
+		
+
+		/**
+		 * the scale for the position of hour hand based on hours passed (0-11)
+		 */	
+			
+			let gradScale = d3.scaleLinear()
+								.domain([-1, 1])
+								.range([100, 0]);
+
+			
+		/**
+		 * The second Hand of the clock
+		 * creating the second hand __ a circle moving out
+		 * I deliberately set the initial position of the moving circle at centre. Because I did not want to define a sec variable outside the repeat()function. This lead to an extra repetition of the first moving circle and this is not desired. 
+		 */
+			clockGraphics.append("circle")
+						.attr("class", "second")
+						.attr("cx", centre.x)
+						.attr("cy", centre.y)
+						.attr("r", r2)
+						.style("fill", "none")
+						.each(update);
+
+
+		
+		/**
+		 * The main clock body.
+		 */	
+			clockGraphics.append("circle")
+						.attr("class", "bodyClock")
+						.attr("cx", centre.x)
+						.attr("cy", centre.y)
+						.attr("r", r1)
+						.style("fill",  am ? amScale(new Date().getMinutes()) : pmScale(new Date().getMinutes()));
+
+
+			clockGraphics.append("circle")
+						.attr("class", "hour")
+						.attr("cx", centre.x)
+						.attr("cy", centre.y)
+						.attr("r", r1+1)
+						.style("fill", "url(#min-gradient)")
+						.each(update);
+		/**
+		 * The function that keeps second Hand flying out continuously
+		 * main body of the clock and the second Hand are internally tanget. then the second Hand moves towards outside a bit (controlled by secScale) and pops out/disappears.
+		 * the condition is set to shoot the second Hand farther away when sec = min. This way the user have to wait (for maximum one minute) to learn the minute value of the time right now. Although the colour scale also gives a rough idea about min. (the more simple gradient the less minutes has passed.)
+		 */
+			
+
+			function update() {
+					let secondHand = d3.selectAll(".second");
+					let hourHand = d3.select(".hour");
+					sec = 0;
+					
+					function repeat() {
+						date = new Date();
+						sec = date.getSeconds();
+						min = date.getMinutes();
+						hour = date.getHours();
+
+						((hour<18) && (hour>5)) ? am = true : am = false ;  //change of colour based on day-light is more intuitive than am 0-12 13-24 pm categories.
+						
+						console.log(hour%12, min, sec, am? "am":"pm");
+
+						
+						am ? bgColour = amScale(89) : bgColour = pmScale(89);
+						d3.select("#graphics").node().style.backgroundColor = bgColour.saturate(2);
+						d3.select("p").node().style.backgroundColor = bgColour.saturate(2);
+						am ? fontColour = pmScale(89).desaturate(2) : fontColour = amScale(89).desaturate(2);
+						d3.selectAll("p").node().style.color = fontColour;
+						// d3.select("p").node().style.height = d3.select("#graphics").node().getBoundingClientRect().height + "px";
+
+					// refresh gradient at every repeatition
+						defs.selectAll("radialGradient").remove();
+
+					// a radialGradient element for roughly showing minutes
+						let minGradient = defs.append("radialGradient")
+											    .attr("id", "min-gradient")
+											    .attr("cx", `${gradScale(1*Math.sin(hour*teta))}` + "%") //play with 1* to adjust the centre of gradient
+											    .attr("cy", `${gradScale(1*Math.cos(hour*teta))}` + "%")
+											    .attr("r", "100%"); //play with 75% to adjust how much the gradient is expanded
+
+					// refresh gradient at every repeatition
+						minGradient.selectAll("stop").remove();
+
+				    // add colors to make the gradient appear more complex as minutes pass...
+						minGradient.append("stop")
+								    .attr("offset", "0%")
+								    .attr("stop-color", am ? amScale(30) : pmScale(30));
+					    
+					   
+					    
+					    minGradient.append("stop")
+								    .attr("offset", "20%")
+								    .attr("stop-color", am ? amScale(min+30) : pmScale(min+30));
+
+					    minGradient.append("stop")
+								    .attr("offset", "60%")
+								    .attr("stop-color",  am ? amScale(60) : pmScale(60));
+
+
+						minGradient.append("stop")
+								    .attr("offset", "80%")
+								    .attr("stop-color",  am ? amScale(min) : pmScale(min));
+					    minGradient.append("stop")
+								    .attr("offset", "100%")
+								    .attr("stop-color",  am ? amScale(min) : pmScale(min));
+
+					// change the colour of hour hand to give a rough idea about minutes
+						hourHand.style("fill", "url(#min-gradient)");
+
+
+						secondHand.attr("cx", centre.x + r2*Math.sin(sec*phi) - r1*Math.sin(sec*phi))
+								.attr("cy", centre.y + r2*Math.cos(sec*phi) - r1*Math.cos(sec*phi))
+								.attr("r", r2)
+								.transition().duration(1000)
+									.attr("cx", sec==min ? centre.x + r2*Math.sin(sec*phi) - shootScale(0.25)*r1*Math.sin(sec*phi) : centre.x + r2*Math.sin(sec*phi) - shootScale(0.2)*r1*Math.sin(sec*phi))
+									.attr("cy", sec==min ? centre.y + r2*Math.cos(sec*phi) - shootScale(0.25)*r1*Math.cos(sec*phi) : centre.y + r2*Math.cos(sec*phi) - shootScale(0.2)*r1*Math.cos(sec*phi))
+									.attr("r", sec==min ? r2/2 : 0)
+									.style("fill", am ? amScale(min) : pmScale(min))
+								.on("end", repeat)
+								
+
+						
+
+					// change the colour of clock's main body
+						d3.select(".bodyClock")
+							.style("fill", am ? amScale(min) : pmScale(min))
+							
+						
+						
+						hourHand.on("click", () => alert((hour%12) + " : " + min + "' : " + sec + '"' + (am? " am":" pm")));
+
+
+					};
+
+					repeat(); //don't forget to call the repaet function inside update function! :)
+			};
+
+			
+			
+
+			
+
+		</script>
+	</body>
+</html>

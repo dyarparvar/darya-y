@@ -1,0 +1,1209 @@
+<!DOCTYPE html>
+<html lang="en">
+    <head>
+        <meta charset="utf-8">
+		<title>Darya-Yarparvar__Graphic Designer</title>
+		<meta name="description" content="Darya Yarparvar * Graphic Designer * Birmingham, UK * Open to work! ** Please visit my personal website and view my works. ** I would be more than happy to be of any help to your creative projects! **">
+		<meta name="author" content="© 2021 Darya Yarparvar. All rights reserved.">
+
+		<meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=no">
+
+		<link rel="preconnect" href="https://use.typekit.net/mok3rgv.css">
+		
+		
+		<link rel="stylesheet" type="text/css" href="css/style.css">
+
+
+		<link rel="stylesheet" type="text/css" href="css/icon-style.css">
+		<link rel="stylesheet" href="https://use.typekit.net/mok3rgv.css">
+
+
+		<base target="_blank">
+
+
+
+        <script type="text/javascript" src="js/d3.js"></script>
+        <script type="text/javascript" src="js/d3-sankey.js"></script>
+       
+       	
+	</head>
+	<body>
+		
+		
+		<div id="wrapper">
+			<div id="container">
+				
+				<div id="context">
+					<h1 id="title">Copy Text Signature</h1>
+				</div>
+				
+				
+				<div id="graphics">
+					<!-- <div id="control-panel"></div> -->
+					<!-- <div id="chart"></div> -->
+				</div>
+			</div>
+			
+			
+		</div>
+
+<!--
+*****************************
+****************************
+***************************
+************************** Data Visualisation Code __ START 
+***************************
+****************************
+******************************
+-->
+
+
+		<script type="text/javascript">
+			
+// Settings (Width and height) from outside to inside
+
+			
+
+			var width = screen.availWidth,
+				height = screen.availHeight,
+
+				padding = {top: 60, right: 60, bottom: 60, left: 60},
+				margin = {top: 20, right: 20, bottom: 30, left: 40};
+
+			
+
+// Load in raw data & THEN...
+			d3.json("data/words_dictionary-test.json").then(function(rawdata) {  //I deleted "jean-christophe": 1, from data. due to - character.
+				// console.log(rawdata); //OK
+
+				const alphabet = ["a","b","c","d","e","f","g","h","i","j","k","l","m","n","o","p","q","r","s","t","u","v","w","x","y","z"];
+				const vowels = ["a","e","i","o","u"];
+				const consonents = ["b","c","d","f","g","h","j","k","l","m","n","p","q","r","s","t","v","w","x","y","z"];
+
+	//Read data
+				var words = Object.keys(rawdata);
+				console.log("words", words); //OK	
+
+	//Data wrangling
+
+			// the length of the longest word	
+				var L = d3.max(words,w => w.length);
+				console.log("max word length", L); //OK
+
+			
+			// Nodes
+
+				var nodes = [];
+				d3.map(alphabet, letter => { for (let i=1; i<=L; i++) {
+												nodes.push({
+															name: letter+i,
+														});
+												}
+											});
+				console.log("nodes", nodes); //OK
+
+				    
+
+
+
+
+		    // Links
+
+				var links = [];
+				var letterByletter = d3.map(words, w => Array.from(w));
+				d3.map(letterByletter, array => { for (let i=0; i<array.length-1; i++) { //single letters of alphabet are excluded from links. & no NaN target is appearing when i<length -1 :)
+													links.push({
+														word : array.join(""), //if you want to keep the word itself.
+														source : array[i]+(i+1),
+														target : array[(i+1)]+(i+2),
+														value : 1,
+														// key : array[i]+(i+1)+array[(i+1)]+(i+2)
+														});
+													}
+												});
+				console.log("links", links); //OK
+
+				
+				
+				// values = d3.rollup(links, g => g.length, obj => obj.key);
+				// // console.log("values", values); //OK
+													
+				// links = d3.map(links, obj => { return {
+				// 										source : obj.source,
+				// 										target : obj.target,
+				// 										value : values.get(obj.key) //if you use rollups, you cannot use get() here!
+				// 									};
+				// 							});
+				// console.log("links", links); //OK
+				
+				values = d3.rollup(links, g => g.length, obj => obj.source+obj.target);
+				console.log("values", values); //OK
+
+			// Data for Sankey
+
+				
+				var data = {
+							nodes : nodes.map(d => Object.assign({}, d)),// using object.assign you make a copy of nodes and links so the source variables are not affected by d3.sankey and remain intact :)
+							links : links.map(d => Object.assign({}, d)) // using object.assign you make a copy of nodes and links so the source variables are not affected by d3.sankey and remain intact :)
+						};
+				console.log("data", data); //OK
+
+
+				// filtered = function(nodename) {
+				// 		d3.filter(data.nodes, this.name 
+				// }
+
+
+				function relatedLinks(node) {
+		      							d3.selectAll(".links > path")
+		      								.style("opacity", path => (path && (path.source.name === node.name || path.target.name === node.name)) ? "1" : "0.1");
+		      						};
+
+				function relatedLinksAll(node) {
+
+										filteredData = d3.filter(words, w => (w[(node.depth+1)-1] == node.name.match(/\w/))); //keeping only those words that are related to the node. words that have the letter the node encodes: node.name.match(/\w/) at the same position w[(node.depth+1) -1 to get the coorect string index in the word.
+										console.log(filteredData); //OK
+										// var selectedLinks = [];
+										// var lByl = d3.map(filteredData, w => Array.from(w));
+										// d3.map(lByl, array => { for (let i=0; i<array.length-1; i++) {
+										// 									selectedLinks.push({
+										// 										word : array.join(""), //if you want to keep the word itself.
+										// 										source : array[i]+(i+1),
+										// 										target : array[(i+1)]+(i+2),
+										// 										value : 1,
+										// 										// key : array[i]+(i+1)+array[(i+1)]+(i+2)
+										// 										});
+										// 									}
+										// 								});
+										// console.log("selectedLinks", selectedLinks); //OK
+										// selectedValues = d3.rollup(selectedLinks, g => g.length, obj => obj.source+obj.target);
+										// console.log("selectedValues", selectedValues); //OK
+
+										// var selectedData = {
+										// 			nodes : nodes.map(d => Object.assign({}, d)),// using object.assign you make a copy of nodes and links so the source variables are not affected by d3.sankey and remain intact :)
+										// 			links : selectedLinks.map(d => Object.assign({}, d)) // using object.assign you make a copy of nodes and links so the source variables are not affected by d3.sankey and remain intact :)
+										// 		};
+										// console.log("selectedData", selectedData); //OK
+										// sankey(selectedData);
+
+										// sankeyChart.select(".nodes")
+										// 			.style("opacity", "0");
+
+										// d3.map(selectedData.nodes, node => { 
+										// 								node.x0 = (node.depth+1)*((width-margin.left-margin.right)/L);
+										// 								node.x1 = node.x0+(((width-margin.left-margin.right)/L)/10); //.nodeWidth(6)
+										// 							}
+										// 					);
+
+										// sankeyChart.append("g")
+										// 			.attr("class", "nodes")
+										// 	    	.selectAll("rect")
+										// 	    	.data(selectedData.nodes)
+										// 	    	.join("rect")
+										// 	     	.attr("x", d => d.x0)
+										// 	      	.attr("y", d => d.y0)
+										// 	      	.attr("height", d => d.y1 - d.y0) //if svg height is not high enough, y0 & y1 for small values will be equal & rect height = zero. :|
+										// 	      	.attr("width", d => d.x1 - d.x0)
+										// 	      	.attr("fill", "white")
+										// 	      	.attr("stroke", "navy")
+										// 	      	.on("mouseover", function(){
+										// 	      						d3.select(this)
+										// 	      							.attr("fill", "navy")
+
+										// 					      	})
+										// 	      	.on("mouseout", function(){
+										// 	      						d3.select(this)
+										// 	      							.attr("fill", "white")
+											      									
+										// 					      	})
+										// 	      	.on("click", function () {
+										// 							      		node = d3.select(this).datum(); //"this" is each <rect>. to reach the bind data you have to use .datum()
+										// 							      		// relatedLinks(node);
+										// 							      		relatedLinksAll(node)
+										// 							      	})
+										// 	    	.append("title")
+										// 	    	.text(d => `${d.name}\n${d.value}`); // d.name.match((/\w/))
+
+										
+
+										// sankeyChart.append("g")
+										// 		    .attr("class", "selectedLinks")
+										// 		    .attr("fill", "none")
+										// 		    .attr("stroke", "darkgreen")
+										// 		    .attr("stroke-opacity", 0.5)
+										// 		    .selectAll("path")
+										// 		    .data(selectedData.links)
+										// 		    .join("path")
+										// 		    .attr("d", d3.sankeyLinkHorizontal())
+										// 		    .attr("stroke-width", 1) //if you want to encode link values with width, generally use d => Math.min(1, d.width) or for our case d => values.get(d.source.name+d.target.name) instead of d.width.
+										// 		    .on("mouseover", function() { 
+										// 								    	d3.select(this)
+										// 								    		.attr("stroke", "navy")
+										// 								    		.attr("stroke-opacity", 1);
+										// 									})
+										// 		    .on("mouseout", function() { 
+										// 								    	d3.select(this).attr("stroke", "darkgreen")
+										// 								    	.attr("stroke-opacity", 0.5);
+										// 								    })
+										// 			.append("title")
+										// 		    .text(d => `${d.source.name} → ${d.target.name}\n${selectedValues.get(d.source.name+d.target.name)}`)
+
+
+										// selectedIndex = d3.map(Array.of(...(d3.union(node.sourceLinks,node.targetLinks))), link => { return { 
+										// 																									linkIndex: link.index,
+										// 																									sourceIndex: link.source.index,
+										// 																									targetIndex: link.target.index }}
+										// 																									);
+
+										// console.log("selectedIndex", selectedIndex); //OK
+
+
+										
+
+										
+
+										
+
+										// d3.select(".nodes")
+										// 	.selectAll("rect")
+										// 	.on("mouseover", function(){
+										// 	      						d3.select(this)
+										// 	      							.attr("fill", "navy")
+
+										// 					      	})
+									 //      	.on("mouseout", function(){
+									 //      						d3.select(this)
+									 //      							.attr("fill", "white")
+									      									
+										// 			      	})
+									 //      	.on("click", function () {
+										// 					      		node = d3.select(this).datum(); //"this" is each <rect>. to reach the bind data you have to use .datum()
+										// 					      		console.log(node); //OK
+										// 					      		// relatedLinks(node);
+										// 					      		relatedLinksAll(node)
+										// 					      	})
+										
+
+									    d3.select(".links")
+											.selectAll("path")
+											.attr("stroke-opacity",  path => (path.source.index == node.index || path.target.index == node.index) ? 1 : 0)
+											.on("mouseover", function() { 
+																    	d3.select(this)
+																    		.attr("stroke", "navy")
+																    		.attr("stroke-opacity", path => (path.source.index != node.index && path.target.index != node.index) ? 0 : 1);
+																	})
+										    .on("mouseout", function() { 
+																    	d3.select(this).attr("stroke", "pink")
+																    	.attr("stroke-opacity", path => (path.source.index != node.index && path.target.index != node.index) ? 0 : 1);
+																    })
+
+
+							      		
+									    
+
+
+
+
+
+																						
+									}
+
+			// Sankey generator
+				sankeyHeight = height*1.2;
+				sankey = d3.sankey()
+					    	.nodeId(d => d.name)
+					      	.nodeAlign(d3.sankeyJustify)
+					      	.nodeWidth((((width-margin.left-margin.right)/L)/10))
+					      	.nodePadding(0)
+					      	.nodeSort(d3.descending) //use null for sort based on input. here I wanted the alphabetic sort for all nodes.
+						    // .linkSort(null)
+					      	.extent([[10,10], [width - 10, sankeyHeight - 10]]);
+
+					      	// .nodes(nodes.map(d => Object.assign({}, d))) // you can also determine nodes & links of the d3.sankey at this step. or give both of the arguments as data {nodes: , links: } format. like sankey(data). 
+					      	// .links(links.map(d => Object.assign({}, d)));
+
+				sankey(data);
+
+				// to put a1,b1,...,z1 on the same line. the same for ba2,b2,...,z2 & ... //no need to worry about links.x0 & x1. they automatically will follow nodes positions :) 
+						// d3.map(data.nodes, node => { for (let i=1; i<=L; i++) { if (i == node.name.match(/\d/) || node.name.match(/\d{2}/)) { // look for the digit by the side of letter. match(/\d/) will result in a1 => 1 or match(/\d{2}/) will result in a10=> 10 :)
+						// 																		node.x0 = i*40;
+						// 																		node.x1 = node.x0+10; //.nodeWidth(6)
+						// 																};
+						// 															};
+						// 										}); 
+
+			// a way better, correct & straightforward way to put a1,b1,...,z1 on the same line. the same for ba2,b2,...,z2 & ... //no need to worry about links.x0 & x1. they automatically will follow nodes positions :) 
+
+				d3.map(data.nodes, node => { 
+											node.x0 = (node.depth+1)*((width-margin.left-margin.right)/L);
+											node.x1 = node.x0+(((width-margin.left-margin.right)/L)/10); //.nodeWidth(6)
+											}
+									);
+
+			// Create Chart
+
+				const graphics = d3.select("#graphics");
+
+				const sankeyChart = graphics.append("svg")
+										.classed("sankey", true)
+										.attr("viewBox", [0, 0, width, sankeyHeight]); //width*1.5
+				
+				sankeyChart.append("g")
+					.attr("class", "nodes")
+			    	.selectAll("rect")
+			    	.data(data.nodes)
+			    	.join("rect")
+			     	.attr("x", d => d.x0)
+			      	.attr("y", d => d.y0)
+			      	.attr("height", d => d.y1 - d.y0) //if svg height is not high enough, y0 & y1 for small values will be equal & rect height = zero. :|
+			      	.attr("width", d => d.x1 - d.x0)
+			      	.attr("fill", "white")
+			      	.attr("stroke", "navy")
+			      	.on("mouseover", function(){
+			      						d3.select(this)
+			      							.attr("fill", "navy")
+
+							      	})
+			      	.on("mouseout", function(){
+			      						d3.select(this)
+			      							.attr("fill", "white")
+			      									
+							      	})
+			      	.on("click", function () {
+									      		node = d3.select(this).datum(); //"this" is each <rect>. to reach the bind data you have to use .datum()
+									      		console.log(node); //OK
+									      		
+									      		relatedLinksAll(node);
+
+									      		
+									      	})
+			    	.append("title")
+			    	.text(d => `${d.name}\n${d.value}`); // d.name.match((/\w/))
+
+			    sankeyChart.append("g")
+				    .attr("class", "links")
+				    .attr("fill", "none")
+				    .attr("stroke", "pink")
+				    .selectAll("path")
+				    .data(data.links)
+				    .join("path")
+				    .attr("d", d3.sankeyLinkHorizontal())
+				    .attr("stroke-width", 1) //if you want to encode link values with width, generally use d => Math.min(1, d.width) or for our case d => values.get(d.source.name+d.target.name) instead of d.width.
+				    .attr("stroke-opacity", 0.5)
+				    .on("mouseover", function() { 
+										    	d3.select(this)
+										    		.attr("stroke", "navy")
+										    		.attr("stroke-opacity", 1);
+											})
+				    .on("mouseout", function() { 
+										    	d3.select(this).attr("stroke", "pink")
+										    	.attr("stroke-opacity", 0.5);
+										    })
+					.append("title")
+				    .text(d => `${d.source.name} → ${d.target.name}\n${values.get(d.source.name+d.target.name)}`)
+
+
+				
+
+
+
+
+
+
+			  // alert("done");
+			});
+
+
+		</script>
+		
+
+
+
+
+					<!-- 
+					// .each() invokes a callback function on each element in the selection:
+
+					function setColor() {
+				      d3.select(this).style('fill', 'steelblue');
+				    }
+				    d3.selectAll('circle').each(setColor);
+				// The above code will iterate through each <circle> element and call setColor. Within the callback function, the ‘this’ keyword is the iterated element. Note that we can also pass an element directly into d3.select().
+
+				// .call() invokes a callback function on the selection itself:
+
+				    function setSelectionFill(selection) {
+				      selection.style('fill', 'steelblue');
+				    }
+				    d3.selectAll('circle').call(setSelectionFill);
+				// The selection itself is passed into the callback function so that the callback can operate on the selection.
+
+				// Both .each() and .call() allow us to write reusable chunks of D3 code and we’ll look at this in more detail in another post. -->
+
+<!-- ****************************** Data Visualisation Code __ END ****************************** -->
+
+
+
+
+		<!-- <script type="text/javascript">  SCOTT FINAL PROJECT - HELP
+
+			//Width and height
+
+			var w = screen.availWidth*0.75;
+			var h = screen.availHeight/2;
+			var padding = 20;
+
+
+			var dataset, xScale, yScale, xAxis, yAxis, area;
+
+			//For converting strings to Dates
+			var parseTime = d3.timeParse("%Y-%m");
+
+			//For converting Dates to strings
+			var formatTime = d3.timeFormat("%b %Y");
+
+
+			//Set up stack method
+			var allStack = d3.stack()
+						  .order(d3.stackOrderAscending);
+			var typeStack = d3.stack()
+						  .order(d3.stackOrderAscending);
+
+			var vehicleStack = d3.stack()
+						  .order(d3.stackOrderAscending);
+			
+
+			var viewState = 0;
+			var viewType;
+
+
+
+			//Load in data & THEN ...
+			d3.text("vehicle_sales_data.csv").then(function(rawdata) {
+
+
+					console.log(rawdata); //OK
+
+
+					//
+					// Parse data from text to JSON format :)
+					//
+
+					var make, 
+						model, 
+						type,
+						makeModel  = [];
+
+					function getData() {
+										dataset = d3.csvParseRows(rawdata, function(d,i) {
+
+											if (i == 0) {
+												d.shift();
+												make = d;
+											}
+											
+											if (i == 1) {
+												d.shift();
+												model = d;
+											}
+
+											if (i == 2) {
+												d.shift();
+												type = d;
+											}
+
+											
+
+											if (i>2) {
+
+												let data = {};
+
+												
+												data.date = parseTime(d[0]);  
+
+
+												data.Sum = { "HEV": 0, "PHEV": 0, "BEV": 0, "FCEV": 0}; 
+
+												d.shift();
+												for (var k=0; k<d.length;k++) {  
+													
+													var newKey = make[k] + " " + model[k];
+
+													var newObj = {
+														make : make[k],
+														model : model[k],
+														type : type[k],
+														sales : +d[k]
+													}
+
+													data[newKey]=newObj;
+
+
+													switch (newObj.type) {
+														case "HEV":
+															data.Sum.HEV += newObj.sales;
+															break;
+														case "PHEV":
+															data.Sum.PHEV += newObj.sales;
+															break;
+														case "BEV":
+															data.Sum.BEV += newObj.sales;
+															break;
+														case "FCEV":
+															data.Sum.FCEV += newObj.sales;
+															break;
+													}
+
+												}
+
+
+												
+												
+												return data;
+												
+											}
+
+										});
+									}
+
+					getData();
+
+
+					console.log(dataset); //OK
+
+					//////////////////////////////////////////////////////////// KEEP a copy of initial dataset. BUT this DOES NOT WORK!!! any mutation on dataset is transferred to mainDataset!!!
+
+					// const mainDataset = dataset;
+					// Object.freeze(mainDataset);
+								
+					// const mainDataset = [];
+					// dataset.forEach(d => mainDataset.push(Object.assign({}, d)));
+
+					// for (k of mainDataset) {
+					// 	Object.freeze(mainDataset[k]);
+					// };
+
+					// console.log(mainDataset);  //OK
+					// var mainDataset = {};
+					// for (element in dataset) {
+					// 	mainDataset[element] = dataset[element];
+					// };
+					// Object.freeze(mainDataset);
+					// console.log(mainDataset);
+
+					////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+
+					
+					
+					
+					
+
+
+
+
+					//
+					// MAKE THE CHART
+					//
+				
+					//Create scale functions 
+					xScale = d3.scaleTime()
+							   .domain([
+									d3.min(dataset, function(d) { return d.date; }),
+									d3.max(dataset, function(d) { return d.date; })
+								])
+							   .range([padding, w - padding * 2]);
+				
+					
+
+					yScale = d3.scaleLinear()
+								.domain([
+									0,
+									d3.max(dataset, function(d) {
+										var sum = 0;
+										for (q in d.Sum) {
+											sum += d.Sum[q];
+										};
+										return sum;
+									})
+								])
+								.range([h - padding, padding / 2])
+								.nice();	
+
+					//Define axes
+					xAxis = d3.axisBottom()
+							   .scale(xScale)
+							   .ticks(10)
+							   .tickFormat(formatTime);
+				
+					
+					yAxis = d3.axisRight()			
+							   .scale(yScale)
+							   .ticks(5);
+				
+					area = d3.area()
+								.x(function(d) { return xScale(d.data.date); })
+								.y0(function(d) { return yScale(d[0]); })
+								.y1(function(d) { return yScale(d[1]); });
+
+
+
+					//Create SVG element
+					
+					
+
+					var svgChart = d3.select("#container #graphic #chart")
+								.append("svg")
+								.attr("width", w)
+								.attr("height", h);
+
+
+
+					//Create a group for our graph
+					var graph = svgChart.append("g")
+									.attr("id", "Graph");
+
+					//Create axes
+					svgChart.append("g")
+						.attr("class", "axis x")
+						.attr("transform", "translate(0," + (h - padding) + ")")
+
+					svgChart.append("g")
+						.attr("class", "axis y")
+						.attr("transform", "translate(" + (w - padding * 2) + ",0)")
+
+
+					var guide = svgChart.append("g")
+									.attr("id", "Guide")
+									.classed("unclickable", true);
+									
+					
+							
+					guide.append("text")
+							.attr("x", padding/2 -2 )
+							.attr("y", 25+(14/2)/2);
+					
+
+
+
+					var svgControl = d3.select("#container #graphic #control-panel")
+								.append("svg")
+								.attr("width", w)
+								.attr("height", h/3);
+
+					//Create back button
+					var backButton = svgControl.append("g")
+										.attr("id", "BackButton")
+										.classed("unclickable, hidden", true)
+										.attr("transform", "translate(" + xScale.range()[0] + "," + yScale.range()[1] + ")");
+
+
+					
+
+					backButton.append("rect")
+								.attr("x", 0)
+								.attr("y", 0)
+								.attr("height", 50);
+							
+					backButton.append("text")
+								.attr("x", padding/2 -2 )
+								.attr("y", 25+(14/2)/2)
+
+					
+					
+					var updateAxis = function() {
+							d3.select(".axis.y")
+								.transition()
+								.duration(300)
+								.call(yAxis);
+							d3.select(".axis.x")
+								.transition()
+								.duration(300)
+								.call(xAxis);
+
+					};
+
+					var showTooltip = function() {
+						graph.selectAll("title")
+							.remove();
+
+						graph.selectAll(".area")
+							.append("title")
+							.text(function(d) {
+								return d.key;
+								});
+					};
+
+
+					var showAllTypes = function() {
+						getData();  
+						//////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////// 
+						// the most important & necessary part that "dataset" needs a reset is this part. aftershowAllTypes, "dataset" is not changed. it enters "singleType" function & it will be changed (to "filtereddataset") unless you use getData(); 
+						// in "singleType" too. but it is not necessary & the "filtereddataset" is enough to draw the chart at that level. 
+						// the changed "dataset" (="filtereddataset") will enter "singleVehicle" & won't be changed anymore. & no filtering is needed at this level. only using thisKey for stacking part is enough :)
+						////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+
+						// console.log(dataset);  //OK
+
+						//
+						// STACKING for each type
+						//
+						var keys = Object.keys(dataset[0].Sum);
+						allStack.keys(keys)
+							.value(function value(d, key) { 
+								return d.Sum[key];
+							});
+						var typeSeries = allStack(dataset);
+
+						viewState = 0;
+
+						graph.selectAll("path")
+						.data(typeSeries)
+						.join("path")
+						.attr("class", "area")
+						.attr("d", area)
+						.attr("fill", function(d) {
+								var color;
+								switch (d.key) {
+									case "HEV":
+										color = d3.schemeCategory10[9];
+										break;
+									case "PHEV":
+										color = d3.schemeCategory10[4];
+										break;
+									case "BEV":
+										color = d3.schemeCategory10[8];
+										break;
+									case "FCEV":
+										color = d3.schemeCategory10[6];
+										break;
+								}
+								
+								return color;
+							});
+
+
+
+						//Add Interactivity
+						graph.selectAll(".area")
+							.call(showTooltip)
+							.call(updateAxis)
+							.on("click", showSingleType);
+
+
+						let guideText = "";
+						guide.select("text")
+								.html(guideText);
+					};
+
+					var showSingleType = function(event,d) {
+							// getData();  // it seems there's no need. because "dataset" is not changed in "showAllTypes"
+							// console.log(dataset);  //OK
+							
+
+							viewState = 1;
+							backButton.classed("unclickable, hidden", false);
+
+							var thisKey = d.key; 
+
+							function filter (inputdata) {
+								for (d of inputdata) {
+									for (k in d) {
+										if (k!= "date" && k!="Sum" && d[k].type != thisKey) {
+											delete d[k];
+										}
+									}
+								}
+								return inputdata;
+							};
+
+							var filtereddataset = filter (dataset);
+							// console.log(dataset);    //Here you see that dataset is changed! so better to have a copy of it before everything happens!!!
+							// console.log(filtereddataset); //OK
+
+
+							///////////////////// this alternative is not working BUT WHY ???!!!! 
+							// var filtereddataset = dataset.filter(d => function(d){
+							// 										for (k in d) {
+							// 											if (k!= "date" && k!="Sum" && d[k].type != thisKey) {
+							// 												return false;
+							// 											};
+							// 										};
+
+							// 									});
+							////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////// still not working  :(( 
+									// function callback (d) {
+									// 		for (k in d) {
+									// 			return !(k!= "date" && k!="Sum" && d[k].type != thisKey);
+									// 	};
+									// };
+									// var filtereddataset2 = dataset.filter(callback);
+									// console.log(filtereddataset2);
+									// console.log(dataset);
+
+
+							//////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+
+							var keys = Object.keys(dataset[0]);
+							keys.splice(keys.indexOf("date"),1);
+							keys.splice(keys.indexOf("Sum"),1);
+
+							typeStack.keys(keys)    					
+								.value(function value(d, key) { 
+									
+									return d[key].sales;
+									
+								});
+							
+							var detailedSeries = typeStack(filtereddataset);
+
+							var paths = graph.selectAll("path")
+										.data(detailedSeries)
+										.join("path")
+										.attr("class", "area");
+
+
+
+							paths.classed("specifictype", true);
+
+							var t = paths.transition()
+								.duration(500)
+								.on("start", function(){
+									paths.classed("unclickable", true); 
+								})
+								.attr("d", area)
+								.attr("fill", "black");
+										
+
+							yScale.domain([
+									0,
+									d3.max(filtereddataset, function(d) {
+										var sum = 0;
+										for (q in d) { 		
+											if (q != "date" && q!= "Sum") {
+												sum += d[q].sales;
+											}
+										};
+										return sum;
+									})
+								]);
+
+							xScale.domain([
+									d3.min(filtereddataset, function(d) {
+																for (q in d) {
+																	if (d[q].sales > 0) {
+																		return d.date;
+																	}
+																}
+															}),
+									d3.max(filtereddataset, function(d) {
+																for (q in d) {
+																	if (d[q].sales > 0) {
+																		return d.date;
+																	}
+																}
+															})
+								]);
+
+								
+							t.transition()
+								.delay(200)
+								.duration(300)
+								.on("start", updateAxis)
+								.duration(300)
+								.on("end", function() {
+									graph.selectAll(".area")
+									.classed("unclickable", false);
+								})
+								.attr("d", area)			
+								.attr("fill", function(d,i) { 
+										var thisKey = d.key;
+										var thisType = d[0].data[thisKey].type;
+										var spread = 0.2;
+										var n = keys.length;
+										var normalized = 0.3 + ((i / n) * spread);
+										
+										switch (thisType) {
+											case "HEV":
+												guide.select("text")
+													.attr("fill", d3.schemeCategory10[9]);
+												return d3.interpolateCool(normalized);
+
+												break;
+											case "PHEV":
+												guide.select("text")
+													.attr("fill", d3.schemeCategory10[4]);
+												return d3.interpolateCool(normalized-0.3);
+												break;
+											case "BEV":
+												guide.select("text")
+													.attr("fill", d3.schemeCategory10[8]);
+												return d3.interpolateCool(normalized+0.3);
+												break;
+											case "FCEV":
+												guide.select("text")
+													.attr("fill", d3.schemeCategory10[6]);
+												return d3.interpolateWarm(0.1+normalized);
+												break;
+										}
+										
+									});
+
+								
+
+							var vehicles = graph.selectAll(".area.specifictype");
+							
+							vehicles.call(showTooltip)
+									.on("click", showSingleVehicle);
+					
+
+							// console.log(dataset);  //OK
+
+							let buttonText = "&larr; Back to all types";
+							// console.log(backButton.select("text").node().getBBox().width);
+							backButton.select("text")
+									.html(buttonText);
+							let textWidth = Math.round(backButton.select("text").node().getBBox().width) + padding ;
+							backButton.select("rect")
+									.attr("width", textWidth);
+
+							let guideText = "all vehicles of type " + thisKey;
+							guide.select("text")
+									.html(guideText);
+
+							let toTransfertoCenter = (xScale.range()[1]-xScale.range()[0])/2 - guide.select("text").node().getBBox().width/2;
+							guide.attr("transform", "translate(" +  toTransfertoCenter + "," + yScale.range()[1] + ")");
+
+
+					};
+
+
+					var showSingleVehicle = function(event,d) {
+							// getData(); 
+							
+							// console.log(dataset);  //OK
+
+							viewState= 2;
+
+							var thisElement = d3.select(this);
+							
+							
+							var thisKey = [d.key];
+
+
+							/////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+							// it seems that there is no need to filter "dataset". it's enough to use the only related key (meaning thisKey = [d.key] in stack.keys(thisKey). it automatically applys a filtering on "dataset" at var singleVehicleSeries = stack(dataset); step. )
+
+							// function singleKey (inputdata) {
+							// 	for (d of inputdata) {
+							// 		for (k in d) {
+							// 			if (k!= "date" && k!="Sum" && k != thisKey[0]) {
+							// 				delete d[k];
+							// 			}
+							// 		}
+							// 	}
+							// 	return inputdata;
+							// };
+
+							
+							// var singleVehicle = singleKey(dataset);
+							// console.log(singleVehicle); //OK
+
+							// ///////////////////// this alternative works for singleVehicle. but not the other?! NO! It's not even working here!!! BUT WHY?
+
+							
+							// var singleVehicle = dataset.filter(d => function(d) {
+							// 										for (k in d) {
+							// 											if (k!= "date" && k!="Sum" && k != thisKey[0]) {
+							// 												return false;
+							// 											};
+							// 										};
+							// 									});   
+
+							// console.log(singleVehicle);
+	
+							 
+							/////////////////////////////// useless efforts to figure out .filter() // here "singleVehicle" will be the data bind to "path"s in previous step meaning "singleType" meaning "filtereddataset" ///////////////////////////////
+							/////////////////////////////////////////////////////////////////////////////////////////////
+							/////////////////////////////////////////////////////////////////////////////////////////////
+							// var singleVehicle = graph.selectAll("path")
+							// 						.filter(d => function callback(d,i,dataset) {
+							// 							for (k in d) {
+							// 								if (k!= "date" && k!="Sum" && k != thisKey[0]) {
+							// 									return false;
+							// 								};
+							// 							};
+							// 						})
+							// 						.data()
+							// console.log(singleVehicle);
+							/////////////////////////////////////////////////////////////////////////////////////////////
+							/////////////////////////////////////////////////////////////////////////////////////////////
+							/////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+							vehicleStack.keys(thisKey)
+								.value(function value(d, key) { 
+									return d[key].sales;
+								});
+
+							var singleVehicleSeries = vehicleStack(dataset);
+
+
+							var paths = graph.selectAll("path")
+										.data(singleVehicleSeries)
+										.join("path")
+										.attr("class", "area"); 
+
+							paths.classed("specificvehicle unclickable", true);
+
+
+
+
+							/////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+							// for updating yScale & xScale, use "dataset" + thisKey[0].sales information if you're NOT filtering the "dataset" at prior steps. If you are filtering "dataset" & you declare "singleVehicle" , then you can use it for yScale & xScale.
+							
+							yScale.domain([0,
+									d3.max(dataset, function(d) {
+																return d[thisKey[0]].sales;
+															})
+								]);
+
+							xScale.domain([
+									d3.min(dataset, function(d) {
+																if (d[thisKey].sales > 0) {
+																	return d.date;
+																}
+															}),
+									d3.max(dataset, function(d) {
+																if (d[thisKey].sales > 0) {
+																	return d.date;
+																}
+															})
+								]);
+							/////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+
+
+
+
+
+							var tt = paths.transition()
+										.duration(1200)
+										.attr("d", area);
+							
+
+							tt.transition()
+								.delay(200)
+								.duration(1000)
+								.on("start", updateAxis)
+								.attr("fill", "turquoise");
+
+							
+							thisElement.attr("fill","blue");
+
+							graph.selectAll(".area")
+								.call(showTooltip);
+
+
+							// console.log(singleVehicleSeries[0][0].data[thisKey].type);  //OK	
+
+							let buttonText = "&larr; Back to all vehicles of " + singleVehicleSeries[0][0].data[thisKey].type + " type" 
+							backButton.select("text")
+									.html(buttonText);
+
+							// console.log(backButton.select("text").node().getBBox().width);
+							var textWidth = Math.round(backButton.select("text").node().getBBox().width) + padding ;
+							backButton.select("rect")
+									.attr("width", textWidth);
+
+							let guideText = singleVehicleSeries[0][0].data[thisKey].type + " || " + thisKey;
+							guide.select("text")
+									.html(guideText)
+									.transition()
+									.delay(1000)
+									.duration(1000)
+									.attr("fill", "teal");
+
+							let toTransfertoCenter = (xScale.range()[1]-xScale.range()[0])/2 - guide.select("text").node().getBBox().width/2;
+							guide.attr("transform", "translate(" +  toTransfertoCenter + "," + yScale.range()[1] + ")");
+
+
+	
+								
+					};
+
+					var goBack = function(event) {
+						
+						if (viewState == 1) { 
+								
+								// viewState--;
+
+								
+
+								xScale.domain([
+												d3.min(dataset, function(d) { return d.date; }),
+												d3.max(dataset, function(d) { return d.date; })
+											]);
+							
+								
+
+								yScale.domain([
+												0,
+												d3.max(dataset, function(d) {
+													var sum = 0;
+													for (q in d.Sum) {
+														sum += d.Sum[q];
+													};
+													return sum;
+												})
+											]);	
+
+
+							    
+
+								showAllTypes();
+
+								backButton.classed("unclickable, hidden", true);
+
+								
+
+						} else if (viewState == 2) {
+
+								// viewState--;
+
+								var d = graph.select("path").data();
+
+								viewType = d[0][0].data[d[0].key].type;
+								
+								var helper = {
+									"key" : viewType
+								};
+
+								
+
+
+								showSingleType(this,helper);   /////////////////////////////////////////////////////////////////////////////////////////// ok. since the input for showSingleType is (event,d) & d must be an object with "key" property, here I put viewType in "key" property of a helper and use it as an input for showSingleType function. it must be used as the 2nd argument. the first argument is not used in showSingleType function . BUT we have to put sth in its place. it can be "this" or any other defined thing! just a fake input.... showSingleType(1,helper); ///////////////////////////////////////////////////////////////////////////////////////////
+
+							
+						} else {
+							console.log("default view");
+							backButton.classed("unclickable, hidden", true);
+						};
+						
+					};
+
+
+					
+
+
+					
+					
+					
+
+
+					showAllTypes();
+
+					//Add Interactivity for Button
+					backButton.on("click", goBack);
+
+			
+			});
+
+		</script> --> 
+	</body>
+</html>

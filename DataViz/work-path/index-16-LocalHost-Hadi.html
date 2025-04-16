@@ -1,0 +1,698 @@
+<!DOCTYPE html>
+<html lang="en">
+    <head>
+        <meta charset="utf-8">
+		<title>Darya-Yarparvar__Graphic Designer</title>
+		<meta name="description" content="Darya Yarparvar * Graphic Designer * Birmingham, UK * Open to work! ** Please visit my personal website and view my works. ** I would be more than happy to be of any help to your creative projects! **">
+		<meta name="author" content="© 2021 Darya Yarparvar. All rights reserved.">
+
+		<meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=no">
+
+		<link rel="preconnect" href="https://use.typekit.net/mok3rgv.css">
+		
+		
+		<link rel="stylesheet" type="text/css" href="css/style.css">
+
+
+		<link rel="stylesheet" type="text/css" href="css/icon-style.css">
+		<link rel="stylesheet" href="https://use.typekit.net/mok3rgv.css">
+
+
+		<base target="_blank">
+
+
+
+        <script type="text/javascript" src="js/d3.js"></script>
+        <script type="text/javascript" src="js/d3-sankey.js"></script>
+       	
+	</head>
+	<body>
+		
+		
+		<div id="wrapper">
+			<div id="container" class="grid">
+				
+				<div id="context">
+					<h1 id="heading">Scrabble Sankey</h1>
+					<h3 id="intro">I could not resist choosing a playful subject to practice Sankey diagram... and I love word games! So here it is: <em>the scrabble sankey</em>! Play with it and have fun!</h3>
+					<p><br><br>Words are strings of letters (spread horizontally). Each node represents a letter at a specific position. Each link connects two adjacent letters of a word.<br><br>This Sankey diagram is a multilevel network idiom that combines a node-link diagram with a derived cluster hirearchy, intending the path tracing as the main desired task.</p>
+				</div>
+					
+				<div id="userGuide">
+					<h2>How to use this visualisation:</h2>	
+					<p>First, set the upper limit for words' length using the slider (the default is set to the longest word in the dataset).<br><br>Click on a node to narrow down the current word list to those words that have the selected letter at the selected position.<br><br>Click on a link to narrow down the current word list to those words that have the selected consecutive letters at those specific positions.<br><br>If you click on the slider without changing its value, the word list filteration caused by clicking node/link will be reset to none.<br><br>You can download the list of the words at whatever step you like :)</p>
+				</div>
+					
+				
+				<!-- <div id="legend">
+						<h3>How to read the chart</h3>	
+				</div> -->
+
+
+
+				<div id="slider">
+				  	<label for="wordLength">Set the word length limit</label>
+					<input type="range" min="1" max="31" value="10" id="wordLength">
+				</div>
+
+				<div id="output">
+					<h3>How many words?</h3>
+					<span></span>
+				</div>
+
+
+				<div id="reset">
+					<a class="button">Reset to the whole dataset</a>
+				</div>
+
+			  	<div id="list">
+					<a href="" download="selected-word-list.txt" class="button">Download the word list</a>
+				</div>
+
+
+				<div id="graphics">
+
+				</div>
+
+
+				<!-- <div id="file">
+				  	<label for="dataFile">You can upload your own word list [in .txt format] & play with the diagram! </label>
+					<input type="file" name="loadData" id="dataFile">
+				</div> -->
+
+
+				<div id="footnotes">
+						<h2>footnotes & methods</h2>	
+				</div>
+
+
+
+					
+			</div>
+				
+
+
+				
+				
+				
+
+
+
+
+				
+
+
+
+			</div>
+			
+			
+		</div>
+
+<!--
+*****************************
+****************************
+***************************
+************************** Data Visualisation Code __ START 
+***************************
+****************************
+******************************
+-->
+
+
+		<script type="text/javascript">
+			
+// Settings (Width and height) from outside to inside
+
+			
+
+			var width = screen.availWidth,
+				height = screen.availHeight,
+
+				padding = {top: 60, right: 60, bottom: 60, left: 60},
+				margin = {top: 60, right: 50, bottom: 60, left: 50};
+				deltaAxis = 40;
+
+			
+
+// Load in raw data & THEN...
+			d3.json("data/words_dictionary-test.json").then(function(rawdata) {  //I deleted "jean-christophe": 1, from data. due to - character.
+				// console.log(rawdata); //OK
+
+				const alphabet = ["a","b","c","d","e","f","g","h","i","j","k","l","m","n","o","p","q","r","s","t","u","v","w","x","y","z"];
+				const vowels = ["a","e","i","o","u"];
+				const consonents = ["b","c","d","f","g","h","j","k","l","m","n","p","q","r","s","t","v","w","x","y","z"];
+
+	//Read data
+				var mainWords = [...d3.difference(Object.keys(rawdata),alphabet)]; //exclude alphabet because they are single letters & no node/link meaning.
+				console.log("mainWords", mainWords); //OK	
+
+	//Data & Funcitons
+
+				
+
+
+				
+				// the length of the longest word	
+				// L = d3.max(mainWords, w => w.length);   //if you define L outside prepareData function by using mainWord instead of inputdata of prepareData & use L instead of d3.max(mainWords, w => w.length) in this part : words = filterbyLength(mainWords, d3.max(mainWords, w => w.length));, then L will be fixed to max length of mainWords & the placement of nodes wont be updated by interactivity at prepareData step and then at generateSakey steps.
+				// console.log("max word length", L); //OK
+				
+
+				
+				// Slider
+				// set slider intial value to max length of the whole dataset
+				d3.select("#wordLength")
+					.node()
+					.setAttribute("max", d3.max(mainWords, w => w.length));
+				d3.select("#wordLength")
+					.node()
+					.setAttribute("value", d3.max(mainWords, w => w.length));
+
+				d3.select("#slider")
+					.append("span")
+					.text(d3.select("#wordLength").node().value);
+
+				// Output
+				d3.select("#output")
+					.select("span")
+					.text(mainWords.length);
+
+
+				function prepareData(inputData) {
+
+					console.log("inputData in prepareData scope", inputData); //OK
+
+					
+					//the length of the longest word	
+					L = d3.max(inputData, w => w.length);
+					console.log("max word length", L); //OK
+					
+
+					// Nodes
+					var nodes = [];
+					d3.map(alphabet, letter => { for (let i=1; i<=L; i++) {
+													nodes.push({
+																name: letter+i,
+															});
+													}
+												});
+					console.log("nodes", nodes); //OK
+
+				    // Links
+					var links = [];
+
+					var letterByletter = d3.map(inputData, w => Array.from(w));
+					d3.map(letterByletter, array => { for (let i=0; i<array.length-1; i++) {
+														links.push({
+															word : array.join(""),
+															source : array[i]+(i+1),
+															target : array[(i+1)]+(i+2),
+															value : 1,
+															});
+														}
+													});
+					console.log("links", links); //OK
+
+					values = d3.rollup(links, g => g.length, obj => obj.source+obj.target);
+					console.log("values", values); //OK
+
+					// Data for Sankey
+					var data = {
+								nodes : nodes.map(d => Object.assign({}, d)),
+								links : links.map(d => Object.assign({}, d))
+							};
+					console.log("data in prepareData scope", data); //OK
+
+					return {data : data,
+							L : L} ;
+					
+
+				};
+
+				
+				
+				function highlightAdjLinks(node) {
+				    d3.select(".links")
+						.selectAll("path")
+						.attr("stroke-opacity",  path => (path.source.index == node.index || path.target.index == node.index) ? 1 : 0.3)
+						.attr("stroke", path => (path.source.index == node.index || path.target.index == node.index) ? "DarkSalmon" : "DarkSeaGreen");
+				};
+
+				function unhighlightAdjLinks(node) {
+				    d3.select(".links")
+						.selectAll("path")
+						.attr("stroke-opacity",  path => (path.source.index == node.index || path.target.index == node.index) ? 0.3 : 0.3)
+						.attr("stroke", path => (path.source.index == node.index || path.target.index == node.index) ? "DarkSeaGreen" : "DarkSeaGreen");
+					
+				};
+
+
+				function highlightNodes(node1,node2) {
+				    d3.select(".nodes")
+						.selectAll("rect")
+						.attr("fill", rect => (rect.index == node1 || rect.index == node2) ? "navy" : "white");
+				};
+
+
+				function filterbyNL(inputData, node, prevFilteredData) {
+					nextFilteredData = d3.filter(prevFilteredData, w => (w[(node.depth+1)-1] == node.name.match(/\w/)));
+					console.log("prevFilteredData in filter scope", prevFilteredData); //OK
+					console.log("nextFilteredData in filter scope", nextFilteredData); //OK
+					return nextFilteredData;
+				};
+
+
+				function filterbyLength(inputData, lengthLimit) {
+					limitedData = d3.filter(inputData, w => (w.length <= lengthLimit));
+					console.log("limitedData in filterbyLength scope", limitedData); //OK
+					return limitedData;
+				};
+			
+
+			// Sankey generator
+				var sankeyHeight = 660 - margin.top - margin.bottom - deltaAxis; //height*1.2;
+
+				function generateSankey(inputData, permission) {   //better to use prepareData inside this function. data still will be available at global scope. and you have control on updating sankey generator based on filtered data.
+					
+					// console.log("data in generateSankey scope", data); //here data is not defined yet. and so not L.
+					data = prepareData(inputData).data;
+					L = prepareData(inputData).L; //the first time you are gonna define data. data will be at global scope.
+					console.log("data in generateSankey scope", data); // OK.  here data is defined. and so is L :)
+					console.log("L in generateSankey scope", L); // OK.  here data is defined. and so is L :)
+
+					// Sankey generator
+					sankey = d3.sankey()
+						    	.nodeId(d => d.name)
+						      	.nodeAlign(d3.sankeyJustify)
+						      	.nodeWidth((((width-margin.left-margin.right)/(L+1))/5))
+						      	.nodePadding(0)
+						      	// .nodeSort((node1,node2) => d3.ascending(node1.name, node2.name)) //use null for sort based on input. here I wanted the alphabetic sort for all nodes.
+							    .linkSort(d3.descending) // it seems without node sorting the results are better!!!! no node crashing ?!?!?!?!?!?!!?!?!!?!?
+						      	.extent([[1,1], [width- 1, sankeyHeight- 1]])
+
+
+
+					
+					sankey(data);
+
+					// fixing the place of a..z nodes at each position (parallel lines with fixed x , width & distance)
+					d3.map(data.nodes, node => { 
+												distance = (width-margin.left-margin.right)/(L+1);
+												nodeWidth = distance/5;
+
+												node.x0 = (node.depth+1)*distance-(nodeWidth/2);
+												node.x1 = node.x0+nodeWidth;
+
+												name = node.name.match(/\w/);
+												nodeHeight= (sankeyHeight)/(26);
+												if (!permission) {
+													console.log(name); //OK
+													d3.map(alphabet, letter => (name==letter) ? node.y0 = alphabet.indexOf(letter)*nodeHeight : 0);  //(margin.bottom-margin.top) + 
+													node.y1 = node.y0 + nodeHeight;
+												};
+												
+											}
+									);
+
+					// fixing the place of links. so all links between two specific nodes are on top of each other. & also each node only encodes the item. and NOT the value. all nodes will have equal length. (fixed y & length)
+					d3.map(data.links, link => { 
+												link.y0 = (link.source.y0+link.source.y1)/2;
+												link.y1 = (link.target.y0+link.target.y1)/2;
+											}
+									);
+				}
+
+
+				words = filterbyLength(mainWords, d3.max(mainWords, w => w.length)); //if you define L outside prepareData function by using mainWord instead of inputdata of prepareData & use L instead of d3.max(mainWords, w => w.length), then L will be fixed to max length of mainWords & the placement of nodes wont be updated by interactivity at prepareData step and then at generateSakey steps.
+				generateSankey(words, false);
+				
+
+				
+
+			// Create Chart
+
+				const graphics = d3.select("#graphics");
+				const sankeyChart = graphics.append("svg")
+										.classed("sankey", true)
+										.attr("viewBox", [0, 0, width, sankeyHeight + margin.top + margin.bottom + deltaAxis]); //width*1.5
+				
+				
+				function drawSankey(inputData, permission) {
+
+					console.log("data in drawSankey scope", data); //OK
+					// data = prepareData(words); //somehow this line causes an error. I could not figure out why!? Maybe because its already defined?!?!
+					
+					if (!permission) { nextFilteredData = words;} else {nextFilteredData = nextFilteredData;} ; //here if any of nodes has been already clicked the nextFilterData wont be reset to words :) so consecutive clicking will result in step by step filtering and selection of words based on each clicked node & ultimately shrinking the inputData :)
+
+					// Nodes
+					sankeyChart.append("g")
+								.attr("class", "nodes")
+								.attr("transform", "translate(" + margin.left + "," + (margin.top + deltaAxis) + ")")
+						    	.selectAll("rect")
+						    	.data(data.nodes)
+						    	.join("rect")
+						     	.attr("x", d => (d.value!=0) ? d.x0 : 100) //100 is just a random number to be able to see any irrelevent nodes.  Use d.x0+1 if you want a bit dettachment from links
+						      	.attr("y", d => (d.value!=0) ? d.y0 : 100) //100 is just a random number to be able to see any irrelevent nodes.
+						      	.attr("height", d => (d.value!=0) ? (d.y1 - d.y0) : 0) //set the width & height of irrelevent nodes to 0.
+						      	.attr("width", d => (d.value!=0) ? (d.x1 - d.x0) : 0) // Use (d.x1 - d.x0)-2 if you want a bit dettachment from links
+						      	.on("mouseover", function(event, node) {
+										      		nodeData = this.__data__;
+						      						d3.select(this) //"this" is each <rect>
+						      							.attr("fill", "navy")
+						      						d3.select(".nodesLabel")
+						      							.append("text")
+						      							.attr("class", "temporary")
+						      							.text((nodeData.value != 0) ? `${nodeData.name.match(/\w/)}`: "")
+						      							.attr("x", (nodeData.x0+nodeData.x1)/2)
+												      	.attr("y", (nodeData.y0+nodeData.y1)/2 +2)
+												   		.attr("font-size", "10")
+												   		.attr("font-weight", "300")
+												   		.attr("text-anchor", "middle")
+												   		.attr("fill", "DarkSalmon");
+						      						highlightAdjLinks(node); //node as the second input of a function applied on an event is directly the bind data itself.
+
+										      	})
+						      	.on("mouseout", function(event, node){
+						      						d3.select(this)
+						      							.attr("fill", "white");
+
+						      						d3.selectAll(".temporary")
+														.attr("fill", "navy");
+
+						      						// unhighlightAdjLinks(node);
+						      									
+										      	})
+						      	.on("click", function (event, node) {
+						      						permissionNode = true; //when permissionNode is true, it means a node has been clicked. so nextFilteredData will NOT be reset to "wrods" each time the drawSankey is called to draw an updated diagram based on the most recent inputData :)
+													var prevFilteredData = nextFilteredData;
+						      						nextFilteredData = filterbyNL(inputData,node,prevFilteredData);
+						      						sankeyChart.select(".nodes").remove();
+						      						sankeyChart.select(".links").remove();
+						      						d3.select(".nodesLabel").remove();
+						      						d3.select(".axis").remove();
+
+
+						      						d3.select("#output")
+						      							.select("span")
+						      							.text(nextFilteredData.length);
+
+						      						generateSankey(nextFilteredData,permissionNode); // "data" in global scope is affected when generateSankey & inside it prepareData functions are called at each click.
+						      						drawSankey(nextFilteredData, permissionNode); //the problem is that nextFilteredData is set to words each time sankeyDraw is called.
+						      						
+						      						console.log("words on node click", words);
+						      						console.log("data on node click", data); //OK Not only at this functions scope, but also in global scope "data" is affected when generateSankey & inside it prepareData functions are called at each click.
+						      						console.log("prevFilteredData on node click", prevFilteredData); //OK
+													console.log("nextFilteredData on node click", nextFilteredData); //OK
+						      						highlightAdjLinks(node);
+
+						      						
+												      	})
+						      	.attr("fill", "white")
+						      	.attr("stroke", "navy")
+						    	.append("title")
+						    	.text(d => `${d.value}`); // ${d.name}\n${d.value}
+
+					// Node Labels
+
+			    	sankeyChart.append("g")
+						    	.attr("class", "nodesLabel")
+								.attr("transform", "translate(" + margin.left + "," + (margin.top + deltaAxis) + ")")
+								.selectAll("text")
+								.data(data.nodes)
+								.join("text")
+								.text(d => (d.value != 0) ? `${d.name.match((/\w/))}`: "")  
+								.attr("x", d => d.x0+(((width-margin.left-margin.right)/(L+1))/10)) // x0 + nodeWidth/2
+						      	.attr("y", d => (d.y0+d.y1)/2 +2) // +2 comes from this : lineheight(set equal to 1.2*fontsize at the * {} in style.css) - labelfontsize = 12 - 10 = 2 :)
+						   		.attr("font-size", "10")
+						   		.attr("font-weight", "300")
+						   		.attr("text-anchor", "middle")
+						   		.attr("fill", "navy");
+
+					// Links
+				    sankeyChart.append("g")
+							    .attr("class", "links")
+								.attr("transform", "translate(" + margin.left + "," + (margin.top + deltaAxis) + ")")
+							    .selectAll("path")
+							    .data(data.links)
+							    .join("path")
+							    .attr("d", d3.sankeyLinkHorizontal())
+							    .attr("stroke-width", 1) //if you want to encode link values with width, generally use d => Math.min(1, d.width) or for our case d => values.get(d.source.name+d.target.name) instead of d.width.
+							    .attr("stroke-opacity", 0.3)
+							    .on("mouseover", function(event, node) { 
+													    	d3.select(this)
+													    		.attr("stroke", (this.getAttribute("stroke")=="DarkSalmon") ? "Tomato" : "navy")
+													    		.attr("stroke-opacity", 1);
+
+													    	index1 = node.source.index;
+													    	index2 = node.target.index;	
+													    	highlightNodes(index1,index2);
+														})
+							    .on("mouseout", function(event, node) { 
+													    	d3.select(this).attr("stroke", (this.getAttribute("stroke")=="Tomato") ? "DarkSalmon" : "DarkSeaGreen")
+													    	.attr("stroke-opacity", (this.getAttribute("stroke")=="DarkSalmon") ? 1 : 0.3);
+
+													    	d3.select(".nodes")
+																.selectAll("rect")
+																.attr("fill", "white");
+													    })
+							   .on("click", function(event, node) { 
+							    							node1 = node.source;
+													    	node2 = node.target;
+
+													    	permissionLink = true; //when permissionLink is true, it means a link has been clicked. so nextFilteredData will NOT be reset to "wrods" each time the drawSankey is called to draw an updated diagram based on the most recent inputData :)
+															var prevFilteredData = nextFilteredData;
+								      						nextFilteredData = Array.from(d3.intersection(filterbyNL(inputData,node1,prevFilteredData),filterbyNL(inputData,node2,prevFilteredData)));  // I had to add Array.from here, comparing to click on node. to have nextFilteredData is an array format. I could not figure out why the results are different when I click on node or link. anyway it's OK now :) even when nextFilteredData is a Set, the code & function works. the only problem is when you want to download the word list. !!!!!!!!!!!!!!!!!!!!
+								      						sankeyChart.select(".nodes").remove();
+								      						sankeyChart.select(".links").remove();
+								      						d3.select(".nodesLabel").remove();
+								      						d3.select(".axis").remove();
+
+								      						d3.select("#output")
+								      							.select("span")
+								      							.text(nextFilteredData.length);
+
+								      						generateSankey(nextFilteredData, permissionLink); // "data" in global scope is affected when generateSankey & inside it prepareData functions are called at each click.
+								      						drawSankey(nextFilteredData, permissionLink); //the problem is that nextFilteredData is set to words each time sankeyDraw is called.
+								      						
+								      						console.log("words on link click", words);
+								      						console.log("data on link click", data); //OK Not only at this functions scope, but also in global scope "data" is affected when generateSankey & inside it prepareData functions are called at each click.
+								      						console.log("prevFilteredData on link click", prevFilteredData); //OK
+															console.log("nextFilteredData on link click", nextFilteredData); //OK
+
+															
+													    })
+								.attr("fill", "none")
+							    .attr("stroke", "DarkSeaGreen")
+								.append("title")
+							    .text(d => `${d.source.name} → ${d.target.name}\n${values.get(d.source.name+d.target.name)}`)
+
+				
+					// Scale
+					rects = d3.select(".nodes")
+								.selectAll("rect")
+								.nodes();
+
+					realnodes = d3.filter(rects, rect => (rect.__data__.value != 0)); 
+					//the following line is the equal to d3.filter . Just for checking the correctness : sum of console.log zeros & rects.length should be 520, which is total number of nodes. (26*L)
+							// realnodes = [];
+							// d3.map(rects, rect => (rect.__data__.value != 0) ? realnodes.push(rect) : console.log(rect.__data__.value)); 
+							// console.log("realnodes", realnodes.length);
+					
+					// sorting nodes first based on their first  digit and then based on their second digit of keys. (a1). so it will successfully sort nodes no matter what the slider limit for wordLength is :) and for each number, a to z has already been sorted.
+					realnodes.sort((a,b) => d3.ascending(a.__data__.name.match(/\d{1}/), b.__data__.name.match(/\d{1}/)));
+					realnodes.sort((a,b) => d3.ascending(a.__data__.name.match(/\d{2}/), b.__data__.name.match(/\d{2}/)));
+
+					console.log("firstNode", realnodes[0]); //OK
+					console.log("lastNode", realnodes[realnodes.length-1]); //OK
+
+					range = [(realnodes[0].__data__.x0 + realnodes[0].__data__.x1)/2  , (realnodes[realnodes.length-1].__data__.x0+realnodes[realnodes.length-1].__data__.x1)/2]; // (firstnode middle , lastnode middle) = ((firstnode start + end)/2 , (lastnode start + end)/2) 
+					// console.log("range", range); //OK
+					positionScale = d3.scaleLinear()
+										.domain([1, L]) // which is L = d3.max(inputData, w => w.length])
+									  	.range(range);
+
+					
+					// Axis my style
+					positionAxis = d3.axisBottom(positionScale)
+										.ticks(L)
+										.tickSizeOuter(0)
+										.tickSizeInner(0)
+										.tickPadding(0)
+							   
+
+					
+					sankeyChart.append("g")
+								.attr("class", "axis")
+								.attr("transform", "translate(" + margin.left + "," + margin.top + ")")
+								.call(positionAxis)
+								.attr("font-family", "hatch")
+								.attr("font-size", "12")
+								.attr("font-weight", "400")
+								.attr("color", "navy")
+								.select("path")
+								.attr("stroke-opacity", 0)
+
+
+
+
+					sankeyChart.select(".axis")
+								.append("g")
+								.attr("class", "axisLabel")
+								.append("text")
+						        .attr("x", (range[0]+range[1])/2)
+						        .attr("y", -15)
+						        .attr("fill", "navy")
+						        .attr("font-size", "12")
+						        .attr("font-weight", "400")
+						        .attr("text-anchor", "middle")
+						        .text("LETTER INDEX");
+
+
+					// Axis Observable style
+					// positionAxis = g => g
+					// 			.classed("positionAxis", true)
+					// 		    .call(d3.axisBottom(positionScale).ticks(L).tickSizeOuter(0))
+					// 		    .call(g => g.append("text")
+					// 				        .attr("x", width - margin.right)
+					// 				        .attr("y", -4)
+					// 				        .attr("fill", "red")
+					// 				        .attr("font-weight", "500")
+					// 				        .attr("text-anchor", "end")
+					// 				        .text("position"));
+
+					
+					// sankeyChart.append("g")
+					// 			.call(positionAxis);
+
+
+
+				}
+
+
+				// when click on white empty space, all links & node labels de-highlighted & 
+				graphics.on("click",  function(event, element) {
+											d3.select(".links")
+												.selectAll("path")
+												.attr("stroke-opacity", 0.3)
+												.attr("stroke", "DarkSeaGreen");
+
+											d3.selectAll(".temporary")
+												.attr("fill", "navy");
+										});
+							
+
+
+				
+				console.log("data in global scope", data); //OK
+				drawSankey(data);
+
+
+			
+
+
+
+			// Toolbar
+
+				
+
+
+				//Slider
+
+				// Slider change
+				function sliderUpdate(lengthLimit){
+
+					d3.select("#wordLength")
+						.node()
+						.setAttribute("value", lengthLimit);
+
+       				// d3.select("#wordLength")
+						// .clone();
+						
+					// d3.select("#wordLength")
+					// 	.remove();
+
+
+					d3.select("#slider")
+						.select("span")
+						.text(lengthLimit);
+
+					
+					sankeyChart.select(".nodes").remove();
+					sankeyChart.select(".links").remove();
+					d3.select(".nodesLabel").remove();
+					d3.select(".axis").remove();
+
+					words = filterbyLength(mainWords, lengthLimit);
+					console.log("words on slider change", words);
+					generateSankey(words, false); // "data" in global scope is affected when generateSankey & inside it prepareData functions are called at each click.
+					drawSankey(words, false); //the problem is that nextFilteredData is set to words each time sankeyDraw is called.
+
+
+					d3.select("#output")
+						.select("span")
+						.text(words.length);
+															
+		      				
+				}
+
+
+				d3.select("#wordLength")
+					.on("click", function() {
+											lengthLimit = this.value;
+											sliderUpdate(lengthLimit);
+										})
+
+
+				//Buttons
+
+				d3.select("#reset")
+					.select(".button")
+					.on("click", function() {
+
+										lengthLimit = d3.max(mainWords, w => w.length);
+										sliderUpdate(lengthLimit);
+
+										sankeyChart.select(".nodes").remove();
+			      						sankeyChart.select(".links").remove();
+										d3.select(".nodesLabel").remove();
+										d3.select(".axis").remove();
+
+
+										words = filterbyLength(mainWords, d3.max(mainWords, w => w.length));
+			      						generateSankey(words, false); // "data" in global scope is affected when generateSankey & inside it prepareData functions are called at each click.
+			      						drawSankey(words, false);
+			      						// set slider intial value to max length of the whole dataset
+										// permissionNode=false;
+										// permissionLink=false;
+
+
+
+									})
+
+
+				d3.select("#list")
+					.select(".button")
+					.on("click", function() {
+									conent = nextFilteredData;
+									header = "data:text/plain;charset=utf-8,"
+									payload = header + encodeURIComponent(conent);
+
+									this.href = payload;
+								})
+
+
+				
+
+
+
+
+
+
+			  // alert("done");
+			});
+
+
+		</script>
+		
+
+	</body>
+</html>

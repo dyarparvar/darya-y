@@ -1,0 +1,1357 @@
+<!DOCTYPE html>
+<html lang="en">
+    <head>
+        <meta charset="utf-8">
+		<title>Darya-Yarparvar__Graphic Designer</title>
+		<meta name="description" content="Darya Yarparvar * Graphic Designer * Birmingham, UK * Open to work! ** Please visit my personal website and view my works. ** I would be more than happy to be of any help to your creative projects! **">
+		<meta name="author" content="© 2021 Darya Yarparvar. All rights reserved.">
+
+		<meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=no">
+
+		<link rel="preconnect" href="https://use.typekit.net/mok3rgv.css">
+		
+		
+		<link rel="stylesheet" type="text/css" href="css/style.css">
+
+
+		<link rel="stylesheet" type="text/css" href="css/icon-style.css">
+		<link rel="stylesheet" href="https://use.typekit.net/mok3rgv.css">
+
+
+		<base target="_blank">
+
+
+
+        <script type="text/javascript" src="js/d3.js"></script>
+       	
+	</head>
+	<body>
+		
+		
+		<div id="wrapper">
+			<div id="container">
+				
+				<div id="context">
+					<h1 id="title">Copy Text Signature</h1>
+				</div>
+				
+				
+				<div id="graphics">
+					<!-- <div id="control-panel"></div> -->
+					<!-- <div id="chart"></div> -->
+				</div>
+			</div>
+			
+			
+		</div>
+
+<!--
+*****************************
+****************************
+***************************
+************************** Data Visualisation Code __ START 
+***************************
+****************************
+******************************
+-->
+
+
+		<script type="text/javascript">
+			
+// Settings (Width and height) from outside to inside
+
+			
+
+			var width = screen.availWidth,
+				height = screen.availHeight*0.75,
+
+				padding = {top: 60, right: 60, bottom: 60, left: 60},
+				margin = {top: 20, right: 20, bottom: 30, left: 40};
+
+			
+
+// Load in raw data & THEN...
+			d3.json("data/words_dictionary.json").then(function(rawdata) {
+				// console.log(rawdata); //OK
+
+				const alphabet = ["a","b","c","d","e","f","g","h","i","j","k","l","m","n","o","p","q","r","s","t","u","v","w","x","y","z"];
+				const vowels = ["a","e","i","o","u"];
+				const consonents = ["b","c","d","f","g","h","j","k","l","m","n","p","q","r","s","t","v","w","x","y","z"];
+
+	//Read data
+				var words = Object.keys(rawdata);
+				console.log(words);	
+
+	//Data wrangling
+
+			// the length of the longest word	
+				var maxLength = d3.max(words,w => w.length);
+				// console.log(maxLength); //OK
+
+			// input l as maxLength to find the longest word **there's a better alternative in the following parts***
+				function findwordswithlengthL(l) {
+					let wordswithlengthL = [];
+				 	d3.map(words,w => {if (w.length==l) { wordswithlengthL.push(w)}});
+					return wordswithlengthL; // you cannot put return into if {} inside map(). the return must be outside of mapping.
+				};
+				// console.log(findwordswithlengthL(maxLength)); //OK
+				// console.log(findwordswithlengthL(2)); //OK
+				
+			// counting words at all lengths ***there's a better alternative in the following parts***	
+				function countwordAlllengths(i) {
+					var counts = [];
+					for (let l=0; l<=maxLength; l++) {
+						let wordswithlengthL = findwordswithlengthL(l)
+						counts.push(wordswithlengthL.length);
+					}
+					return counts;
+				};
+				counts = countwordAlllengths();
+				console.log(counts); //OK
+
+
+		//OPTION ONE
+			// gathering info about each word as an obj.
+				var wordInfo1 = d3.map(words, w => { if(w.length>1) { 
+														return {
+															word: w,
+															key: w[0]+w[w.length-1],
+															howManyCoLetter: NaN,
+															length: w.length,
+															howManyCoLength: counts[w.length]
+														};
+													} else {
+														return {
+															word: w,
+															key: w[0],
+															howManyCoLetter: NaN,
+															length: w.length,
+															howManyCoLength: counts[w.length]
+														};
+													};
+												});
+				// console.log(wordInfo1); //OK
+
+				
+			// grouping the objects in wordsInfo based on their "key" (start/end letters):
+				group = d3.group(wordInfo1, d => d.key); //max 26*26=676 cases.  //the result of d3.group is a Map Obj.
+										// hierarchy = d3.hierarchy(group);
+										// console.log(group); //OK
+										// console.log(hierarchy); //OK
+										// console.log(hierarchy.data); //OK
+										// console.log(hierarchy.data[1]); //OK
+										// console.log(hierarchy.children); //OK 
+										// console.log(hierarchy.children[3].data); //OK //the best way to get info about the main data from its hierarchy is via its hierarchy.children[].data
+									
+									// unreasonably complex way! via using hierarchy :/
+										// d3.map(wordInfo1, info => {
+										// 						for (child of hierarchy) {
+										// 							if (info.key == child.data[0]) {
+										// 								info.howManyCoLetter = +child.data[1].length;
+										// 							};
+										// 						}
+										// 					});
+										
+										// console.log(wordInfo1); //OK	
+
+			// simpler alternative using d3.group. :)
+				d3.map(wordInfo1, info => info.howManyCoLetter = group.get(info.key).length); //group.get(key) finds the group with the specified key. 
+				console.log("wordInfo1", wordInfo1); //OK
+				
+
+		//OPTION TWO
+			// grouping the words by key at first and then by word length when generating "wordInfo1rmation".
+
+				wordsNoAlphabet = d3.difference(words,alphabet); // first exclude alphabet so for example "a" won't be included in group with key "aa" 
+
+				
+				groupbyKEY = d3.group(wordsNoAlphabet, w => w[0]+w[w.length-1]); // using dynamic keys.
+				// console.log(groupbyKEY); //OK same as group. only there is no group for single letters of alphabet.
+									// console.log(Array.from(groupDynamically.values())); //To convert back into an array, we can use map.values and Array.from.
+									// console.log(Array.from(groupDynamically, ([key, value]) => ({key, value}))); //To convert back into an array, we can use map.values and Array.from.
+
+			// generating "wordInfo2" at the same time grouping each groupedbyKEY member by word length
+				var wordInfo2 = d3.map(groupbyKEY, g => {  
+														return {
+															key: g[0], //g[0] is the KEY
+															howMany: g[1].length, //g[1] is the value of each group, meaning its memebers!
+															words: Array.from(d3.group(g[1], w => w.length).values()) //grouping each groupedbyKEY member by word length then making an array by getting each values (members)
+														};
+													});
+				console.log("wordInfo2", wordInfo2); //OK  
+		
+
+
+		//OPTION THREE
+			// grouping the words first by key and then by word length >> nested group.
+
+				wordsNoAlphabet = d3.difference(words,alphabet); // first exclude alphabet so for example "a" won't be included in group with key "aa" 
+				
+				wordsGroupbyKEYthenLENGTH = d3.group(wordsNoAlphabet, w => w[0]+w[w.length-1], w => w.length);
+				console.log(wordsGroupbyKEYthenLENGTH);
+
+				var wordInfo3 = d3.map(wordsGroupbyKEYthenLENGTH, g => {  
+														return {
+															key: g[0],
+															howMany: d3.sum(d3.map(Array.from(g[1]), g => g[1].length)),
+															words: Array.from(g[1])
+														};
+													});
+				console.log("wordInfo3", wordInfo3); //OK
+
+				
+		// ************************************************************************
+		// ***********************************************************************
+		// **********************************************************************
+		// ********************************************************************* there's a slight difference between wordInfo2.words & wordInfo3.words.  wordInfo2.words has this structure : [[words with length i],[words with length i+1],...,[words with length n]] while  wordInfo3.words has this structure : [[i,words with length i],[i+1, words with length i+1],...,[n, words with length n]] ********************************** however a subtle change can make them equal. it's up to you, how you need your data :) if you remove .values() in wordInfo2.words so it's = Array.from(d3.group(g[1], w => w.length) , wordInfo2.words & wordInfo3.words will be the same results. OR if you add .values() in wordInfo3.words so it's = Array.from(g[1].values()) , wordInfo2.words & wordInfo3.words will be the same results. 
+		// *********************************************************************
+		// **********************************************************************
+		// ***********************************************************************
+		// ************************************************************************
+
+
+		// ************************************************************************
+		// ***********************************************************************
+		// **********************************************************************
+		// ********************************************************************* using .groups to get Array instead of Map! Easier to handle & understand Array. Fundamentally wordInfo3b & wordInfo3 are the VERY SAME & have the VERY SAME code.
+
+		//OPTION THREE-b 
+
+			// wordsKeyLength = d3.groups(wordsNoAlphabet, w => w[0]+w[w.length-1], w => w.length);
+			// // console.log(wordsKeyLength); //OK
+
+			// var wordInfo3b = d3.map(wordsKeyLength, g => {  
+			// 										return {
+			// 											key: g[0],
+			// 											howMany: d3.sum(d3.map(Array.from(g[1]), g => g[1].length)),
+			// 											words: Array.from(g[1])
+			// 										};
+			// 									});
+			// console.log("wordInfo3b", wordInfo3b); //OK
+		// *********************************************************************
+		// **********************************************************************
+		// ***********************************************************************
+		// ************************************************************************
+
+
+
+
+
+		// Counts
+
+			// using rollups to count words with same length and words with same start/end letters in Array format: (use rollup for Map format)
+				summaryCountsCoLength = d3.rollups(words, g => g.length, w => w.length);
+				console.log("group words by length >> how many in each group",summaryCountsCoLength); //OK //it groups words based on their length (w.length) & gives how many are in each group (g.length). therefore it is similar to the "counts" that I wrote previousely.
+				summaryCountsCoLetter = d3.rollups(wordsNoAlphabet, g => g.length, w => w[0]+w[w.length-1]);
+				console.log("group words by Start/End letters >> how many in each group", summaryCountsCoLetter); //OK //it is very similar to "groupbyKEY". both are Map obj. each g in "summaryCountsCoLetter" has te value that is calculated based on the reducer function, here v.length. so the value in "summaryCountsCoLetter" is the length of each g.value in "groupbyKEY".
+			
+			
+
+			// some extra groupings: 
+				wordsFirstLetter = d3.group(words, w => w[0]); //words with the same first letter.
+				console.log("words starting with each Letter", wordsFirstLetter); //OK
+				// console.log(wordsFirstLetter.get("c")); //OK //for example all the words starting with c.
+				wordsLastLetter = d3.group(words, w => w[w.length-1]); //words with the same last letter.
+				console.log("words ending in each Letter", wordsLastLetter); //OK
+				// console.log(wordsLastLetter.get("y")); //OK //for example all the words ending in y.
+
+
+
+
+
+	//Histogram
+				// var lengths = [...words].map(w => w.length); //without using d3.
+				var lengths = d3.map(words,w => w.length); //with using d3.
+				binGenerator = d3.bin().thresholds(maxLength)
+				bins = binGenerator(lengths); //to make bins you need gather the length of each word in an array; here I called it "lengths". no need to count them and use "counts" array! still useful to check the bins & counts :D 
+				// equal to : bins = d3.bin().thresholds(maxLength)(lengths);
+		
+		// Define scales
+				xScale1 = d3.scaleLinear()
+							.domain([bins[0].x0, bins[bins.length - 1].x1])
+					   		.range([margin.left, width - margin.right]);
+
+				yScale1 = d3.scaleLinear()
+						    .domain([0, d3.max(bins, d => d.length)]).nice()
+						    .range([height - margin.bottom, margin.top]);
+				
+		// Define axis
+				xAxis1 = g => g
+							.classed("xAxis", true)
+						    .attr("transform", `translate(${(width/(2*maxLength))-1},${height - margin.bottom })`)
+						    .call(d3.axisBottom(xScale1).ticks(maxLength).tickSizeOuter(0)) //when d3. is in the middle of the chain, use call ()
+						    .append("text")  //you can also put these parts in a call(). not sure about the pro & cons & the difference it makes. *like yAxis
+					        .attr("x", width - margin.right)
+					        .attr("y", -4)
+					        .attr("fill", "currentColor")
+					        .attr("font-weight", "bold")
+					        .attr("text-anchor", "end")
+					        .text("word length");
+
+				yAxis1 = g => g
+							.classed("yAxis", true)
+						    .attr("transform", `translate(${margin.left},0)`)
+						    .call(d3.axisLeft(yScale1).ticks(height / 50))
+						    .select(".domain").remove() // to remove the y axis //you can also put it in a call().
+						    .call(g => g.select(".tick:last-of-type text").clone()
+								        .attr("x", 4)
+								        .attr("text-anchor", "start")
+								        .attr("font-weight", "bold")
+								        .text("counts")); //you can get rid of the call. not sure about the pro & cons & the difference it makes  *like xAxis
+
+		// Create Chart
+				const graphics = d3.select("#graphics");
+
+				const histogram = graphics.append("svg")
+										.classed("histogram", true)
+										.attr("viewBox", [0, 0, width, height]);
+
+				histogram.append("g")
+						.call(xAxis1);
+
+				histogram.append("g")
+						.call(yAxis1);
+				
+
+			 	histogram.append("g")
+						.selectAll("rect")
+						.data(bins)
+						.join("rect")
+				   		.attr("x", d => xScale1(d.x0) + 1)
+						.attr("width", d => Math.max(0, xScale1(d.x1) - xScale1(d.x0) - 1))
+						.attr("y", d => yScale1(d.length))
+						.attr("height", d => yScale1(0) - yScale1(d.length))
+						.attr("fill", "teal");
+
+			  
+
+
+
+	//Bubble Chart 
+
+		
+		// Define scales
+
+
+				let configX = {
+						  domain: d3.map(wordInfo2, d => d.key[0]), //.sort(),
+						  paddingInner: 0, //0.1 of step, btw each bandwidth.
+						  paddingOuter: 0, //0.2 of step, half of the sum of left & right outer paddings.
+						  round: true, // 👀 //rounding step to the closest integer
+						  align: 0.5, //the ratio paddingOuter*2 will be devided btw left & right outer paddings.
+						  range: [0, height - margin.bottom] //to have a square chart area
+						};
+
+				let configY = {
+						  domain: d3.map(wordInfo2, d => d.key[0]),  // d.key[1]).sort() BUT MAKE SURE YOU ALSO SORT THE DATA?!?!?!?!
+						  paddingInner: 0, //0.1 of step, btw each bandwidth.
+						  paddingOuter: 0, //0.2 of step, half of the sum of left & right outer paddings.
+						  round: true, // 👀 //rounding step to the closest integer
+						  align: 0.5, //the ratio paddingOuter*2 will be devided btw left & right outer paddings.
+						  range: [height - margin.bottom, 0] //to have a square chart area
+						};
+
+
+				alphabetXScale = d3.scaleBand()
+									.domain(configX.domain)
+								  	.range(configX.range)
+								 	.paddingInner(configX.paddingInner)
+								  	.paddingOuter(configX.paddingOuter)
+								  	.align(configX.align)
+
+
+				
+
+				alphabetYScale = d3.scaleBand()
+									.domain(configY.domain)
+								  	.range(configY.range)
+								 	.paddingInner(configY.paddingInner)
+								  	.paddingOuter(configY.paddingOuter)
+								  	.align(configY.align)
+
+				// console.log(alphabetXScale.bandwidth()); console.log(alphabetYScale.bandwidth()); //OK //since it's a square chart area, these two should be equal.
+				  	
+
+				qScale = d3.scaleSqrt()
+							.domain([0, d3.max(wordInfo2, d => d.howMany)])
+							.range([0, 30]);
+
+				// opacityScale= d3.scaleSqrt()
+				// 			.domain([0, d3.max(wordInfo2, d => d.howMany)])
+				// 			.range([0, 100]);
+
+				
+		// Define axis
+				xAxis2 = g => g
+							.classed("xAxis", true)
+						    .attr("transform", `translate(${margin.left},${height - margin.bottom })`)
+						    .call(d3.axisBottom(alphabetXScale).tickValues(alphabetXScale.domain()).tickSizeOuter(0).tickPadding(10))
+						    .call(g => g.append("text")
+								        .attr("x", width - margin.right)
+								        .attr("y", -4)
+								        .attr("fill", "currentColor")
+								        .attr("font-weight", "bold")
+								        .attr("text-anchor", "end")
+								        .text("first letter"));
+
+				yAxis2 = g => g
+							.classed("yAxis", true)
+						    .attr("transform", `translate(${margin.left},0)`)
+						    .call(d3.axisLeft(alphabetYScale).ticks(26).tickSizeOuter(0))
+						    .call(g => g.select(".tick:last-of-type text").clone()
+								        .attr("x", 0)
+								        .attr("y", (height - margin.bottom)/2)
+								        .attr("text-anchor", "start")
+								        .attr("font-weight", "bold")
+								        .text("last letter"));
+
+		// Create Chart
+
+				const bubble = graphics.append("svg")
+										.classed("bubble", true)
+										.attr("viewBox", [0, 0, width, height]);
+
+				bubble.append("g")
+						.call(xAxis2);
+
+				bubble.append("g")
+						.call(yAxis2);
+				
+
+			 	bubble.append("g")
+						.selectAll("circle")
+						.data(wordInfo2)
+						.join("circle")
+				   		.attr("r", d => qScale(d.howMany))
+				   		.attr("cx", d => alphabetXScale(d.key[0]) )
+				   		.attr("cy", d => alphabetYScale(d.key[1]) )
+						.attr("transform", `translate(${margin.left + alphabetXScale.bandwidth()/2}, ${alphabetYScale.bandwidth()/2})`)
+						.attr("fill", "red")
+						.attr("opacity", 0.1)
+				
+				bubble.append("g")
+						.selectAll("text")
+						.data(wordInfo2)
+						.join("text")
+						.text(d => {if (d.howMany>5000||d.howMany<2) return d.key + " | " + d.howMany;})
+						.attr("x", d => alphabetXScale(d.key[0])-qScale(d.howMany)/2)
+				   		.attr("y", d => alphabetYScale(d.key[1])+9/3)
+						.attr("transform", `translate(${margin.left + alphabetXScale.bandwidth()/2}, ${alphabetYScale.bandwidth()/2})`)
+				   		.attr("font-size", "9px")
+
+
+	// 			   		
+
+   		// Define scales
+
+
+				
+				lengthXScale = d3.scaleLinear()
+									.domain([0, d3.max(summaryCountsCoLength, d => d[0])])
+								  	.range([0, width - margin.left])
+
+
+				
+
+				countsCoLengthYScale = d3.scaleLinear()
+									.domain([0, d3.max(summaryCountsCoLength, d => d[1])])
+								  	.range([height - margin.bottom, 0])
+
+
+				countsCoLetterYScale = d3.scaleLinear()
+									.domain([0, d3.max(summaryCountsCoLetter, d => d[1])])
+								  	.range([height - margin.bottom, 0])
+				  	
+
+				// qScale = d3.scaleSqrt()
+				// 			.domain([0, d3.max(wordInfo2, d => d.howMany)]) //use flatRollup on words source data????
+				// 			.range([0, 30]);
+
+			
+
+				
+		// Define axis
+				xAxis3 = g => g
+							.classed("xAxis", true)
+						    .attr("transform", `translate(${margin.left},${height - margin.bottom })`)
+						    .call(d3.axisBottom(lengthXScale).ticks(31).tickSizeOuter(0))
+						    .call(g => g.append("text")
+								        .attr("x", width - margin.right)
+								        .attr("y", -4)
+								        .attr("fill", "currentColor")
+								        .attr("font-weight", "bold")
+								        .attr("text-anchor", "end")
+								        .text("word length"));
+
+				yAxis3 = g => g
+							.classed("yAxis", true)
+						    .attr("transform", `translate(${margin.left},0)`)
+						    .call(d3.axisLeft(countsCoLengthYScale).ticks(10).tickSizeOuter(0))
+						    .call(g => g.select(".tick:last-of-type text").clone()
+								        .attr("x", 0)
+								        .attr("y", (height - margin.bottom)/2)
+								        .attr("text-anchor", "start")
+								        .attr("font-weight", "bold")
+								        .text("how many coLength"));
+        // Create Chart
+
+			 //    const contour = graphics.append("svg")
+				// 						.classed("contour", true)
+				// 						.attr("viewBox", [0, 0, width, height]);
+
+				// contour.append("g")
+				// 		.call(xAxis3);
+
+				// contour.append("g")
+				// 		.call(yAxis3);
+				
+
+			 // 	contour.append("g")
+				// 		.selectAll("circle")
+				// 		.data(wordInfo1)
+				// 		.join("circle")
+				//    		.attr("r", 1)
+				//    		.attr("cx", d => lengthXScale(d.length) )
+				//    		.attr("cy", d => countsCoLengthYScale(d.howManyCoLength) )
+				// 		.attr("transform", `translate(${margin.left}, 0)`)
+				// 		.attr("fill", "blue")
+				// 		.attr("opacity", 0.1)
+				
+
+
+			    const contour = graphics.append("svg")
+										.classed("contour", true)
+										.attr("viewBox", [0, 0, width, height]);
+
+				contour.append("g")
+						.call(xAxis3);
+
+				contour.append("g")
+						.call(yAxis3);
+				
+
+			 	contour.append("g")
+						.selectAll("circle")
+						.data(wordInfo1)
+						.join("circle")
+				   		.attr("r", 1)
+				   		.attr("cx", d => lengthXScale(d.length) )
+				   		.attr("cy", d => countsCoLengthYScale(d.howManyCoLength) )
+						.attr("transform", `translate(${margin.left}, 0)`)
+						.attr("fill", "blue")
+						.attr("opacity", 0.1)
+				// contour.append("g")
+				// 		.selectAll("text")
+				// 		.data(wordInfo1)
+				// 		.join("text")
+				// 		.text(d => {if (d.howMany>5000||d.howMany<2) return d.key + " | " + d.word;})
+				// 		.attr("x", d => lengthXScale(d.length)-qScale(d.howMany)/2)
+				//    		.attr("y", d => countsCoLengthYScale(d.howManyCoLetter)+9/3)
+				// 		.attr("transform", `translate(${margin.left}, 0)`)
+				//    		.attr("font-size", "9px")
+
+
+
+
+						
+						
+
+
+				    
+			  
+			});
+
+
+		</script>
+		
+
+
+
+
+					<!-- 
+					// .each() invokes a callback function on each element in the selection:
+
+					function setColor() {
+				      d3.select(this).style('fill', 'steelblue');
+				    }
+				    d3.selectAll('circle').each(setColor);
+				// The above code will iterate through each <circle> element and call setColor. Within the callback function, the ‘this’ keyword is the iterated element. Note that we can also pass an element directly into d3.select().
+
+				// .call() invokes a callback function on the selection itself:
+
+				    function setSelectionFill(selection) {
+				      selection.style('fill', 'steelblue');
+				    }
+				    d3.selectAll('circle').call(setSelectionFill);
+				// The selection itself is passed into the callback function so that the callback can operate on the selection.
+
+				// Both .each() and .call() allow us to write reusable chunks of D3 code and we’ll look at this in more detail in another post. -->
+
+<!-- ****************************** Data Visualisation Code __ END ****************************** -->
+
+
+
+
+		<!-- <script type="text/javascript">  SCOTT FINAL PROJECT - HELP
+
+			//Width and height
+
+			var w = screen.availWidth*0.75;
+			var h = screen.availHeight/2;
+			var padding = 20;
+
+
+			var dataset, xScale, yScale, xAxis, yAxis, area;
+
+			//For converting strings to Dates
+			var parseTime = d3.timeParse("%Y-%m");
+
+			//For converting Dates to strings
+			var formatTime = d3.timeFormat("%b %Y");
+
+
+			//Set up stack method
+			var allStack = d3.stack()
+						  .order(d3.stackOrderAscending);
+			var typeStack = d3.stack()
+						  .order(d3.stackOrderAscending);
+
+			var vehicleStack = d3.stack()
+						  .order(d3.stackOrderAscending);
+			
+
+			var viewState = 0;
+			var viewType;
+
+
+
+			//Load in data & THEN ...
+			d3.text("vehicle_sales_data.csv").then(function(rawdata) {
+
+
+					console.log(rawdata); //OK
+
+
+					//
+					// Parse data from text to JSON format :)
+					//
+
+					var make, 
+						model, 
+						type,
+						makeModel  = [];
+
+					function getData() {
+										dataset = d3.csvParseRows(rawdata, function(d,i) {
+
+											if (i == 0) {
+												d.shift();
+												make = d;
+											}
+											
+											if (i == 1) {
+												d.shift();
+												model = d;
+											}
+
+											if (i == 2) {
+												d.shift();
+												type = d;
+											}
+
+											
+
+											if (i>2) {
+
+												let data = {};
+
+												
+												data.date = parseTime(d[0]);  
+
+
+												data.Sum = { "HEV": 0, "PHEV": 0, "BEV": 0, "FCEV": 0}; 
+
+												d.shift();
+												for (var k=0; k<d.length;k++) {  
+													
+													var newKey = make[k] + " " + model[k];
+
+													var newObj = {
+														make : make[k],
+														model : model[k],
+														type : type[k],
+														sales : +d[k]
+													}
+
+													data[newKey]=newObj;
+
+
+													switch (newObj.type) {
+														case "HEV":
+															data.Sum.HEV += newObj.sales;
+															break;
+														case "PHEV":
+															data.Sum.PHEV += newObj.sales;
+															break;
+														case "BEV":
+															data.Sum.BEV += newObj.sales;
+															break;
+														case "FCEV":
+															data.Sum.FCEV += newObj.sales;
+															break;
+													}
+
+												}
+
+
+												
+												
+												return data;
+												
+											}
+
+										});
+									}
+
+					getData();
+
+
+					console.log(dataset); //OK
+
+					//////////////////////////////////////////////////////////// KEEP a copy of initial dataset. BUT this DOES NOT WORK!!! any mutation on dataset is transferred to mainDataset!!!
+
+					// const mainDataset = dataset;
+					// Object.freeze(mainDataset);
+								
+					// const mainDataset = [];
+					// dataset.forEach(d => mainDataset.push(Object.assign({}, d)));
+
+					// for (k of mainDataset) {
+					// 	Object.freeze(mainDataset[k]);
+					// };
+
+					// console.log(mainDataset);  //OK
+					// var mainDataset = {};
+					// for (element in dataset) {
+					// 	mainDataset[element] = dataset[element];
+					// };
+					// Object.freeze(mainDataset);
+					// console.log(mainDataset);
+
+					////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+
+					
+					
+					
+					
+
+
+
+
+					//
+					// MAKE THE CHART
+					//
+				
+					//Create scale functions 
+					xScale = d3.scaleTime()
+							   .domain([
+									d3.min(dataset, function(d) { return d.date; }),
+									d3.max(dataset, function(d) { return d.date; })
+								])
+							   .range([padding, w - padding * 2]);
+				
+					
+
+					yScale = d3.scaleLinear()
+								.domain([
+									0,
+									d3.max(dataset, function(d) {
+										var sum = 0;
+										for (q in d.Sum) {
+											sum += d.Sum[q];
+										};
+										return sum;
+									})
+								])
+								.range([h - padding, padding / 2])
+								.nice();	
+
+					//Define axes
+					xAxis = d3.axisBottom()
+							   .scale(xScale)
+							   .ticks(10)
+							   .tickFormat(formatTime);
+				
+					
+					yAxis = d3.axisRight()			
+							   .scale(yScale)
+							   .ticks(5);
+				
+					area = d3.area()
+								.x(function(d) { return xScale(d.data.date); })
+								.y0(function(d) { return yScale(d[0]); })
+								.y1(function(d) { return yScale(d[1]); });
+
+
+
+					//Create SVG element
+					
+					
+
+					var svgChart = d3.select("#container #graphic #chart")
+								.append("svg")
+								.attr("width", w)
+								.attr("height", h);
+
+
+
+					//Create a group for our graph
+					var graph = svgChart.append("g")
+									.attr("id", "Graph");
+
+					//Create axes
+					svgChart.append("g")
+						.attr("class", "axis x")
+						.attr("transform", "translate(0," + (h - padding) + ")")
+
+					svgChart.append("g")
+						.attr("class", "axis y")
+						.attr("transform", "translate(" + (w - padding * 2) + ",0)")
+
+
+					var guide = svgChart.append("g")
+									.attr("id", "Guide")
+									.classed("unclickable", true);
+									
+					
+							
+					guide.append("text")
+							.attr("x", padding/2 -2 )
+							.attr("y", 25+(14/2)/2);
+					
+
+
+
+					var svgControl = d3.select("#container #graphic #control-panel")
+								.append("svg")
+								.attr("width", w)
+								.attr("height", h/3);
+
+					//Create back button
+					var backButton = svgControl.append("g")
+										.attr("id", "BackButton")
+										.classed("unclickable, hidden", true)
+										.attr("transform", "translate(" + xScale.range()[0] + "," + yScale.range()[1] + ")");
+
+
+					
+
+					backButton.append("rect")
+								.attr("x", 0)
+								.attr("y", 0)
+								.attr("height", 50);
+							
+					backButton.append("text")
+								.attr("x", padding/2 -2 )
+								.attr("y", 25+(14/2)/2)
+
+					
+					
+					var updateAxis = function() {
+							d3.select(".axis.y")
+								.transition()
+								.duration(300)
+								.call(yAxis);
+							d3.select(".axis.x")
+								.transition()
+								.duration(300)
+								.call(xAxis);
+
+					};
+
+					var showTooltip = function() {
+						graph.selectAll("title")
+							.remove();
+
+						graph.selectAll(".area")
+							.append("title")
+							.text(function(d) {
+								return d.key;
+								});
+					};
+
+
+					var showAllTypes = function() {
+						getData();  
+						//////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////// 
+						// the most important & necessary part that "dataset" needs a reset is this part. aftershowAllTypes, "dataset" is not changed. it enters "singleType" function & it will be changed (to "filtereddataset") unless you use getData(); 
+						// in "singleType" too. but it is not necessary & the "filtereddataset" is enough to draw the chart at that level. 
+						// the changed "dataset" (="filtereddataset") will enter "singleVehicle" & won't be changed anymore. & no filtering is needed at this level. only using thisKey for stacking part is enough :)
+						////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+
+						// console.log(dataset);  //OK
+
+						//
+						// STACKING for each type
+						//
+						var keys = Object.keys(dataset[0].Sum);
+						allStack.keys(keys)
+							.value(function value(d, key) { 
+								return d.Sum[key];
+							});
+						var typeSeries = allStack(dataset);
+
+						viewState = 0;
+
+						graph.selectAll("path")
+						.data(typeSeries)
+						.join("path")
+						.attr("class", "area")
+						.attr("d", area)
+						.attr("fill", function(d) {
+								var color;
+								switch (d.key) {
+									case "HEV":
+										color = d3.schemeCategory10[9];
+										break;
+									case "PHEV":
+										color = d3.schemeCategory10[4];
+										break;
+									case "BEV":
+										color = d3.schemeCategory10[8];
+										break;
+									case "FCEV":
+										color = d3.schemeCategory10[6];
+										break;
+								}
+								
+								return color;
+							});
+
+
+
+						//Add Interactivity
+						graph.selectAll(".area")
+							.call(showTooltip)
+							.call(updateAxis)
+							.on("click", showSingleType);
+
+
+						let guideText = "";
+						guide.select("text")
+								.html(guideText);
+					};
+
+					var showSingleType = function(event,d) {
+							// getData();  // it seems there's no need. because "dataset" is not changed in "showAllTypes"
+							// console.log(dataset);  //OK
+							
+
+							viewState = 1;
+							backButton.classed("unclickable, hidden", false);
+
+							var thisKey = d.key; 
+
+							function filter (inputdata) {
+								for (d of inputdata) {
+									for (k in d) {
+										if (k!= "date" && k!="Sum" && d[k].type != thisKey) {
+											delete d[k];
+										}
+									}
+								}
+								return inputdata;
+							};
+
+							var filtereddataset = filter (dataset);
+							// console.log(dataset);    //Here you see that dataset is changed! so better to have a copy of it before everything happens!!!
+							// console.log(filtereddataset); //OK
+
+
+							///////////////////// this alternative is not working BUT WHY ???!!!! 
+							// var filtereddataset = dataset.filter(d => function(d){
+							// 										for (k in d) {
+							// 											if (k!= "date" && k!="Sum" && d[k].type != thisKey) {
+							// 												return false;
+							// 											};
+							// 										};
+
+							// 									});
+							////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////// still not working  :(( 
+									// function callback (d) {
+									// 		for (k in d) {
+									// 			return !(k!= "date" && k!="Sum" && d[k].type != thisKey);
+									// 	};
+									// };
+									// var filtereddataset2 = dataset.filter(callback);
+									// console.log(filtereddataset2);
+									// console.log(dataset);
+
+
+							//////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+
+							var keys = Object.keys(dataset[0]);
+							keys.splice(keys.indexOf("date"),1);
+							keys.splice(keys.indexOf("Sum"),1);
+
+							typeStack.keys(keys)    					
+								.value(function value(d, key) { 
+									
+									return d[key].sales;
+									
+								});
+							
+							var detailedSeries = typeStack(filtereddataset);
+
+							var paths = graph.selectAll("path")
+										.data(detailedSeries)
+										.join("path")
+										.attr("class", "area");
+
+
+
+							paths.classed("specifictype", true);
+
+							var t = paths.transition()
+								.duration(500)
+								.on("start", function(){
+									paths.classed("unclickable", true); 
+								})
+								.attr("d", area)
+								.attr("fill", "black");
+										
+
+							yScale.domain([
+									0,
+									d3.max(filtereddataset, function(d) {
+										var sum = 0;
+										for (q in d) { 		
+											if (q != "date" && q!= "Sum") {
+												sum += d[q].sales;
+											}
+										};
+										return sum;
+									})
+								]);
+
+							xScale.domain([
+									d3.min(filtereddataset, function(d) {
+																for (q in d) {
+																	if (d[q].sales > 0) {
+																		return d.date;
+																	}
+																}
+															}),
+									d3.max(filtereddataset, function(d) {
+																for (q in d) {
+																	if (d[q].sales > 0) {
+																		return d.date;
+																	}
+																}
+															})
+								]);
+
+								
+							t.transition()
+								.delay(200)
+								.duration(300)
+								.on("start", updateAxis)
+								.duration(300)
+								.on("end", function() {
+									graph.selectAll(".area")
+									.classed("unclickable", false);
+								})
+								.attr("d", area)			
+								.attr("fill", function(d,i) { 
+										var thisKey = d.key;
+										var thisType = d[0].data[thisKey].type;
+										var spread = 0.2;
+										var n = keys.length;
+										var normalized = 0.3 + ((i / n) * spread);
+										
+										switch (thisType) {
+											case "HEV":
+												guide.select("text")
+													.attr("fill", d3.schemeCategory10[9]);
+												return d3.interpolateCool(normalized);
+
+												break;
+											case "PHEV":
+												guide.select("text")
+													.attr("fill", d3.schemeCategory10[4]);
+												return d3.interpolateCool(normalized-0.3);
+												break;
+											case "BEV":
+												guide.select("text")
+													.attr("fill", d3.schemeCategory10[8]);
+												return d3.interpolateCool(normalized+0.3);
+												break;
+											case "FCEV":
+												guide.select("text")
+													.attr("fill", d3.schemeCategory10[6]);
+												return d3.interpolateWarm(0.1+normalized);
+												break;
+										}
+										
+									});
+
+								
+
+							var vehicles = graph.selectAll(".area.specifictype");
+							
+							vehicles.call(showTooltip)
+									.on("click", showSingleVehicle);
+					
+
+							// console.log(dataset);  //OK
+
+							let buttonText = "&larr; Back to all types";
+							// console.log(backButton.select("text").node().getBBox().width);
+							backButton.select("text")
+									.html(buttonText);
+							let textWidth = Math.round(backButton.select("text").node().getBBox().width) + padding ;
+							backButton.select("rect")
+									.attr("width", textWidth);
+
+							let guideText = "all vehicles of type " + thisKey;
+							guide.select("text")
+									.html(guideText);
+
+							let toTransfertoCenter = (xScale.range()[1]-xScale.range()[0])/2 - guide.select("text").node().getBBox().width/2;
+							guide.attr("transform", "translate(" +  toTransfertoCenter + "," + yScale.range()[1] + ")");
+
+
+					};
+
+
+					var showSingleVehicle = function(event,d) {
+							// getData(); 
+							
+							// console.log(dataset);  //OK
+
+							viewState= 2;
+
+							var thisElement = d3.select(this);
+							
+							
+							var thisKey = [d.key];
+
+
+							/////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+							// it seems that there is no need to filter "dataset". it's enough to use the only related key (meaning thisKey = [d.key] in stack.keys(thisKey). it automatically applys a filtering on "dataset" at var singleVehicleSeries = stack(dataset); step. )
+
+							// function singleKey (inputdata) {
+							// 	for (d of inputdata) {
+							// 		for (k in d) {
+							// 			if (k!= "date" && k!="Sum" && k != thisKey[0]) {
+							// 				delete d[k];
+							// 			}
+							// 		}
+							// 	}
+							// 	return inputdata;
+							// };
+
+							
+							// var singleVehicle = singleKey(dataset);
+							// console.log(singleVehicle); //OK
+
+							// ///////////////////// this alternative works for singleVehicle. but not the other?! NO! It's not even working here!!! BUT WHY?
+
+							
+							// var singleVehicle = dataset.filter(d => function(d) {
+							// 										for (k in d) {
+							// 											if (k!= "date" && k!="Sum" && k != thisKey[0]) {
+							// 												return false;
+							// 											};
+							// 										};
+							// 									});   
+
+							// console.log(singleVehicle);
+	
+							 
+							/////////////////////////////// useless efforts to figure out .filter() // here "singleVehicle" will be the data bind to "path"s in previous step meaning "singleType" meaning "filtereddataset" ///////////////////////////////
+							/////////////////////////////////////////////////////////////////////////////////////////////
+							/////////////////////////////////////////////////////////////////////////////////////////////
+							// var singleVehicle = graph.selectAll("path")
+							// 						.filter(d => function callback(d,i,dataset) {
+							// 							for (k in d) {
+							// 								if (k!= "date" && k!="Sum" && k != thisKey[0]) {
+							// 									return false;
+							// 								};
+							// 							};
+							// 						})
+							// 						.data()
+							// console.log(singleVehicle);
+							/////////////////////////////////////////////////////////////////////////////////////////////
+							/////////////////////////////////////////////////////////////////////////////////////////////
+							/////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+							vehicleStack.keys(thisKey)
+								.value(function value(d, key) { 
+									return d[key].sales;
+								});
+
+							var singleVehicleSeries = vehicleStack(dataset);
+
+
+							var paths = graph.selectAll("path")
+										.data(singleVehicleSeries)
+										.join("path")
+										.attr("class", "area"); 
+
+							paths.classed("specificvehicle unclickable", true);
+
+
+
+
+							/////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+							// for updating yScale & xScale, use "dataset" + thisKey[0].sales information if you're NOT filtering the "dataset" at prior steps. If you are filtering "dataset" & you declare "singleVehicle" , then you can use it for yScale & xScale.
+							
+							yScale.domain([0,
+									d3.max(dataset, function(d) {
+																return d[thisKey[0]].sales;
+															})
+								]);
+
+							xScale.domain([
+									d3.min(dataset, function(d) {
+																if (d[thisKey].sales > 0) {
+																	return d.date;
+																}
+															}),
+									d3.max(dataset, function(d) {
+																if (d[thisKey].sales > 0) {
+																	return d.date;
+																}
+															})
+								]);
+							/////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+
+
+
+
+
+							var tt = paths.transition()
+										.duration(1200)
+										.attr("d", area);
+							
+
+							tt.transition()
+								.delay(200)
+								.duration(1000)
+								.on("start", updateAxis)
+								.attr("fill", "turquoise");
+
+							
+							thisElement.attr("fill","blue");
+
+							graph.selectAll(".area")
+								.call(showTooltip);
+
+
+							// console.log(singleVehicleSeries[0][0].data[thisKey].type);  //OK	
+
+							let buttonText = "&larr; Back to all vehicles of " + singleVehicleSeries[0][0].data[thisKey].type + " type" 
+							backButton.select("text")
+									.html(buttonText);
+
+							// console.log(backButton.select("text").node().getBBox().width);
+							var textWidth = Math.round(backButton.select("text").node().getBBox().width) + padding ;
+							backButton.select("rect")
+									.attr("width", textWidth);
+
+							let guideText = singleVehicleSeries[0][0].data[thisKey].type + " || " + thisKey;
+							guide.select("text")
+									.html(guideText)
+									.transition()
+									.delay(1000)
+									.duration(1000)
+									.attr("fill", "teal");
+
+							let toTransfertoCenter = (xScale.range()[1]-xScale.range()[0])/2 - guide.select("text").node().getBBox().width/2;
+							guide.attr("transform", "translate(" +  toTransfertoCenter + "," + yScale.range()[1] + ")");
+
+
+	
+								
+					};
+
+					var goBack = function(event) {
+						
+						if (viewState == 1) { 
+								
+								// viewState--;
+
+								
+
+								xScale.domain([
+												d3.min(dataset, function(d) { return d.date; }),
+												d3.max(dataset, function(d) { return d.date; })
+											]);
+							
+								
+
+								yScale.domain([
+												0,
+												d3.max(dataset, function(d) {
+													var sum = 0;
+													for (q in d.Sum) {
+														sum += d.Sum[q];
+													};
+													return sum;
+												})
+											]);	
+
+
+							    
+
+								showAllTypes();
+
+								backButton.classed("unclickable, hidden", true);
+
+								
+
+						} else if (viewState == 2) {
+
+								// viewState--;
+
+								var d = graph.select("path").data();
+
+								viewType = d[0][0].data[d[0].key].type;
+								
+								var helper = {
+									"key" : viewType
+								};
+
+								
+
+
+								showSingleType(this,helper);   /////////////////////////////////////////////////////////////////////////////////////////// ok. since the input for showSingleType is (event,d) & d must be an object with "key" property, here I put viewType in "key" property of a helper and use it as an input for showSingleType function. it must be used as the 2nd argument. the first argument is not used in showSingleType function . BUT we have to put sth in its place. it can be "this" or any other defined thing! just a fake input.... showSingleType(1,helper); ///////////////////////////////////////////////////////////////////////////////////////////
+
+							
+						} else {
+							console.log("default view");
+							backButton.classed("unclickable, hidden", true);
+						};
+						
+					};
+
+
+					
+
+
+					
+					
+					
+
+
+					showAllTypes();
+
+					//Add Interactivity for Button
+					backButton.on("click", goBack);
+
+			
+			});
+
+		</script> --> 
+	</body>
+</html>

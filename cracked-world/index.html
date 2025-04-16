@@ -1,0 +1,1962 @@
+<!DOCTYPE html>
+<html lang="en">
+    <head>
+        <meta charset="utf-8">
+		<title>cracked__world</title>
+		<meta name="description" content="world fragile state index - One canvas for each country. All countries projected into center of canvas. each year is used as a seed for noise functions. so same noise for countries. total score mapped to grid angle a&b. Cracks propagate as frames go on...">
+		<meta name="author" content="© 2023 Darya Yarparvar. All rights reserved.">
+
+
+	  	<link rel="preconnect" href="https://use.typekit.net/msx1qtx.css">
+	  	<link rel="stylesheet" href="https://use.typekit.net/msx1qtx.css">
+
+
+		<meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=no">
+	    <link rel="stylesheet" type="text/css" href="css/style.css">
+
+		<base target="_blank">
+
+    <script type="text/javascript" src="js/d3.js"></script>
+    <script type="text/javascript" src="js/d3plus-text.full.js"></script>
+    <script type="text/javascript" src="js/chroma.js"></script>
+    <script type="text/javascript" src="js/chroma.palette-gen.js"></script>
+    <script type="text/javascript" src="js/d3-legend.js"></script>
+		<!-- <script type="text/javascript" src="js/p5.min.js"></script> -->
+		<script language="javascript" type="text/javascript" src="https://cdn.jsdelivr.net/npm/p5@1.4.0/lib/p5.min.js"></script>
+       
+	</head>
+	<body>
+		
+		
+		<div id="wrapper">
+    <div id="container">
+
+      <div id="canvas" class="grid"> 
+      	<div id="intro">
+      		<h2 class="category">cracked world</h2>
+	        <h3 class="subcategory">the less fragile, the more neat outcome pattern.</h3>
+	        <p class="goal"> data source: <a href="https://fragilestatesindex.org/">Fragile States Index __ Measuring Fragility, Risk, and Vulnerability in 179 Countries</a></p>
+	        <div class="info"> <p>For each country:<br>a grid is generated for each year. the total fragility score is mapped to the angles of the flow field. the flow field is also distorted by perlin noise, the parameters of which are determined based on the total fragility score. each crack starts at the centre of the canvas and propagates outwards as frames go on. colours are randomly selected among the country's flag colours. the colour blend mode is set to "multiply". so, if a country's total fragility score is high and it has high variations during many years then there will be more overlapping cracks ultimately creating black lines. also the propagating cracks will have a greater chance to escape the main grid area if a country has very low total fragility score that has been well maintained and remained stable during many years. </p> </div>
+      	</div>
+        
+      	<fieldset>
+		   		<legend>Select a country:</legend>
+	    	</fieldset>		    
+      </div>
+    </div>
+  </div>
+
+<!--
+*****************************
+****************************
+***************************
+************************** Data Visualisation Code __ START 
+***************************
+****************************
+******************************
+-->
+
+
+		<script type="text/javascript">
+
+
+//////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+//////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+//////////////////////////////////////////////////////////// p5.js preparation & functions 
+//////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+//////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+
+
+			let padding = 10;
+			let freq = 10;
+
+
+			// generating the grid and putting angle information for the flow filed in it.
+			generateGrid = function (num_columns=0, num_rows=0, grid=[], seed=false, qTotal, scoreMax, p) {
+			    
+
+      	alpha = scaleAngle(qTotal); 
+
+		    for (let column=0; column < num_columns; column++) {
+		      	grid[column]=[];
+		      	for (let row=0; row < num_rows; row++) {
+              if (seed) { 
+                p.noiseSeed(seed);
+            	};
+            	// get our noise value, between 0.0 and 1.0       
+              lod = p.map(qTotal, 0,scoreMax, 1,8);
+              falloff = p.map(qTotal, 0,scoreMax, 0,1);;
+              p.noiseDetail(lod,falloff);
+
+              scaled_x = (column+1) * scaleGrid(qTotal);
+              scaled_y = (row+1) * scaleGrid(qTotal);
+              noise_val = p.noise(scaled_x,scaled_y);
+              
+              grid[column][row] = p.map(noise_val, 0, 1, -alpha, alpha);
+        		};
+    		};
+		    return grid;
+	    };
+
+		  /**
+		   * Draws a vector.
+		   * much simpler function
+		   *
+		   * @param      {number}  [start_x=0]
+		   * @param      {number}  [start_y=0]
+		   * @param      {<type>}  end_x        The end x
+		   * @param      {<type>}  end_y        The end y
+		   * @param      {<type>}  angle        The angle
+		   * @param      {<type>}  length       The length
+		   * @param      {<type>}  p            sketch canvas
+		   */
+
+		  	drawVector = function (start_x=0, start_y=0, end_x=false, end_y=false, length=30, tetha, colour, p) {
+
+		    	if (!end_x || !end_y) {
+			     	v0 = p.createVector(start_x, start_y);
+			      	start_x = v0.x;
+			      	start_y = v0.y;
+			      	v = p5.Vector.fromAngle(tetha, length);
+			      	v1 = v0.add(v);
+			      	end_x = v1.x;
+			      	end_y = v1.y;
+			    } else if (end_x && end_y) {
+			      v1 = p.createVector(start_x, start_y, end_x, end_y);
+			    };
+
+			    
+			    colour.setAlpha(0.5);
+			    p.stroke(colour);
+			    p.line(start_x, start_y, end_x, end_y); 
+			    return v1;
+		  	};
+
+
+		  /**
+		   * [drawCurve description]
+		   * @param  {Number} start_x       
+		                          1.  Use a regular grid for starting points >> the simplest, but sometimes it can feel overly stiff
+		                          2.  Use uniformly random selection to pick the points >> a looser feeling, but it will leave some clumps and some sparse areas,
+		                          3.  Use circle packing >> a nice balance: things are pretty evenly spaced out, but with enough random variation that it's more relaxed
+		   * @param  {Number} start_y
+		                          1.  Use a regular grid for starting points
+		                          2.  Use uniformly random selection to pick the points
+		                          3.  Use circle packing
+		   * @param  {Number} num_steps    affect the texture of the result. Short curves may look more like "fur". Long curves are more fluid.
+		   * @param  {Number} step_length  usually around 0.1% to 0.5% of the image width. go larger for quicker render speeds, go smaller if there are tight turns that need to be clean.
+		   * @param  {[type]} left_x      [description]
+		   * @param  {[type]} right_x     [description]
+		   * @param  {[type]} top_y       [description]
+		   * @param  {[type]} bottom_y    [description]
+		   * @param  {[type]} resolutionX [description]
+		   * @param  {[type]} resolutionY [description]
+		   * @param  {[type]} p           [description]
+		   * @return {[type]}             [description]
+		   */
+		  	drawCurve = function (start_x=0, start_y=0, num_steps=100, step_length=1, num_columns, num_rows, resolutionX, resolutionY, grid=[], strokeColour, qTotal, p) {
+			    // to visualise the start point   
+				p.noFill();
+			    x = start_x;
+			    y = start_y;
+			    // console.log("grid inside drawCurve",grid);
+			    
+			    p.blendMode(p.MULTIPLY);
+			    strokeColour.setAlpha(1)//0.2);
+			    p.strokeWeight(Math.min(Math.max(2*step_length,2)*strokeScale(qTotal), 5));
+			    p.stroke(strokeColour);
+
+
+
+			    p.beginShape();
+			    p.curveVertex(x, y); // to include the start point
+			    for (let n=0; n<num_steps; n++) {
+			      // to avoid falling off the margins, it's better to check whether x,y are inside the boundaries or not
+			    	if (x>=0 && x<=width && y>=0 && y<=height) {
+			        p.curveVertex(x, y); // to include the last point
+			        column_index = p.int(x / resolutionX); //correct except that p.int may give column_index = num_columns which will mess with the next step for index of grid array.
+			        row_index = p.int(y / resolutionY); //correct
+			        // console.log(column_index, row_index);
+			        if (column_index < num_columns && row_index < num_rows) { 
+			        	grid_angle = grid[column_index][row_index]; 
+		        	}; // else { console.log("skip the nasty error!"); };
+			        x_step = step_length * Math.cos(grid_angle);    
+			        y_step = step_length * Math.sin(grid_angle);
+			        x += x_step;     
+			        y += y_step;
+			        p.curveVertex(x, y); // to include the last point
+		      	};
+			    };
+			    
+			    p.curveVertex(x, y); // to include the last point
+			    p.endShape();
+		 	};
+
+
+
+
+	  	//Create panning buttons
+				createPanButtons = function() {
+
+					//Create the clickable groups
+					//North
+					north = geo.append("g")
+												.attr("class", "pan")	//All share the 'pan' class
+												.attr("id", "north");	//The ID will tell us which direction to head
+
+					north.append("rect")
+						.attr("x", 0)
+						.attr("y", 0)
+						.attr("width", width)
+						.attr("height", 30);
+
+					north.append("text")
+						.attr("x", width/2)
+						.attr("y", 20)
+						.html("&uarr;");
+					
+					//South
+					south = geo.append("g")
+						.attr("class", "pan")
+						.attr("id", "south");
+
+					south.append("rect")
+						.attr("x", 0)
+						.attr("y", height - 30)
+						.attr("width", width)
+						.attr("height", 30);
+
+					south.append("text")
+						.attr("x", width/2)
+						.attr("y", height - 10)
+						.html("&darr;");
+
+					//West
+					west = geo.append("g")
+						.attr("class", "pan")
+						.attr("id", "west");
+
+					west.append("rect")
+						.attr("x", 0)
+						.attr("y", 30)
+						.attr("width", 30)
+						.attr("height", height - 60);
+
+					west.append("text")
+						.attr("x", 15)
+						.attr("y", height/2)
+						.html("&larr;");
+
+					//East
+					east = geo.append("g")
+						.attr("class", "pan")
+						.attr("id", "east");
+
+					east.append("rect")
+						.attr("x", width - 30)
+						.attr("y", 30)
+						.attr("width", 30)
+						.attr("height", height - 60);
+
+					east.append("text")
+						.attr("x", width - 15)
+						.attr("y", height/2)
+						.html("&rarr;");
+
+					//Panning interaction
+
+					d3.selectAll(".pan")
+						.on("click", function() {
+																			//Set how much to move on each click
+																			moveAmount = 500;
+																			//Set x/y to zero for now
+																			xx = 0;
+																			yy = 0;
+																			
+																			//Which way are we headed?
+																			direction = d3.select(this).attr("id");
+
+																			//Modify the offset, depending on the direction
+																			switch (direction) {
+																				case "north":
+																					yy += moveAmount;  //Increase y offset
+																					break;
+																				case "south":
+																					yy -= moveAmount;  //Decrease y offset
+																					break;
+																				case "west":
+																					xx += moveAmount;  //Increase x offset
+																					break;
+																				case "east":
+																					xx -= moveAmount;  //Decrease x offset
+																					break;
+																				default:
+																					break;
+																			}
+
+																			//This triggers a zoom event, translating by x, y
+																			map.transition()
+																					.call(zoom.translateBy, xx, yy);
+
+																		});
+				};
+		  	
+
+
+
+		  	
+						
+			
+
+//////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+//////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+//////////////////////////////////////////////////////////// Load & Read data  - multiple files
+//////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+//////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+			let rawData = [];
+			let data = [];
+			let width = 0.618*window.screen.availWidth;
+			let height = 0.618*window.screen.availHeight;
+			Promise.all([
+					    d3.text("data/fsi-2006.csv"),
+					    d3.text("data/fsi-2007.csv"),
+					    d3.text("data/fsi-2008.csv"),
+					    d3.text("data/fsi-2009.csv"),
+					    d3.text("data/fsi-2010.csv"),
+					    d3.text("data/fsi-2011.csv"),
+					    d3.text("data/fsi-2012.csv"),
+					    d3.text("data/fsi-2013.csv"),
+					    d3.text("data/fsi-2014.csv"),
+					    d3.text("data/fsi-2015.csv"),
+					    d3.text("data/fsi-2016.csv"),
+					    d3.text("data/fsi-2017.csv"),
+					    d3.text("data/fsi-2018.csv"),
+					    d3.text("data/fsi-2019.csv"),
+					    d3.text("data/fsi-2020.csv"),
+					    d3.text("data/fsi-2021.csv"),
+					    d3.text("data/fsi-2022.csv")
+					]).then(function(inputData) { // manipulate data inside this {}
+						// console.log("inputData", inputData); // OK data from all files is combined in a single array. each row is a file in text format.
+						
+					    d3.json("data/world-geo.json").then(function(world_geo){
+					    	geoData = world_geo.features;
+					    	mapCountries = d3.map(geoData, d => d.properties.name);
+								console.log("geoData", geoData); // OK
+								// console.log("inputData", inputData); // OK
+								d3.map(inputData, row => rawData.push(d3.csvParse(row, line => line))); // map every row into an array of object instead of text. now all data from all files is in a single array in which each row is an array of object for a single file.
+								// console.log("rawData", rawData); // OK
+
+
+								
+
+								let countries = new Set(); // to get rid of redundency
+								d3.map(rawData, file => d3.map(file, country => countries.add(country.Country)));
+								countries = [...countries];
+								countries = d3.sort(countries, d => d);
+								console.log("countries", countries); // OK
+
+
+
+								// json Data key1: country key2: year
+								let jsonData = {};
+								d3.map(rawData, file => { 
+														d3.map(countries, name =>  {
+																					jsonData[name] = [];
+																					d3.map(rawData, file => d3.map(file, country => { 
+																																	if (country.Country == name) {jsonData[name].push(country);}
+																																}));
+																				});
+													});
+
+								// console.log("jsonData", jsonData); // OK
+								// console.log("countries", d3.sort(Object.keys(jsonData), k => k)); // OK
+								
+
+
+
+								
+								let flagColoursAll = { 
+
+													'Sint Maarten' :
+													["#dc1016",
+													"#002688",
+													"#62b0e2",
+													"#f9da06",
+													"#bd725f",
+													"#00892d"],
+
+													'Curaçao' :
+													["#002680",
+													"#fff",
+													"#f9e90d"],
+
+													'Old Mauritania' :
+													["#006233",
+													"#ffc400"],
+
+													'Scotland ' :
+													["#0065bf",
+													"#fff"],
+
+													'Wales ' :
+													["#fff",
+													"#d30731",
+													"#00ad36"],
+
+													'England ' :
+													["#cf081f",
+													"#fff"],
+
+													'Ethiopia' :
+													["#da1219",
+													"#078930",
+													"#fcdc09",
+													"#a55b44",
+													"#6b6b6c",
+													"#000"],
+
+													'Uzbekistan' :
+													["#0099b5",
+													"#ce1126",
+													"#fff",
+													"#1eb53a"],
+
+													'Uruguay' :
+													["#fcd116",
+													"#7b3f00",
+													"#fff",
+													"#0038a8"],
+
+													'United Kingdom':
+													["#00247d",
+													"#fff",
+													"#cf142b"],
+
+													'United Arab Emirates' :
+													["red",
+													"#00732f",
+													"#fff",
+													"#000"],
+
+													'Ukraine' :
+													["#005bbb",
+													"#ffd500"],
+
+													'Uganda' :
+													["#000",
+													"#fcdc04",
+													"#d90000",
+													"#fff",
+													"#9ca69c"],
+
+													'Niue' :
+													["#002868",
+													"#fff",
+													"#cf142b",
+													"#fcd116"],
+
+													'Cook Islands' :
+													["#cf142b",
+													"#fff",
+													"#00247d"],
+
+													'Zimbabwe' :
+													["#006400",
+													"#ffd200",
+													"#d40000",
+													"#000",
+													"#fff",
+													"#fc0"],
+
+													'Zambia' :
+													["#198a00",
+													"#de2010",
+													"#000",
+													"#ef7d00"],
+
+													'Yemen' :
+													["#ce1126",
+													"#fff",
+													"#000"],
+
+													'Vietnam' :
+													["#da251d",
+													"#ffcd00"],
+
+													'Venezuela' :
+													["#fc0",
+													"#00247d",
+													"#cf142b",
+													"#fff"],
+
+													'Vatican City' :
+													["#ffe100",
+													"#fff",
+													"#cdcdcd",
+													"red"],
+
+													'Vanuatu' :
+													["#000",
+													"#fdce12",
+													"#d21034",
+													"#009543"],
+
+													'Tuvalu' :
+													["#00247d",
+													"#fff",
+													"#cf142b",
+													"#ffce00",
+													"#5b97b1"],
+
+													'Turkmenistan' :
+													["#00843d",
+													"#fff",
+													"#d22630",
+													"#ffc72c"],
+
+													'Turkey' :
+													["#e30a17",
+													"#fff"],
+
+													'Tunisia' :
+													["#e70013",
+													"#fff"],
+
+													'Trinidad and Tobago' :
+													["#da1a35",
+													"#fff",
+													"#000"],
+
+													'Tonga' :
+													["#fff",
+													"#c10000"],
+
+													'Togo' :
+													["#d21034",
+													"#fff",
+													"#006a4e",
+													"#ffce00"],
+
+													'Thailand' :
+													["#a51931",
+													"#f4f5f8",
+													"#2d2a4a"],
+
+													'Tanzania' :
+													["#1eb53a",
+													"#fcd116",
+													"#000",
+													"#00a3dd"],
+
+													'Tajikistan' :
+													["#c00",
+													"#fff",
+													"#060",
+													"#f8c300"],
+
+													'Syria' :
+													["#007a3d",
+													"#fff",
+													"#000",
+													"#ce1126"],
+
+													'Switzerland' :
+													["#d52b1e",
+													"#fff"],
+
+													'Sweden' :
+													["#004b87",
+													"#ffcd00"],
+
+													'Swaziland' :
+													["#3e5eb9",
+													"#ffd900",
+													"#b10c0c",
+													"#fff",
+													"#000"],
+
+													'Suriname' :
+													["#377e3f",
+													"#fff",
+													"#b40a2d",
+													"#ecc81d"],
+
+													'Sudan' :
+													["#007229",
+													"#d21034",
+													"#fff",
+													"#000"],
+
+													'Sri Lanka' :
+													["#ffbe29",
+													"#8d153a",
+													"#eb7400",
+													"#00534e"],
+
+													'Spain' :
+													["#aa151b",
+													"#f1bf00",
+													"#0039f0",
+													"#ccc",
+													"#ed72aa",
+													"#058e6e"],
+
+													'South Sudan' :
+													["#0f47af",
+													"#fcdd09",
+													"#000",
+													"#fff",
+													"#da121a",
+													"#078930"],
+
+													'South Africa' :
+													["#000",
+													"#ffb612",
+													"#007a4d",
+													"#fff",
+													"#de3831",
+													"#002395"],
+
+													'Somalia' :
+													["#4189dd",
+													"#fff"],
+
+													'Solomon Islands' :
+													["#0051ba",
+													"#fff",
+													"#fcd116",
+													"#215b33"],
+
+													'Slovenia' :
+													["#fff",
+													"#005da4",
+													"#ed1c24",
+													"#fd0"],
+
+													'Slovak Republic' :
+													["#fff",
+													"#0b4ea2",
+													"#ee1c25"],
+
+													'Singapore' :
+													["#ef3340",
+													"#fff"],
+
+													'Sierra Leone' :
+													["#1eb53a",
+													"#fff",
+													"#0072c6"],
+
+													'Seychelles' :
+													["#003f87",
+													"#fcd856",
+													"#d62828",
+													"#fff",
+													"#007a3d"],
+
+													'Serbia' :
+													["#c6363c",
+													"#0c4076",
+													"#fff",
+													"#edb92e"],
+
+													'Senegal' :
+													["#00853f",
+													"#fdef42",
+													"#e31b23"],
+
+													'Saudi Arabia' :
+													["#006c35",
+													"#fff"],
+
+													'Sao Tome and Principe' :
+													["#d21034",
+													"#12ad2b",
+													"#ffce00",
+													"#000"],
+
+													'San Marino' :
+													["#5eb6e4",
+													"#fff",
+													"#f1bf31",
+													"#d99f31",
+													"#658d5c",
+													"#94bb79"],
+
+													'Samoa' :
+													["#002b7f",
+													"#fff",
+													"#ce1126"],
+
+													'Saint Vincent and the Grenadines' :
+													["#0072c6",
+													"#fcd116",
+													"#009e60"],
+
+													'Saint Lucia' :
+													["#6cf",
+													"#fcd116",
+													"#fff",
+													"#000"],
+
+													'Saint Kitts and Nevis' :
+													["#009e49",
+													"#fcd116",
+													"#ce1126",
+													"#fff",
+													"#000"],
+
+													'Rwanda' :
+													["#00a1de",
+													"#e5be01",
+													"#fad201",
+													"#20603d"],
+
+													'Russia' :
+													["#fff",
+													"#0033a0",
+													"#da291c"],
+
+													'Romania' :
+													["#002b7f",
+													"#fcd116",
+													"#ce1126"],
+
+													'Qatar' :
+													["#fff",
+													"#8d1b3d"],
+
+													'Portugal' :
+													["#060",
+													"red",
+													"#ff0",
+													"#fff",
+													"#039"],
+
+													'Poland' :
+													["#fff",
+													"#dc143c"],
+
+													'Philippines' :
+													["#fcd116",
+													"#0038a8",
+													"#ce1126",
+													"#fff"],
+
+													'Peru' :
+													["#d91023",
+													"#fff"],
+
+													'Paraguay' :
+													["#d52b1e",
+													"#fff",
+													"#0038a8",
+													"#000",
+													"#009a3a",
+													"#fedf00"],
+
+													'Papua New Guinea' :
+													["#000",
+													"#fff",
+													"#ce1126",
+													"#fcd116"],
+
+													'Panama' :
+													["#d21034",
+													"#fff",
+													"#005293"],
+
+													'Palestine' :
+													["#ce1126",
+													"#000",
+													"#fff",
+													"#007a3d"],
+
+													'Palau' :
+													["#09f",
+													"#ff0"],
+
+													'Pakistan' :
+													["#01411c",
+													"#fff"],
+
+													'Oman' :
+													["#fff",
+													"#db161b",
+													"green"],
+
+													'Norway' :
+													["#c8102e",
+													"#fff",
+													"#003087"],
+
+													'Nigeria' :
+													["#008751",
+													"#fff"],
+
+													'Niger' :
+													["#e05206",
+													"#fff",
+													"#0db02b"],
+
+													'Nicaragua' :
+													["#0067c6",
+													"#fff",
+													"#c9a504",
+													"#6fd8f3",
+													"#97c924",
+													"red"],
+
+													'New Zealand' :
+													["#00247d",
+													"#fff",
+													"#cc142b"],
+
+													'Netherlands' :
+													["#ae1c28",
+													"#fff",
+													"#21468b"],
+
+													'Nepal' :
+													["#003893",
+													"#dc143c",
+													"#fff"],
+
+													'Nauru' :
+													["#002b7f",
+													"#ffc61e",
+													"#fff"],
+
+													'Namibia' :
+													["#ffce00",
+													"#003580",
+													"#d21034",
+													"#fff",
+													"#009543"],
+
+													'Myanmar' :
+													["#fecb00",
+													"#34b233",
+													"#ea2839",
+													"#fff"],
+
+													'Mozambique' :
+													["#d21034",
+													"#007168",
+													"#000",
+													"#fff",
+													"#fce100"],
+
+													'Morocco' :
+													["#c1272d",
+													"#006233"],
+
+													'Montenegro' :
+													["#c40308",
+													"#d3ae3b",
+													"#1d5e91",
+													"#6d8c3e"],
+
+													'Mongolia' :
+													["#c4272f",
+													"#f9cf02",
+													"#015197"],
+
+													'Monaco' :
+													["#ce1126",
+													"#fff"],
+
+													'Moldova' :
+													["#0046ae",
+													"#ffd200",
+													"#cc092f",
+													"#b07f55",
+													"#097754"],
+
+													'Micronesia' :
+													["#75b2dd",
+													"#fff"],
+
+													'Mexico' :
+													["#006341",
+													"#fff",
+													"#ce1126"],
+
+													'Mauritius' :
+													["#ea2839",
+													"#1a206d",
+													"#ffd500",
+													"#00a551"],
+
+													'Mauritania' :
+													["#d01c1f",
+													"#00a95c",
+													"gold"],
+
+													'Marshall Islands' :
+													["#003893",
+													"#fff",
+													"#dd7500"],
+
+													'Malta' :
+													["#cf142b",
+													"#fff",
+													"#ccc",
+													"#96877d"],
+
+													'Mali' :
+													["#14b53a",
+													"#fcd116",
+													"#ce1126"],
+
+													'Maldives' :
+													["#d21034",
+													"#007e3a",
+													"#fff"],
+
+													'Malaysia' :
+													["#010066",
+													"#cc0001",
+													"#fff",
+													"#fc0"],
+
+													'Malawi' :
+													["#000",
+													"#ce1126",
+													"#339e35"],
+
+													'Madagascar' :
+													["#fff",
+													"#fc3d32",
+													"#007e3a"],
+
+													'Macedonia' :
+													["#d20000",
+													"#ffe600"],
+
+													'Luxembourg' :
+													["#f6343f",
+													"#fff",
+													"#00a2e1"],
+
+													'Lithuania' :
+													["#fdb913",
+													"#006a44",
+													"#c1272d"],
+
+													'Liechtenstein' :
+													["#002b7f",
+													"#ce1126",
+													"#ffd83d",
+													"#000"],
+
+													'Libya' :
+													["#e70013",
+													"#000",
+													"#fff",
+													"#239e46"],
+
+													'Liberia' :
+													["#002868",
+													"#fff",
+													"#bf0a30"],
+
+													'Lesotho' :
+													["#00209f",
+													"#fff",
+													"#000",
+													"#009543"],
+
+													'Lebanon' :
+													["#ed1c24",
+													"#fff",
+													"#00a651"],
+
+													'Latvia' :
+													["#9e3039",
+													"#fff"],
+
+													'Laos' :
+													["#ce1126",
+													"#002868",
+													"#fff"],
+
+													'Kyrgyzstan' :
+													["#e8112d",
+													"#ffef00"],
+
+													'Kuwait' :
+													["#000",
+													"#007a3d",
+													"#fff",
+													"#ce1126"],
+
+													'South Korea' :
+													["#000",
+													"#fff",
+													"#cd2e3a",
+													"#0047a0"],
+
+													'North Korea' :
+													["#024fa2",
+													"#fff",
+													"#ed1c27"],
+
+													'Kiribati' :
+													["#ce1126",
+													"#fcd116",
+													"#fff",
+													"#003f87"],
+
+													'Kenya' :
+													["#922529",
+													"#008c51",
+													"#fff",
+													"#000"],
+
+													'Kazakhstan' :
+													["#00afca",
+													"#fec50c"],
+
+													'Jordan' :
+													["#ce1126",
+													"#000",
+													"#fff",
+													"#007a3d"],
+
+													'Japan' :
+													["#fff",
+													"#bc002d"],
+
+													'Jamaica' :
+													["#000",
+													"#fed100",
+													"#009b3a"],
+
+													"Ivory Coast" :
+													["#f77f00",
+													"#fff",
+													"#009e60"],
+													
+
+													'Italy' :
+													["#008c45",
+													"#f4f5f0",
+													"#cd212a"],
+
+													'Israel' :
+													["#fff",
+													"#0038b8"],
+
+													'Ireland' :
+													["#169b62",
+													"#fff",
+													"#ff883e"],
+
+													'Iraq' :
+													["#ce1126",
+													"#fff",
+													"#007a3d",
+													"#000"],
+
+													'Iran' :
+													["#239f40",
+													"#fff",
+													"#da0000"],
+
+													'Indonesia' :
+													["red",
+													"#fff"],
+
+													'Iceland' :
+													["#dc1e35",
+													"#fff",
+													"#02529c"],
+
+													'Hungary' :
+													["#cd2a3e",
+													"#fff",
+													"#436f4d"],
+
+													'Honduras' :
+													["#0073cf",
+													"#fff"],
+
+													'Haiti' :
+													["#00209f",
+													"#d21034",
+													"#fff",
+													"#016a16",
+													"#f1b517"],
+
+													'Guyana' :
+													["#ce1126",
+													"#000",
+													"#fcd116",
+													"#fff",
+													"#009e49"],
+
+													'Guinea Bissau' :
+													["#000",
+													"#ce1126",
+													"#fcd116",
+													"#009e49"],
+
+													'Guinea' :
+													["#ce1126",
+													"#fcd116",
+													"#009460"],
+
+													'Guatemala' :
+													["#4997d0",
+													"#fff",
+													"#448127",
+													"#f9f0aa",
+													"#6c301e",
+													"#b2b6ba"],
+
+													'Grenada' :
+													["#ce1126",
+													"#fcd116",
+													"#007a5e"],
+
+													'Greece' :
+													["#0d5eaf",
+													"#fff"],
+
+													'Ghana' :
+													["#ce1126",
+													"#fcd116",
+													"#000",
+													"#006b3f"],
+
+													'Germany' :
+													["#000",
+													"#d00",
+													"#ffce00"],
+
+													'Georgia' :
+													["red",
+													"#fff"],
+
+													'Gambia' :
+													["#ce1126",
+													"#fff",
+													"#0c1c8c",
+													"#3a7728"],
+
+													'Gabon' :
+													["#009e60",
+													"#fcd116",
+													"#3a75c4"],
+
+													'United States' :
+													["#3c3b6e",
+													"#fff",
+													"#b22234"],
+
+													'France' :
+													["#0055a4",
+													"#fff",
+													"#ef4135"],
+
+													'Finland' :
+													["#002f6c",
+													"#fff"],
+
+													'Fiji' :
+													["#002868",
+													"#68bfe5",
+													"#fff",
+													"#ce1126",
+													"#ffd100",
+													"#00a651"],
+
+													'Ethiopia' :
+													["#078930",
+													"#fcdd09",
+													"#da121a",
+													"#0f47af"],
+
+													'Estonia' :
+													["#0072ce",
+													"#000",
+													"#fff"],
+
+													'Eritrea' :
+													["#ea0437",
+													"#ffc726",
+													"#12ad2b",
+													"#4189dd"],
+
+													'Equatorial Guinea' :
+													["#000",
+													"#0073ce",
+													"#3e9a00",
+													"#fff",
+													"#e32118",
+													"gold"],
+
+													'El Salvador' :
+													["#0f47af",
+													"#fff",
+													"#fc0",
+													"#1e5b19",
+													"#e60000"],
+
+													'Egypt' :
+													["#ce1126",
+													"#fff",
+													"#c09300",
+													"#000"],
+
+													'Ecuador' :
+													["#fd0",
+													"#034ea2",
+													"#ed1c24",
+													"#452c25",
+													"#b87510",
+													"#086f35"],
+
+													'Timor-Leste' :
+													["#000",
+													"#fff",
+													"#ffc726",
+													"#dc241f"],
+
+													'Dominican Republic' :
+													["#002d62",
+													"#fff",
+													"#ce1126",
+													"#eac102",
+													"#008337"],
+
+													'Dominica' :
+													["#006b3f",
+													"#fcd116",
+													"#000",
+													"#fff",
+													"#d41c30",
+													"#9461c9"],
+
+													'Djibouti' :
+													["#6ab2e7",
+													"#12ad2b",
+													"#fff",
+													"#d7141a"],
+
+													'Denmark' :
+													["#c60c30",
+													"#fff"],
+
+													'Czech Republic' :
+													["#11457e",
+													"#fff",
+													"#d7141a"],
+
+													'Cyprus' :
+													["#d57800",
+													"#fff",
+													"#4e5b31"],
+
+													'Cuba' :
+													["#002a8f",
+													"#fff",
+													"#cf142b"],
+
+													'Croatia' :
+													["red",
+													"#fff",
+													"#0093dd",
+													"#f7db17",
+													"#171796"],
+
+													'Costa Rica' :
+													["#002b7f",
+													"#fff",
+													"#ce1126"],
+
+													'Congo Republic' :
+													["#009543",
+													"#fbde4a",
+													"#dc241f"],
+
+													'Congo Democratic Republic' :
+													["#007fff",
+													"#f7d618",
+													"#ce1021"],
+
+													'Comoros' :
+													["#3d8e33",
+													"#ffc61e",
+													"#fff",
+													"#ce1126",
+													"#3a75c4"],
+
+													'Colombia' :
+													["#fcd116",
+													"#003893",
+													"#ce1126"],
+
+													'China' :
+													["#de2910",
+													"#ffde00"],
+
+													'Chile' :
+													["#0039a6",
+													"#fff",
+													"#d52b1e"],
+
+													'Chad' :
+													["#002664",
+													"#fecb00",
+													"#c60c30"],
+
+													'Central African Republic' :
+													["#003082",
+													"#fff",
+													"#289728",
+													"#ffce00",
+													"#d21034"],
+
+													'Cape Verde' :
+													["#003893",
+													"#fff",
+													"#f7d116",
+													"#cf2027"],
+
+													'Canada' :
+													["red",
+													"#fff"],
+
+													'Cameroon' :
+													["#007a5e",
+													"#ce1126",
+													"#fcd116"],
+
+													'Cambodia' :
+													["#032ea1",
+													"#e00025",
+													"#fff",
+													"#000"],
+
+													'Burundi' :
+													["#1eb53a",
+													"#fff",
+													"#ce1126"],
+
+													'Burkina Faso' :
+													["#ef2b2d",
+													"#fcd116",
+													"#009e49"],
+
+													'Bulgaria' :
+													["#fff",
+													"#00966e",
+													"#d62612"],
+
+													'Brunei Darussalam' :
+													["#f7e017",
+													"#fff",
+													"#000",
+													"#cf1126"],
+
+													'Brazil' :
+													["#009c3b",
+													"#ffdf00",
+													"#002776",
+													"#fff"],
+
+													'Botswana' :
+													["#75aadb",
+													"#fff",
+													"#000"],
+
+													'Bosnia and Herzegovina' :
+													["#002395",
+													"#fecb00"],
+
+													'Bolivia' :
+													["#d52b1e",
+													"#f9e300",
+													"#007934"],
+
+													'Bhutan' :
+													["#ffd520",
+													"#fff",
+													"#ff4e12"],
+
+													'Benin' :
+													["#008751",
+													"#fcd116",
+													"#e8112d"],
+
+													'Belize' :
+													["#ce1126",
+													"#003f87",
+													"#fff",
+													"#289400",
+													"#ffd83c",
+													"#9dd7ff"],
+
+													'Belgium' :
+													["#000",
+													"#fdda24",
+													"#ef3340"],
+
+													'Belarus' :
+													["#c8313e",
+													"#4aa657",
+													"#fff"],
+
+													'Barbados' :
+													["#00267f",
+													"#ffc726",
+													"#000"],
+
+													'Bangladesh' :
+													["#006747",
+													"#da291c"],
+
+													'Bahrain' :
+													["#fff",
+													"#ce1126"],
+
+													'Bahamas' :
+													["#000",
+													"#00778b",
+													"#ffc72c"],
+
+													'Azerbaijan' :
+													["#00b9e4",
+													"#ed2939",
+													"#fff",
+													"#3f9c35"],
+
+													'Austria' :
+													["#ed2939",
+													"#fff"],
+
+													'Australia' :
+													["#00008b",
+													"#fff",
+													"red"],
+
+													'Armenia' :
+													["#d90012",
+													"#0033a0",
+													"#f2a800"],
+
+													'Argentina' :
+													["#75aadb",
+													"#fff",
+													"#fcbf49",
+													"#843511"],
+
+													'Antigua and Barbuda' :
+													["#ce1126",
+													"#fff",
+													"#0072c6",
+													"#fcd116",
+													"#000"],
+
+													'Angola' :
+													["#cc092f",
+													"#ffcb00",
+													"#000"],
+
+													'Andorra' :
+													["#0018a8",
+													"#fedf00",
+													"#c7b37f",
+													"#fff",
+													"#d52b1e"],
+
+													'Algeria' :
+													["#007229",
+													"#fff",
+													"#d21034"],
+
+													'Albania' :
+													["#e41e20",
+													"#000"],
+
+													'African Union' :
+													["#319400",
+													"#f7c608",
+													"#fff",
+													"#952038"],
+
+													'Afghanistan' :
+													["#000",
+													"#d32011",
+													"#fff",
+													"#007a36"],
+
+													'Aaland' :
+													["#1274bf",
+													"#fdd600",
+													"#d22131"],
+
+													'India' :
+													["#f93",
+													"#fff",
+													"#138808",
+													"navy"]
+
+												};
+								// console.log("flagColoursAll", flagColoursAll); // OK
+								flagCountries = d3.sort(Object.keys(flagColoursAll), c => c);
+								// console.log("flags", flagCountries); // OK
+
+
+								// commonCountries = d3.intersection(mapCountries, countries); //d3.intersection(flagCountries, countries);
+								// missingCountries = d3.difference(countries, commonCountries);
+								// extraCountries = d3.difference(mapCountries, commonCountries);//d3.difference(flagCountries, commonCountries);
+								// console.log("found flag countries:", commonCountries); //OK
+								// console.log("missing map/flag countries:", missingCountries); //OK
+								// console.log("extra map/flag countries:", extraCountries); //OK
+
+
+
+
+
+              	scoreMax = 120; // 120 is max total score (max score of 10 for 12 categories)
+
+								// scale for mapping Total score to angle variation of grid
+								scaleAngle = d3.scaleRadial()
+															.domain([0,scoreMax]) 
+															.range([0,2*Math.PI]);
+
+            		scaleGrid = d3.scaleLinear()
+															.domain([0,scoreMax]) 
+															.range([0.001,0.999]);
+
+
+								strokeScale = d3.scaleLinear()
+																.domain([0,scoreMax]) 
+																.range([0.2,0.8]);
+
+								div = d3.select("fieldset")
+												.append("div");
+								div.append("input")
+										.attr("type", "radio")
+										.attr("id", "ALL")
+										.attr("name", "countries")
+										.attr("value", "All Countries")
+										.attr("class", "PointerCursor");
+								div.append("label")
+										.attr("for", "ALL")
+										.attr("class", "PointerCursor")
+										.html("All Countries");
+
+								for (countryName in jsonData) {
+									div = d3.select("fieldset")
+													.append("div");
+
+									div.append("input")
+											.attr("type", "radio")
+											.attr("id", countryName)
+											.attr("name", "countries")
+											.attr("value", countryName)
+											.attr("class", "PointerCursor");
+
+									div.append("label")
+											.attr("for", countryName)
+											.attr("class", "PointerCursor")
+											.html(countryName);
+								};
+
+								
+
+
+
+							//Define map projection
+								projection = d3.geoMercator()
+																.translate([width/2,140+height/2])
+																.scale(height/4.2)
+																// .fitWidth(width, outline)
+
+							  // console.log(d3.select("svg"))
+
+
+							//Define path generator
+
+								path = d3.geoPath()
+												 .projection(projection)
+												 
+												 // .bounds(outline);
+
+
+							//Create SVG element
+								geo = d3.select("#canvas")
+												.append("svg")
+												.attr("id", "map")
+												.attr("width", width)
+												.attr("height", height);
+
+								geo.selectAll("path")
+								   .data(geoData)
+								   .enter()
+								   .append("path")
+								   .attr("d", path)
+								   .style("stroke", "blue")
+								   .style("fill", "none")
+								   .attr("class", d => d.properties.name)
+								   .property("centroid", d => path.centroid(d));
+
+							//Define what to do when panning or zooming
+								zooming = function(event,d) {
+									//New offset array
+									offset = [event.transform.x, event.transform.y];
+
+									//Calculate new scale
+									newScale = event.transform.k * 2000;
+
+									//Update projection with new offset and scale
+									projection.translate(offset)
+													  .scale(newScale);
+
+									//Update all paths and circles
+									geo.selectAll("path")
+											.attr("d", path);
+
+									// d3.select("#canvas").selectAll("*")
+									// 	.attr("cx", function(d) {
+									// 		return projection([d.lon, d.lat])[0];
+									// 	})
+									// 	.attr("cy", function(d) {
+									// 		return projection([d.lon, d.lat])[1];
+									// 	});
+
+									// 	console.log("the event transform info ____ " + event.transform);
+									// 	console.log("____ is also stored in the zoomed element obj :) ____" + d3.zoomTransform(this));
+
+								};
+
+								//Then define the zoom behavior
+								zoom = d3.zoom()
+											 		.on("zoom", zooming);
+
+								//The center of the country, roughly
+								center = projection([width/2, height/2]);
+
+
+								//Create a container in which all zoom-able elements will live
+								map = geo.append("g")
+													// .attr("id", "map")
+													.call(zoom)  //Bind the zoom behavior //Then apply the initial transform
+						  						.call(zoom.transform, d3.zoomIdentity.translate(width/2,150+height/2)
+																																.scale(0.08)
+																																.translate(-center[0], -center[1]));
+
+								//Create a new, invisible background rect to catch zoom events
+								map.append("rect")
+										.attr("x", 0)
+										.attr("y", 0)
+										.attr("width", width)
+										.attr("height", height)
+										.attr("opacity", 0);
+
+		//////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+		//////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+		//////////////////////////////////////////////////////////// Sketches
+		//////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+		//////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+
+
+		// maybe make local grids not all of them in the whole canvas ?!
+								/**
+							   * drawing sketches
+							   */
+								function drawSketchAll(id, countryName, p) {
+						    	sketch = ( p ) => {
+						        p.setup = function() {
+							        let canvas = p.createCanvas(width,height).class("canvas").parent(id);
+							        p.colorMode(p.RGB,255,255,255,1);
+					              	seed = false;//p.day()*p.hour(); //higher speed if no seeding! :)
+						        };
+						        p.draw = function() {
+					          	p.background(255);
+					          	p.frameRate(100);
+
+
+					          	for (countryName in jsonData) {
+					          	//specific to each sketch
+						          	data = jsonData[countryName];
+
+
+						          	domain = d3.extent(data, d => d.Year);
+
+												flagColours = d3.map(flagColoursAll[countryName], colour => d3.color(colour));
+												// console.log("flagColours",flagColours);
+
+						          	gridColourScale = d3.scaleSequential()
+																						.domain(domain)
+																						.interpolator(d3.interpolateRgbBasis(flagColours));
+						       
+						       	
+								       	curveColourScale = d3.scaleSequential()
+														        				.domain(domain)
+														        				.interpolator(d3.interpolateRgbBasis(flagColours));
+														    
+										    let gridColour = {};
+										    let curveColour = {};    				
+										    d3.map(data, d => {
+																			    	year = d.Year;
+															        			gridColour[year] = p.color(gridColourScale(year)); // OR random ?!?!
+														              	curveColour[year] = p.color(curveColourScale(year));;
+									              	});
+
+
+						          	let reduction_factor = 0.3;
+						          	let resolution_factorX = 0.1; 
+						          	let resolution_factorY = 0.1;
+						          	let resolutionX = p.int(width * resolution_factorX); 
+						          	let resolutionY = p.int(height * resolution_factorY);  
+						          	let num_columns = Math.ceil(width/resolutionX)+1;
+						          	let num_rows = Math.ceil(height/resolutionY)+1;
+						          	let length = 0.5*Math.sqrt(resolutionX*resolutionX+resolutionY*resolutionY) * reduction_factor;
+										
+
+												let grid = {};
+
+												
+
+												const step_length = 0.001 * width; // fix to this amount to get smooth curves
+						          	let num_steps = p.frameCount*reduction_factor*(width/step_length)/(data.length);
+						          	if (d3.select("." + `${countryName}`).node()) { centre = d3.select("." + `${countryName}`).node().centroid } else {console.log(countryName, centre)}; // check if any problematic countries with no centroid ?!
+												point = {x:centre[0], y:centre[1]};
+												p.stroke(p.color(p.random(flagColours).formatRgb()));
+												p.strokeWeight(width/300);
+												p.point(point.x,point.y);
+
+												gridTransfer = {x: point.x - reduction_factor*width/2, y: point.y - reduction_factor*height/2};
+
+												// if (p.frameCount==1) {p.createElement("span").parent("#" + id);};
+												// if (!d3.select(".canvasContainer").select("span").node()) {p.createElement("span").parent("#" + id);};
+												// rank = data[p.frameCount-1].Rank;
+												// start = parseInt(data[0].Year);
+												// year = start + p.frameCount - 1 ;
+												// score = data[p.frameCount-1].Total;
+												// totalNum = Object.keys(jsonData).length; //??
+
+											  // d3.select("#" + id).select("span").html(`<sup>[</sup> ${countryName} | ${year} | fragility score: ${score} | ranked ${rank} out of ${totalNum} <sub>]</sub>`);
+
+						          	// generate grid 
+												d3.map(data, (d,i) => {
+											              	year = d.Year;
+											              	qTotal = d.Total; 
+											              	let g = [];
+											              	grid[year] = generateGrid(num_columns, num_rows, g, seed, qTotal, scoreMax, p);  // a grid for each country each year
+															
+
+									              		// draw grid (optional)
+																			// for (const column of grid[year]) { 
+														          //  		pointX = grid[year].indexOf(column) * resolutionX * reduction_factor + gridTransfer.x  ;
+														          //   	for (const row of column) {
+																      //         	pointY = column.indexOf(row) * resolutionY  * reduction_factor + gridTransfer.y  ;
+																      //         	tetha = row;
+																      //         	weight = 0.3/Math.max(Math.abs(grid[year].indexOf(column)-num_columns/2), Math.abs(column.indexOf(row)-num_rows/2)); // the goal is to have thicker strokes in the middle of the grid
+															        //           p.strokeWeight(weight);
+
+																      //         	drawVector(pointX, pointY, false , false, length, tetha, gridColour[year], p);
+																      //       };
+														          // 	};
+				              	}); 
+												// console.log("grid", grid); // OK
+
+
+												// draw cracks
+												d3.map(data, d => {
+													year = d.Year;
+									              	g = grid[year];
+									              	qTotal = d.Total; 
+													drawCurve(point.x, point.y, num_steps, step_length, num_columns, num_rows, resolutionX, resolutionY, g, curveColour[year], qTotal, p);
+												});
+
+
+						          	if (p.frameCount==data.length) {
+						           		p.frameRate(0);
+						            	console.log("finished", "all countries", year);
+						            	// p.saveCanvas("all countries"); 
+						          	};
+
+											}; //closes thes "for" for all countries
+
+							    	};
+
+							    };
+								  canvas = new p5(sketch, "canvas"); 
+								};
+
+								// to do: when select the country, center & zoom onto that country on the map and then draw.
+								function drawSketchSingle(id, countryName, p) {
+						    	sketch = ( p ) => {
+						        p.setup = function() {
+							        let canvas = p.createCanvas(width,height).class("canvas").parent(id);
+							        p.colorMode(p.RGB,255,255,255,1);
+			              	seed = false;//p.day()*p.hour(); //higher speed if no seeding! :)
+						        };
+						        p.draw = function() {
+					          	p.background(255);
+					          	p.frameRate(100);
+
+
+					          	// for (countryName in jsonData) {
+					          	//specific to each sketch
+						          	data = jsonData[countryName];
+
+
+						          	domain = d3.extent(data, d => d.Year);
+
+												flagColours = d3.map(flagColoursAll[countryName], colour => d3.color(colour));
+												// console.log("flagColours",flagColours);
+
+						          	gridColourScale = d3.scaleSequential()
+																						.domain(domain)
+																						.interpolator(d3.interpolateRgbBasis(flagColours));
+						       
+						       	
+								       	curveColourScale = d3.scaleSequential()
+														        				.domain(domain)
+														        				.interpolator(d3.interpolateRgbBasis(flagColours));
+														    
+										    let gridColour = {};
+										    let curveColour = {};    				
+										    d3.map(data, d => {
+																			    	year = d.Year;
+															        			gridColour[year] = p.color(gridColourScale(year)); // OR random ?!?!
+														              	curveColour[year] = p.color(curveColourScale(year));;
+									              	});
+
+										    let reduction_factor = 0.5;
+						          	let resolution_factorX = 0.08; 
+						          	let resolution_factorY = 0.08;
+						          	let resolutionX = p.int(width * resolution_factorX); 
+						          	let resolutionY = p.int(height * resolution_factorY);  
+						          	let num_columns = Math.ceil(width/resolutionX)+1;
+						          	let num_rows = Math.ceil(height/resolutionY)+1;
+						          	let length = 0.5*Math.sqrt(resolutionX*resolutionX+resolutionY*resolutionY) * reduction_factor;
+										
+
+												let grid = {};
+
+												
+
+												const step_length = 0.001 * width; // fix to this amount to get smooth curves
+						          	let num_steps = p.frameCount*reduction_factor*(width/step_length)/(data.length);
+						          	centre=[width/2,height/2];
+												point = {x:centre[0], y:centre[1]};
+												p.stroke(p.color(p.random(flagColours).formatRgb()));
+												p.strokeWeight(width/100);
+												p.point(point.x,point.y);
+
+												gridTransfer = {x: point.x - reduction_factor*width/2, y: point.y - reduction_factor*height/2};
+
+												// if (p.frameCount==1) {p.createElement("span").parent("#" + id);};
+												// if (!d3.select(".canvasContainer").select("span").node()) {p.createElement("span").parent("#" + id);};
+												// rank = data[p.frameCount-1].Rank;
+												// start = parseInt(data[0].Year);
+												// year = start + p.frameCount - 1 ;
+												// score = data[p.frameCount-1].Total;
+												// totalNum = Object.keys(jsonData).length; //??
+
+											  // d3.select("#" + id).select("span").html(`<sup>[</sup> ${countryName} | ${year} | fragility score: ${score} | ranked ${rank} out of ${totalNum} <sub>]</sub>`);
+
+						          	// generate grid 
+												d3.map(data, (d,i) => {
+											              	year = d.Year;
+											              	qTotal = d.Total; 
+											              	let g = [];
+											              	grid[year] = generateGrid(num_columns, num_rows, g, seed, qTotal, scoreMax, p);  // a grid for each country each year
+															
+
+									              		// draw grid (optional)
+																			for (const column of grid[year]) { 
+														           		pointX = grid[year].indexOf(column) * resolutionX * reduction_factor + gridTransfer.x  ;
+														            	for (const row of column) {
+															              	pointY = column.indexOf(row) * resolutionY  * reduction_factor + gridTransfer.y  ;
+															              	tetha = row;
+
+															              	weight = 0.3/Math.max(Math.abs(grid[year].indexOf(column)-num_columns/2), Math.abs(column.indexOf(row)-num_rows/2)); // the goal is to have thicker strokes in the middle of the grid
+														                  p.strokeWeight(weight);
+
+															              	drawVector(pointX, pointY, false , false, length, tetha, gridColour[year], p);
+																            };
+														          	};
+				              	}); 
+												// console.log("grid", grid); // OK
+
+
+												// draw cracks
+												d3.map(data, d => {
+													year = d.Year;
+									              	g = grid[year];
+									              	qTotal = d.Total; 
+													drawCurve(point.x, point.y, num_steps, step_length, num_columns, num_rows, resolutionX, resolutionY, g, curveColour[year], qTotal, p);
+												});
+
+
+						          	if (p.frameCount==data.length) {
+						           		p.frameRate(0);
+						            	console.log("finished", countryName, year);
+						            	// p.saveCanvas(`${countryName}`); 
+						          	};
+
+											// }; //closes thes "for" for all countries
+
+							    	};
+
+							    };
+								  canvas = new p5(sketch, id); 
+								};
+
+
+
+								d3.selectAll("input")
+									.on("click", function (){
+										
+
+										d3.select("#canvas")
+											.selectAll(".canvasContainer")
+											.remove();
+										countryName = d3.select(this).property("value");
+										id = "canvas" + countryName;
+										d3.select("#canvas")
+											.append("div")
+											.attr("id", id)
+											.attr("class", "canvasContainer");
+										if (countryName == "All Countries") { 
+											drawSketchAll(id, countryName,);
+											// createPanButtons();  //for now - until pan & zoom set up
+											
+										} else { 
+											drawSketchSingle(id, countryName,);
+										};
+
+										
+
+										d3.select(".pan")
+											.attr("opacity", 0) //for now - until pan & zoom set up
+											.raise(); 
+										d3.select("#map")
+												.attr("opacity", 0) //for now - until pan & zoom set up
+												.raise();
+										
+										
+									});
+
+								
+									// drawSketchAll(countryName,);
+
+
+									
+
+					    });
+
+
+					}); // the END of .then(function(inputData1, inputData2, inputData3, ...) {...  after loading data } - multiple files
+		</script>
+	</body>
+</html>
