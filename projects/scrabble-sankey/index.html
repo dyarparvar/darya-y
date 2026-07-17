@@ -1,0 +1,3262 @@
+<!DOCTYPE html>
+<html lang="en">
+    <head>
+        <meta charset="utf-8">
+		<title>Scrabble Sankey</title>
+		<meta name="description" content="Darya Yarparvar * Graphic Designer * Birmingham, UK * Open to work! ** Please visit my personal website and view my works. ** I would be more than happy to be of any help to your creative projects! **">
+		<meta name="author" content="© 2021 Darya Yarparvar. All rights reserved.">
+		<meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=no">
+		<link rel="stylesheet" type="text/css" media="screen and (min-width: 600px)and (min-height: 660px)" href="css/style.css">
+		
+	
+		<link rel="preconnect" href="https://use.typekit.net/msx1qtx.css">
+		<link rel="stylesheet" href="https://use.typekit.net/msx1qtx.css">
+
+		<base target="_blank">
+
+        <script type="text/javascript" src="js/d3.js"></script>
+        <script type="text/javascript" src="js/d3-sankey.js"></script>
+        <script type="text/javascript" src="js/d3plus-text.full.js"></script>
+        <script type="text/javascript" src="js/chroma.js"></script>
+        <script type="text/javascript" src="js/chroma.palette-gen.js"></script>
+        <script type="text/javascript" src="js/d3-legend.js"></script>
+       	
+	</head>
+	<body>
+		
+		
+		<div id="wrapper">
+			<div id="container" class="grid">
+				
+				
+				<div id="context">
+					<h1>Scrabble Sankey</h1>
+					<p>I could not resist choosing a playful subject to practise Sankey diagram... and I love word games! So here it is: <em>the scrabble sankey</em>! Play with it and have fun!</p>
+					<!-- <div style="background-image: url('../img/heatmap-rect-hover.jpg')"></div> -->
+				</div>
+					
+				<div id="userGuide">
+					<h2>How to use this visualisation:</h2>	
+					<div id="titles">
+						<h4 class="heatMap info">heatmap chart</h4>
+						<h4 class="histo info">histogram chart</h4>
+						<h4 class="sankey info">sankey diagram</h4>
+						<h4 class="sliders info">sliders</h4>
+						<h4 class="buttons info">reset & download buttons</h4>
+						<h4 class="input info">text box</h4>
+						<a class="button info">close guides &#215;</a>
+					</div>
+					
+					
+				
+				</div>
+				<div id="info">
+						<div class="heatMap info">
+							<div>
+								<p ><!-- The <em>heatmap</em> chart  -->Helps you to find words <b>starting with</b> and/or <b>ending in</b> a specific letter.</p>
+								<p>Click on a letter on the <b>y-axis</b> to select and filter the words <b>start</b>ing with that specific letter.</p>
+								<p>Click on a letter on the <b>x-axis</b> to select and filter the words <b>end</b>ing in that letter.</p>
+								<p>Hover and click on a <b>cell/rectangle</b> on the heatmap to see, select and filter the words with those specific <b>first & last letters</b>.</p><br>
+								<p>If you double click on a letter on the axis or on a cell/rectangle on the heatmap, the list of selected words appears on the right hand side. The number appearing by each word in superscript is its score in the Scrabble game.
+								</p>
+								<p>If you click on a word, its meaning will appear at the bottom of the page.</p>
+							</div>
+						</div>
+
+						<div class="histo info">
+							<div>
+								<p><!-- The <em>histogram</em> chart  -->Shows an overview of <b>all</b> the words in <a href="http://www.scrabblepages.com/scrabble/dictionary/" target="_blank"><strong>SOWPODS</strong></a> dictionary.</p>
+							</div>
+						</div>
+						
+						<div class="sankey info">
+							<div>
+								<p>In the <em>sankey</em> diagram words are considered as strings of letters (spread horizontally starting from letter index 1 to the word's length). Each node represents a letter at a specific letter index. Each link connects two adjacent letters of a word.</p>
+								<p>Double click on a node to narrow down the current word list to those words that have the selected letter at that specific letter index.</p>
+								<p>Double click on a link to narrow down the current word list to those words that have the selected consecutive letters at those specific letter indices.</p>
+								<p>Drag out a node to discard all words containing that specific letter at that specific letter index.</p>
+								<p>Drag out a link to discard all words containing the selected consecutive letters at those specific letter indices.</p>
+								<p>Hover over a link to see the number of words that have the specified pair of letters at those letter indices.</p>
+								<p>If you click on the Reset button, the word list filtration caused by clicking/dragging nodes/links will be reset to none.</p>
+								<p>You can download the list of the words appearing in the Sankey diagram at whatever step you like.</p><br>
+							</div>
+							
+						</div>
+						
+						<div class="sliders info">
+							<div>
+								<p>You can set the lower and upper limit for the <b>length</b> of words using the sliders. The result will be reflected on the <b>heatmap</b> and the <b>sankey</b> diagram.</p><br>
+							</div>
+						</div>		
+
+						<div class="buttons info">
+							<div>
+								<p>The <b>Reset</b> button will remove any selections node/link or first/last letter. It will restore the sankey diagram considering only the sliders' information. (all words between the specified min & max word lengths)</p>
+								<p>The <b>Download</b> button will download all the words <b>currently shown</b> in the sankey diagram in .txt format.</p>
+							</div>
+						</div>
+
+						<div class="input info">
+							<div>
+								<p>You can also add your own text into the text box (ideas: baby names, place names, ...)</p><br>
+								<p>Use the load sankey data to load sankey from the begining</p><br>
+							</div>
+						</div>
+					</div>
+					
+
+
+
+				<div id="graphics" class="grid">
+					<div id="resetSankey">
+						<a class="button">Reset Sankey</a>
+					</div>
+					<div id="downloadSankey">
+						<a href="" download="selected-word-list.txt" class="button">Download Sankey Data</a>
+					</div>
+					<div id="legendSankey">
+					</div>
+					<div id="control-panel">
+						<div class="slider">
+						  	<label for="minLength">min length: </label>
+							<input type="range" min="2" max="31" value="3" id="minLength">
+							<span></span>
+							<br>
+							<label for="maxLength">max length: </label>
+							<input type="range" min="2" max="31" value="10" id="maxLength">
+							<span></span>
+						</div>
+						<div id="information"> 
+							<span></span>
+						</div>
+					</div>
+
+					<div id="special">
+						<input type="radio" id="factOn" name="facts" value="true" class="factOn">
+						<label for="factOn" class="factOn">show facts</label>
+						<input type="radio" id="factOff" name="facts" value="false" checked="true" class="factOff">
+						<label for="factOff" class="factOff">hide facts</label>
+					</div>
+				</div>
+
+
+				<div id="userData">
+					<h2>You can paste your own text or word list and update the graphics using that data...</h2>
+					<textarea  id="data" name="message" placeholder="Please paste your text here and press Load Data"></textarea>
+					<a id="loadData" class="button">Load my data</a>
+					<a id="sowpodsData" class="button">Re-load SOWPODS data</a>
+				</div>
+
+
+				<div id="footnotes">
+					<h2>footnotes & methods</h2>
+					<p>Data Source: <a href="https://www.wordgamedictionary.com/sowpods/download/sowpods.txt">sowpods.txt</a></p>
+					<p>Free Dictionary API: <a href="https://dictionaryapi.dev/">dictionaryapi.dev</a></p>
+
+					<p>Since there are 7 tiles at each round, as a reasonable start, the default minimum and maximum word length are set to 3 and 10, recpectively. It is still possible to dig deeper and play with the word length limits using the sliders.</p>
+					<p>The Sankey diagram is a multilevel network idiom that combines a node-link diagram with a derived cluster hierarchy, intending the path tracing as the main desired task.</p>
+				</div>
+
+				<div id="meanings">
+					<!-- <div id="exclamation"></div>
+					<div id="noun"></div>
+					<div id="intransitive verb"></div>
+					<div id="verb"></div>
+					<div id="adjective"></div>
+					<div id="adverb"></div> -->
+				</div>
+
+				
+
+
+
+				
+				
+			</div>
+			
+
+			</div>
+			
+			
+		</div>
+
+<!--
+*****************************
+****************************
+***************************
+************************** Data Visualisation Code __ START 
+***************************
+****************************
+******************************
+-->
+
+
+		<script type="text/javascript">
+			
+//////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+//////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+//////////////////////////////////////////////////////////// General Display Settings (width, height, margin, colours)
+//////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////// 
+
+
+			let width = screen.availWidth,
+				height = screen.availHeight;
+
+			const margin = {top: 20, right: 30, bottom: 30, left: 30}, // right,left:50
+				  deltaAxis = 40,
+				  labelDist = 18;
+
+//////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+//////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+////////////////////////////////////////////////////////////  constant Data
+//////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+//////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+
+			const alphabet = ["a","b","c","d","e","f","g","h","i","j","k","l","m","n","o","p","q","r","s","t","u","v","w","x","y","z"];
+			const vowels = ["a","e","i","o","u"];
+			const consonents = ["b","c","d","f","g","h","j","k","l","m","n","p","q","r","s","t","v","w","x","y","z"];
+			const scores = { a: 1, b: 3, c: 3, d: 2, e: 1, f: 4, g: 2, h: 4, i: 1, j: 8, k: 5, l: 1, m: 3, n: 1, o: 1, p: 3, q: 10, r: 1, s: 1, t: 1, u: 1, v: 4, w: 4, x: 8, y: 4, z: 10 };
+
+
+
+//////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+//////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+//////////////////////////////////////////////////////////// Colour Palette & Font-Sizes & ...
+//////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+//////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+
+
+			const pinks = ["#5b001f",
+							"#c80051",
+							"#b47789",
+							"#dec1c2"]; //dark to light
+
+			const greens = ["#6b8400",
+							"#8a9077",
+							"#bfb62e",
+							"#b7ce77",
+							"#dfff80"]; //dark to light (#dfff80)
+
+			const blues = ["#4b4582",
+							"#afa1f4", //dark to light purple 
+							"#0269ca",
+							"#8f9dff"]; //dark to light blue
+
+			const reds = ["#6b382b",
+							"#b3412a",
+							"#ff6457",
+							"#e99990", //**use this with care!
+							"#c1b2ac"]; //dark to light
+
+			const greys = ["#DCD8E3", //from blues
+							"#CDCFDE", //from blues
+							"#E7E7E7", //from reds
+							"#363636", //from greens
+							"#BDBDBD"]; //from greens
+
+			const whites = ["#F6F6F6", //from pinks
+							"#FDFDFD"]; //from greens
+
+			const blacks = ["#000020", //from blues
+							"#001500"]; //from greens
+
+
+			const bgColour = whites[1]; 
+			const tooltipBoxSize = 54;
+			const linkOpacity = 0.5;
+			const heatmapColour = [chroma(greys[2]), reds[1]];
+
+
+			const fonts = {
+							node : { 
+									size: 14,
+									weight : 400,
+									colour : chroma(blues[0])
+								},
+							link : {
+									size: 14,
+									weight : 400,
+									colour : chroma(blues[0]).darken(0.5),
+								},
+							index : {
+									size: 12,
+									weight : 400,
+									colour : chroma(blues[1]).saturate().darken(2) //chroma(blues[0]) //chroma(blues[1]).saturate().darken(2) //chroma(blacks[0]).brighten(3).desaturate(2)
+								},
+							axis : { 
+									size: 8,
+									weight : 300,
+									colour : chroma(blacks[0]).brighten(3).desaturate(2),
+									colourH : chroma(blacks[0]).brighten(2).desaturate(2)
+								},
+							tick : { 
+									size: 8,
+									weight : 300,
+									colour : chroma(blacks[0]).brighten(3).desaturate(2),
+									colourH : chroma(blacks[0]).brighten(2).desaturate(2)
+								},
+							tooltip : {
+									size: 6,
+									weight : 500,
+									colour1 : chroma(blues[0]).darken(0.5),
+									colour2: chroma(greens[3])
+								},
+							info : {
+									size: 14,
+									weight : 400,
+									colour : greys[3]
+								}
+			}; 
+
+
+			colours = {
+				node : chroma(blues[1]),
+				nodeH : chroma(blues[1]).saturate().darken(2), //chroma(blues[0]), //chroma(blues[1]).saturate().darken(2),
+				link : chroma(greens[3]),
+				linkH : chroma(blues[0]),
+				focus : chroma(reds[2]).brighten().saturate(3),
+				include : chroma(reds[2]).brighten(),
+				tooltipbg : chroma(blues[1]).saturate().darken(2), //chroma(blues[1]),
+				dbLetter : chroma(greens[0]),
+				dbLetterH : chroma(greens[0]).saturate().darken(),
+				dbLetterMax : chroma(greens[2]),
+				dbLetterMaxG : chroma(greens[2]),
+				histo : chroma(blacks[0]).brighten(3.5).desaturate(2), //chroma(blues[1]),
+				histoH : chroma(blues[0]),
+				histoMax : chroma(reds[2]),
+				heatmapH : chroma(blues[0]),
+				radioOn : chroma(blues[2]),
+				radioOff : greys[2]
+			}
+			
+
+			
+ 
+
+			
+//////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+//////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+//////////////////////////////////////////////////////////// Load & Read data 
+//////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+//////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+			d3.text("data/sowpods.txt").then(function(rawdata) {
+
+				allWords = [...d3.difference(d3.csvParseRows(rawdata, line => line.toString().toLowerCase()),alphabet)]; // I deleted "won't" & "don't" from words list.
+
+
+//////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+//////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+//////////////////////////////////////////////////////////// Auxilary Functions
+//////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+//////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+
+				/**
+				 * Sets as much styles as you want on an element
+				 *
+				 * @param      {style}  styles   The styles
+				 * @param      {element}  element  The element
+				 */
+				function setStylesOnElement(styles, element) {
+					    Object.assign(element.style, styles);
+				}; 
+
+
+			    /**
+			     * moves an HTML element to front
+			     *
+			     * @param      {selection}  link
+			     * @return     {selection}  link
+			     * 
+			     * @todo       replace this with d3.raise() https://github.com/wbkd/d3-extended
+			     */
+			    function moveToFront(link) { 
+			    	return link.parentNode.appendChild(link);
+			    };
+
+				
+			    /**
+			     * moves an HTML element to back
+			     *
+			     * @param      {selection}  link
+			     * @return     {selection}  link
+			     * 
+			     * @todo       replace this with d3.lower() https://github.com/wbkd/d3-extended
+			     */
+			    function moveToBack(link) { 
+			    	firstChild = link.parentNode.firstChild;
+			    	if (firstChild) { 
+			                return link.parentNode.insertBefore(link, firstChild); 
+			            };
+			    };
+
+
+			    /**
+			     * Creation of string from HTML entities
+			     *
+			     * @param      {string}  any string which contains HTML entities.
+			     * @return     {string}  decoded string
+			     */
+			    String.fromHtmlEntities = function(string) {
+											    return (string+"").replace(/&#\d+;/gm,function(s) {
+											        return String.fromCharCode(s.match(/\d+/gm)[0]);
+											    })
+				};
+
+				/**
+				 * Conversion of string to HTML entities
+				 * @param      {string}  any string
+			     * @return     {string}  now the encoded string consists of HTML entities.
+				 */
+				String.prototype.toHtmlEntities = function() {
+													    return this.replace(/./gm, function(s) {
+													        // return "&#" + s.charCodeAt(0) + ";";
+													        return (s.match(/[a-z0-9\s]+/i)) ? s : "&#" + s.charCodeAt(0) + ";";
+													    });
+				};
+
+
+			    /**
+				 * reflects the changes in the slider (min & max values) to the input data & Sankey & Heatmap
+				 *
+				 * @param      {number}  min     the minimum word length
+				 * @param      {number}  max     the maximum word length
+			     * @param      {Array} inputData 	an array of words (default: allWords unless when the user loads their own data)
+				 */
+				function sliderUpdate(min, max, inputData=allWords) {
+
+					
+
+					d3.select("#minLength")
+						.node()
+						.setAttribute("value", min);
+
+					d3.select("#maxLength")
+						.node()
+						.setAttribute("value", max);
+
+					d3.select(".slider")
+						.select("span:first-of-type")
+						.text(min);
+					d3.select(".slider")
+						.select("span:last-of-type")
+						.text(max);
+					
+
+
+					///// Updating the input data and the graphs
+
+					words = filterbyLength(inputData, min, max);
+					
+					
+					d3.select(".sankeyWords").remove();
+					d3.select(".heatMapWords").remove();
+					d3.selectAll(".temporary").remove();
+					graphics.selectAll(".extra").selectAll("*").remove();
+
+
+					sankeyChart.selectAll("*").remove();
+					drawSankey(words, false);
+
+					heatmapChart.selectAll("*").remove();
+					drawHeatMap(words);
+
+					
+
+					/**
+					 * @description 	add these lines of code if you want the histogram follow the changes in slider & min,max lengths.
+					 * histoChart.selectAll("*").remove();
+					 * drawHisto(words);
+					 */	
+					
+
+					///// Updating the information
+					if (!d3.select("#data").node().value){
+						d3.select("#information")
+							.select("span")
+							.html((min==max) ? `<tspan>${(100*words.length/allWords.length).toFixed(2)}%</tspan> of the words are <tspan>${min}</tspan> letter long.` : `<tspan>${(100*words.length/allWords.length).toFixed(2)}%</tspan> of the words are between <tspan>${min}</tspan> and <tspan>${max}</tspan> letter long.`);
+					} else {
+						d3.select("#information")
+							.select("span")
+							.html((min==max) ? `<tspan>${(100*words.length/userWords.length).toFixed(2)}%</tspan> of the words are <tspan>${min}</tspan> letter long.` : `<tspan>${(100*words.length/userWords.length).toFixed(2)}%</tspan> of the words are between <tspan>${min}</tspan> and <tspan>${max}</tspan> letter long.`);
+					}
+					
+					
+
+					
+					///// Reset radio buttons to hide mode.
+					factON = false;
+
+					d3.select("#special")
+						.select("div.factOn")
+						.node()
+						.style.backgroundColor = colours.radioOff;
+					d3.select("#special")
+						.select("div.factOff")
+						.node()
+						.style.backgroundColor = colours.radioOn;
+					
+					sankeyChart.select(".links")
+								.selectAll("path")
+								.attr("stroke", colours.link)
+								.attr("stroke-opacity", linkOpacity);
+
+					histoChart.select(".histoRect")
+								.selectAll("rect")
+								.attr("fill" , colours.histo);
+				};
+
+				/**
+				 * filters data based on the node or link that has been clicked
+				 *
+				 * @param      {string}  node  The information about the node that has been clicked. OR The information about one of the source/target nodes of the link that has been clicked
+				 * @param      {array}  filteredData  an array of words
+				 * @return     {array}  nextFilteredData  an array of words
+				 */
+				function filterbyNL(node, filteredData) {
+					nextFilteredData = d3.filter(filteredData, w => (w[(node.depth+1)-1] == node.name.match(/\w/)));
+					return nextFilteredData;
+				};
+
+				/**
+				 * filters words with length between min & max (interval extremes included)
+				 *
+				 * @param      {array}  inputData  an array of words
+				 * @param      {number}  min        The minimum length
+				 * @param      {number}  max        The maximum length
+				 * @return     {array}  an array of words
+				 */
+				function filterbyLength(inputData, min, max) {
+					limitedData = d3.filter(inputData, w => ((w.length >= min)&&(w.length <= max)));
+					return limitedData;
+				};
+
+
+				/**
+				 * filters data based on the node or link that has been dragged
+				 * although this is thechnically the same function as filterbyLength, but using it for both clicking & dragging, messes up with the outcome!! 
+				 * @param      {string}  node  The information about the node that has been dragged. OR The information about one of the source/target nodes of the link that has been dragged
+				 * @param      {array}  filteredData  an array of words
+				 * @return     {array}  letterExcludeData  an array of words
+				 */
+				function filterbyNLdragged(node, filteredData) {
+					letterExcludeData = d3.filter(filteredData, w => (w[(node.depth+1)-1] == node.name.match(/\w/)));
+					return letterExcludeData;
+				};
+
+
+
+				/**
+				 * sorts and delivers a list of all the words that are related to a specific selection in Sankey diagram (sorted based on their score in the game)
+				 *
+				 * @param      {Array}   filteredData  an array of words
+				 * @param      {number}  wordNumber  the limit for number of words in the list; if this argument is not given, default is 10
+				 */
+				function sankeyWords(filteredData, wordNumber=10) {
+					scoreCalc = d3.map(filteredData, w => { return { word: w, score: d3.sum(d3.map(w, letter => scores[letter]))}});
+					scoredWords = scoreCalc.sort((obj1,obj2) => (obj2.score - obj1.score));
+
+					if (filteredData.length <= wordNumber) {
+						if (!graphics.select(".sankeyWords").node()) {  
+							graphics.append("g")
+									.attr("transform", `translate(${margin.left}, ${margin.top})`)
+									.attr("class", "sankeyWords");
+						};
+						if (!d3.select(".sankeyWords").select(".close").node()) {
+								d3.select(".sankeyWords")
+									.append("div")
+									.attr("class", "close")
+									.append("a")
+									.html("close &#215;")
+									.on("mouseover", function() {
+													button = d3.select(this);
+													darkerColour = chroma(getComputedStyle(button.node()).backgroundColor).darken(0.5);
+													button.node().style.backgroundColor = darkerColour;
+												})
+									.on("mouseout", function() {
+													button = d3.select(this);
+													lighterColour = chroma(getComputedStyle(button.node()).backgroundColor).brighten(0.5);
+													button.node().style.backgroundColor = lighterColour;
+												})
+									.on("click", function(event) {
+													d3.select(this).node().parentNode.parentNode.remove(); // when clicking "close" delete the grand-parent of "this" :))
+												});
+							/**
+							 * @todo figure out what next lines do!
+							 */
+							// wordsHeight = graphics.select(".sankey").select(".axis").node().getBoundingClientRect().height*2;
+							// d3.select(".sankeyWords") 
+							// 	.node().style.height = wordsHeight + "px";
+						};
+
+						graphics.select(".sankeyWords")
+								.selectAll("text")
+								.data(scoredWords)
+								.join("text")
+								.html(d => `<a>${d.word} <tspan>${d.score}</tspan> </a>`)
+								.on("mouseover", function() {
+												button = d3.select(this);
+												darkerColour = chroma(getComputedStyle(button.node()).backgroundColor).darken(0.5);
+												button.node().style.backgroundColor = darkerColour;
+											})
+								.on("mouseout", function() {
+												button = d3.select(this);
+												lighterColour = chroma(getComputedStyle(button.node()).backgroundColor).brighten(0.5);
+												button.node().style.backgroundColor = lighterColour;
+											})
+								.on("click", function(event, d) {
+											findMeaning(d.word);
+								});
+
+
+					};
+				};
+
+
+				/**
+				 * filters words starting with a specific letter
+				 *
+				 * @param      {Array}  inputData  an array of words
+				 * @param      {string}  letter     a specific letter
+				 * @return     {Array}  an array of words
+				 */
+				function startLetter(inputData,letter) {
+					(!letter) ? letter = w[0] : letter = letter.toString();
+					return d3.group(inputData, w => w[0]).get(letter);
+				};
+				
+				/**
+				 * filters words ending in a specific letter
+				 *
+				 * @param      {Array}  inputData  an array of words
+				 * @param      {string}  letter     a specific letter
+				 * @return     {Array}  an array of words
+				 */
+				function endLetter(inputData,letter) {
+					(!letter) ? letter = w[w.length-1] : letter = letter.toString();
+					return d3.group(inputData, w => w[w.length-1]).get(letter);
+				};
+				
+				
+				/**
+				 * sorts and delivers a list of all the words that are related to a specific selection in Heatmap chart (sorted based on their score in the game)
+				 *
+				 * @param      {Array}  inputData  an array of words
+				 * @param      {string}  letter     a specific letter
+				 * @return     {Array}  an array of words
+				 * 
+				 * @todo very similar to sankeyWords function. should I merge them somehow?
+				 */
+				function heatMapWords(keyWordList) {
+					scoreCalc = d3.map(keyWordList, w => { return { word: w, score: d3.sum(d3.map(w, letter => scores[letter]))}});
+					scoredWords = scoreCalc.sort((obj1,obj2) => (obj2.score - obj1.score));
+
+					if (!graphics.select(".heatMapWords").node()) {
+						graphics.append("g")
+								.attr("transform", `translate(${margin.left}, ${margin.top})`)
+								.attr("class", "heatMapWords");
+
+						/**
+						 * @description set the height of div.heatMapWords
+						 * alternative: d3.select(".heatmap").node().getBoundingClientRect().height - margin.top - margin.bottom + (margin.bottom/2+1.2*fonts.axis.size);
+						 */
+						divHeight = d3.select(".heatmap").node().getBoundingClientRect().height - margin.top - margin.bottom; 
+						d3.select(".heatMapWords")
+							.node().style.height = divHeight + "px";
+						console.log(divHeight);
+
+					};
+
+					if (!d3.select(".heatMapWords").select(".close").node()) {
+								d3.select(".heatMapWords")
+									.append("div")
+									.attr("class", "close")
+									.append("a")
+									.html("close &#215;")
+									.on("mouseover", function() {
+													button = d3.select(this);
+													darkerColour = chroma(getComputedStyle(button.node()).backgroundColor).darken(0.5);
+													button.node().style.backgroundColor = darkerColour;
+												})
+									.on("mouseout", function() {
+													button = d3.select(this);
+													lighterColour = chroma(getComputedStyle(button.node()).backgroundColor).brighten(0.5);
+													button.node().style.backgroundColor = lighterColour;
+												})
+									.on("click", function(event) {
+													d3.select(this).node().parentNode.parentNode.remove();
+												});
+					};
+
+					graphics.select(".heatMapWords")
+							.selectAll("text")
+							.data(scoredWords)
+							.join("text")
+							.html(d => `<a>${d.word} <tspan>${d.score}</tspan> </a>`)
+							.on("mouseover", function() {
+											button = d3.select(this);
+											darkerColour = chroma(getComputedStyle(button.node()).backgroundColor).darken(0.5);
+											button.node().style.backgroundColor = darkerColour;
+										})
+							.on("mouseout", function() {
+											button = d3.select(this);
+											lighterColour = chroma(getComputedStyle(button.node()).backgroundColor).brighten(0.5);
+											button.node().style.backgroundColor = lighterColour;
+										})
+							.on("click", function(event, d) {
+								findMeaning(d.word);
+							});
+				
+
+					if (!d3.select(".heatMapWords").select(".close").select(".info").node()) {
+						graphics.select(".heatMapWords")
+								.select(".close")
+								.append("span")
+								.attr("class", "info");
+					};
+
+				};
+
+
+				/**
+				 * fetches API for a word's meaning/pronounciation/...
+				 *
+				 * @param      {string}  word     a word
+				 * @return     {Audio} plays the pronounciation of a word
+				 */
+				function findMeaning(word) {
+					const source = "https://api.dictionaryapi.dev/api/v2/entries/en/";
+			        const options = {
+			              method: "GET",
+			              headers: {
+			                "Accept": "application/json"
+			              },
+			            };
+			        let url = source + word;
+			        fetch(url, options)
+			        	.then(resp => {
+			        		return resp.json()
+			            })
+			            .then(data => {
+			            	meanings = data[0].meanings;
+			            	definitions = d3.map(meanings, obj => { 
+			            											key = obj.partOfSpeech;
+			            											
+			            											if (!d3.select(`#${key}`).node()) {
+			            												d3.select("#meanings")
+								            								.append("div")
+								            								.attr("id", key)
+								            								.attr("class", "temporary")
+								            								.append("h6")
+								            								.html(`${key}`);
+							            							};
+			            											
+
+
+			            											d3.select(`#${key}`)
+							            								.selectAll("text")
+							            								.data(obj.definitions)
+							            								.join("text")
+							            								.text(d => d.definition)
+							            							});
+
+			            	// pronunciation = new Audio(data[0].phonetics[0].audio);
+			            	// pronunciation.play();
+			            })
+			            .catch(err => {
+			              console.error(err);
+			              alert("Sorry pal, we couldn't find definitions for the word you were looking for.");
+			            }
+			        );
+		        };
+
+				/**
+				 * get the user's word list
+				 *
+				 * @return     {array} userWords is an array of words the has been generated from the text user has entered.
+				 */
+
+		        function getUserData() {
+		        	///// Get the text data that user has entered into the textarea
+					let userData = d3.select("#data").node().value;
+					if (!userData) { alert("Please add some text into the text box.");}
+					///// slpit the text into the lines
+					let singleLines = d3.csvParseRows(userData, line => line.toString().toLowerCase());
+					///// remove all digits & non-alphanumeric characters and replace it by space : " "
+					let cleanData = d3.map(singleLines, line => line.replaceAll((/\W+/g), " ").replaceAll((/\d+/g), " "));
+					///// split the line into words. (the filter part ensures that there will be no null element in the singleWords array)
+					let singleWords = d3.filter(cleanData, line => line.match(/\b(\w+)\b/g)).flatMap(line => line.match(/\b(\w+)\b/g));
+					///// exclude alphabet & get rid of redundent words (because d3.difference returns a Set)
+		        	userWords = [...d3.difference(singleWords, alphabet)];
+
+		        	return userWords;
+		        };
+
+
+		        /**
+		         * when dragging of node/link starts >> this means when mouse-down. meaning click on node/link. the stroke colour changes until the mouse is on the node/link. it's just a minor alert to bold the node/link the user is paying attention to.
+		         */
+		        function dragstarted(event) {
+		        	d3.select(this)
+		        		.raise()
+						.attr("stroke", colours.focus);
+				};
+
+		        /**
+		         * when dragging of node/link is happening
+		         * I replaced node.on(click, f) with double click to even make the difference btw positive(narrowing down by selecting a specific node/link) & negative(narrowing down by excluding a specific node/link) filteration more.  
+		         * @todo  figure out why single click on nodes has became double click even when I deliverately use node.on(click, f) in draw sankey part. and why it's not happening the same for link.
+		         * when a node is being dragged, if the curser hover on that node or a related link, dragging is canceled. the user will be notified by stroke colour change to colours.include.
+		         * when a link is being dragged, if the curser hover on that link or a related node, dragging is canceled. the user will be notified by stroke colour change to colours.include.
+		         */
+		        function dragged() {
+		        	if (d3.select(this).node().getAttribute("fill") == "none") {  //while a link is being dragged
+		        		elementColour = d3.select(this).node().getAttribute("stroke");
+		        		if (elementColour != chroma(colours.link).hex()) {  //terminate & cancel the dargging
+		        			dragging = false;  
+		        			d3.select(this)
+							   .attr("stroke", colours.include);
+						} else { 
+							dragging = true;
+						};
+			        } else {  //while a node is being dragged
+			        	elementColour = d3.select(this).node().getAttribute("fill"); 
+			        	if (elementColour != chroma(colours.node).hex()) {
+			        		dragging = true;
+			        	} else { //terminate & cancel the dargging
+			        		dragging = false; 
+			        		d3.select(this)
+							   .attr("stroke", colours.include);
+			        	};
+			        	
+				    };
+				};
+
+				/**
+				 * when dragging of a node is finished, that node & corresponding links will be removed. Sankey diagram is updated as well as DownloadSankey words.
+				 *
+				 * @param      {event}    The darg event
+				 * @param      {node element}  The dragged element to which node (data) is bound.
+				 */
+				function dragendedN(event, node, clicked) {
+						if (dragging) { //to make sure it is a drag and not a click event.
+
+								prevExcludeData = letterExcludeData;
+	      						exclude = filterbyNLdragged(node, prevExcludeData);
+      							letterExcludeData = d3.map(d3.difference(prevExcludeData, exclude), w => w);
+
+	      						sankeyChart.selectAll("*").remove();
+								graphics.selectAll(".extra").selectAll("*").remove();
+								graphics.select(".heatMapWords").remove();
+
+	      						drawSankey(letterExcludeData, dragging);
+	      						sankeyWords(letterExcludeData);
+
+	      						chainDrag = true;
+	      						clicked = false;
+	      						
+
+	      				} else { clicked = true; } ; //if it's not dragged, then it's clicked
+				};
+
+				/**
+				 * when dragging of a link is finished, that link & corresponding nodes will be removed. Sankey diagram is updated as well as DownloadSankey words.
+				 *
+				 * @param      {event}    The drag event
+				 * @param      {link element}  The dragged element to which link (data) is bound.
+				 */
+				function dragendedL(event, link) {
+						if (dragging) {
+								node1 = link.source;
+						    	node2 = link.target;
+
+								prevExcludeData = letterExcludeData;
+	      						exclude = Array.from(d3.intersection(filterbyNLdragged(node1,prevExcludeData),filterbyNLdragged(node2,prevExcludeData))); 
+	      						letterExcludeData = d3.map(d3.difference(prevExcludeData, exclude), w => w);
+
+	      						sankeyChart.selectAll("*").remove();
+								graphics.selectAll(".extra").selectAll("*").remove();
+								graphics.select(".heatMapWords").remove();
+
+	      						drawSankey(letterExcludeData, dragging);
+								sankeyWords(letterExcludeData);
+
+								chainDrag = true;
+								clicked = false;
+
+	      				} else { clicked = true; } ; //if it's not dragged, then it's clicked
+				};
+		        
+
+//////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+//////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+//////////////////////////////////////////////////////////// Interactivity Functions
+//////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+//////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+			
+
+				/**
+				 * highlights the links related to a given selection (node/link) 
+				 * & also based on the radio button on/off (show/hide extra information), adjusts the highlight colours & opacity of the links for double-letters
+				 *
+				 * @param      {Object}   n       node data
+				 * @param      {boolean}  show    True if the radio button is on for showing extra information
+				 * @return     some changes in the appearance of some links
+				 */
+				function highlightLinks(n, show) {
+					if (show === true) {
+						d3.select(".links")
+							.selectAll("path")
+							.attr("stroke-opacity",  p => (p.source.name == n.name || p.target.name == n.name) ? 1 : linkOpacity)
+							.attr("stroke", p => (p.source.name == n.name || p.target.name == n.name) && (p.y0==p.y1) ? colours.dbLetterH :  (p.source.name == n.name || p.target.name == n.name) && (p.y0!=p.y1) ? colours.linkH : (p.source.name != n.name && p.target.name != n.name) && (p.y0==p.y1) ? colours.dbLetter : colours.link);
+						} else {
+						d3.select(".links")
+							.selectAll("path")
+							.attr("stroke-opacity",  p => (p.source.name == n.name || p.target.name == n.name) ? 1 : linkOpacity)
+							.attr("stroke", p => (p.source.name == n.name || p.target.name == n.name) ? colours.linkH : colours.link);
+						};
+				};
+
+				/**
+				 * removes the highlight from the links when there's no active selection (node/link) 
+				 * & also based on the radio button on/off (show/hide extra information), adjusts the unhighlight colours & opacity of the links for double-letters
+				 *
+				 * @param      {Object}   n       node data
+				 * @param      {boolean}  show    True if the radio button is on for showing extra information
+				 * @return     some changes in the appearance of some links
+				 */
+				function unhighlightLinks(n, show) {
+					if (show === true) {
+				    d3.select(".links")
+						.selectAll("path")
+						.attr("stroke-opacity",  p => (p.source.name == n.name || p.target.name == n.name) ? linkOpacity : linkOpacity)
+						.attr("stroke", p => (p.y0==p.y1) ? colours.dbLetter : colours.link);
+					} else {
+					d3.select(".links")
+						.selectAll("path")
+						.attr("stroke-opacity",  p => (p.source.name == n.name || p.target.name == n.name) ? linkOpacity : linkOpacity)
+						.attr("stroke", colours.link);
+					};
+				};
+
+				/**
+				 * highlights the nodes related to a given selection (node/link) 
+				 *
+				 * @param      {Object}   n1       node data
+				 * @param      {Object}   n2       node data (meaningful when a link btw n1 and n2 is under active selection. otherwise ignore.)
+				 * @return     some changes in the appearance of one or two nodes
+				 */
+
+				function highlightNodes(n1, n2=n1) {
+				    d3.select(".nodes")
+						.selectAll("rect")
+						.attr("fill", r => (r.name == n1.name || r.name == n2.name) ? colours.node : nodeValueScale(r.value) );
+				};
+
+
+//////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+//////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+//////////////////////////////////////////////////////////// Initiation - before everything :))
+//////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+//////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+
+				//////////////////////////////////////////////////////////// Slider settings
+				d3.select("#maxLength")
+					.node()
+					.setAttribute("max", d3.max(allWords, w => w.length));
+				d3.select("#minLength")
+					.node()
+					.setAttribute("max", d3.max(allWords, w => w.length));
+
+				d3.select("#minLength")
+					.node()
+					.setAttribute("min", d3.min(allWords, w => w.length));
+
+				d3.select("#maxLength")
+					.node()
+					.setAttribute("min", d3.min(allWords, w => w.length));
+
+				/**
+				 * @description set slider initial value to an arbitrary value of 3 & 10.  No need to use the complete dataset to draw sankey at first. For scrabble game with 7 tiles of letters in hand, this length range is the most reasonable :) if someone wants to explore more, they can play with the slider.
+				 */
+				
+				min = d3.select("#minLength").node().getAttribute("value");
+				max = d3.select("#maxLength").node().getAttribute("value");
+
+				initialWords = filterbyLength(allWords, min, max);
+
+				d3.select(".slider")
+					.select("span:first-of-type")
+					.text(min);
+
+				d3.select(".slider")
+					.select("span:last-of-type")
+					.text(max);
+
+				d3.select("#information")
+					.select("span")
+					.html((min==max) ? `<tspan>${(100*initialWords.length/allWords.length).toFixed(2)}%</tspan> of the words are <tspan>${min}</tspan> letter long.` : `<tspan>${(100*initialWords.length/allWords.length).toFixed(2)}%</tspan> of the words are between <tspan>${min}</tspan> and <tspan>${max}</tspan> letter long.`);
+
+
+			/** 
+			 * Radio Buttons part was discarded to keep things simple :) 
+			 * @todo  Remove the code & clean up other related parts!
+			 */
+
+			//////////////////////////////////////////////////////////// Radio Buttons
+				let factON = false ;
+
+				pParent = d3.select("#special").node().getBoundingClientRect();
+				pOn = d3.select("#special").select("#factOn").node().getBoundingClientRect();
+				pOff = d3.select("#special").select("#factOff").node().getBoundingClientRect();
+
+				/**
+				 * @HACK use <div> instead of <circle>, 2 advantages : no need to have svg element for circle. & clicking on div is also OK & it affects the selection and changes of radio buttons
+				 */
+				elementOn = d3.select("#special")
+								.append("div")
+								.attr("class", "factOn")
+								.node();
+				/**
+				 * @hint to find the top & left positions and to set the position of a child relative to its parent, you need to subtract their x & y.
+				 */
+				setStylesOnElement({left:`${ pOn.x - 18/2 - pParent.x }px`,top:`${ pOn.y - 18/2 - pParent.y }px`}, elementOn);
+
+				elementOff = d3.select("#special")
+								.append("div")
+								.attr("class", "factOff")
+								.node();
+				setStylesOnElement({left:`${ pOff.x - 18/2 - pParent.x }px`,top:`${ pOff.y  - 18/2 - pParent.y }px`}, elementOff);
+
+
+				///// show facts interactivity
+				d3.select("#special")
+					.selectAll(".factOn")
+					.on("click", function() {
+											/**
+											 * @hint !* factON = (this.value == "true") ? true : false;* Because I made a fake radio button, this is not OK any more. I have to manually & explicitly set factON value to true or false.
+											 */
+											factON = true;
+											d3.select("#special")
+												.select("div.factOn")
+												.node()
+												.style.backgroundColor = colours.radioOn;
+											d3.select("#special")
+												.select("div.factOff")
+												.node()
+												.style.backgroundColor = colours.radioOff;
+
+										//////////////////////////////////////////////////////////// Extra facts for sankey
+											
+											///// calculating Global Info: which double letters appear the most frequently in the whole filtered dataset
+											dbLetterGlobal = d3.rollup(links.filter( d => d.y0 == d.y1), g => d3.sum(g, a => a.value) , d => d.source.name[0]+d.target.name[0]);
+											dbLetterGlobalMax = d3.filter(dbLetterGlobal, g => (g[1] == d3.max(dbLetterGlobal, g => g[1])));
+											///// highlighting all double letter links & bringing them to forward
+											dbLetterPaths = sankeyChart.select(".links")
+																		.selectAll("path")
+																		.filter(d => d.y0 == d.y1)
+																		.attr("stroke", colours.dbLetter);
+
+											d3.map(dbLetterPaths.nodes(), node => moveToFront(node));
+
+											///// filtering in only double letter links with max value. 
+											dbLetterPaths.filter(d => d.value == d3.max(links.filter(l=>l.y0==l.y1), l => l.value))
+															.attr("stroke",  colours.dbLetterMax)
+															.attr("stroke-opacity", 1); 
+
+											///// delivering Global Info based on how many local maximums the global double letter info has.
+											d3.map(dbLetterGlobalMax, p => {
+																			if (dbLetterGlobalMax.length>1) {
+																				globalMaxText = `The most frequent double letters are <tspan>${d3.map(dbLetterGlobalMax, p => " " + p[0])}</tspan>. The most frequent double letter at a specific position is highlighted in <tspan>olive</tspan>, if available. Click to see all the words...`
+
+																				sankeyChart.select(".links")
+																							.selectAll("path")
+																							.filter( d => (d.source.name[0]+d.target.name[0] == p[0]) && (d.y0 == d.y1))
+																							.attr("stroke", colours.dbLetterMaxG)
+																							.attr("stroke-opacity", 1);
+
+																			} else if (dbLetterGlobalMax.length==1) {
+																				globalMaxText = `The most frequent double letter is <tspan>${p[0]}</tspan>. The most frequent double letter at a specific position is highlighted in <tspan>pink</tspan>, if available. Click to see all <tspan>${p[1]}</tspan> words...`
+																				sankeyChart.select(".links")
+																							.selectAll("path")
+																							.filter( d => (d.source.name[0]+d.target.name[0] == p[0]) && (d.y0 == d.y1))
+																							.attr("stroke", colours.dbLetterMaxG)
+																							.attr("stroke-opacity", 1);
+																			} else {
+																				globalMaxText = `No double letter in this selected group of words.`
+																			};
+																		});
+											
+										   	if ((dbLetterGlobalMax.length>=1) && (!sankeyChart.select(".extra").select(".globalMax").node())) { 
+												sankeyChart.select(".extra")
+															.append("g")
+															.attr("class", "globalMax")
+															.append("rect")
+														   	.attr("x", sankeyWidth/2 - (dbLetterGlobalMax.length*20+sankeyWidth)/2)
+													      	.attr("y", 0)
+													      	.attr("height", 100)
+													      	.attr("width", sankeyWidth)
+														   	.attr("fill", bgColour);
+
+												sankeyChart.select(".extra")
+															.select(".globalMax")
+															.append("text")
+															.html(globalMaxText)
+															.attr("x", sankeyWidth/2)
+													      	.attr("y", 0 + 100/2 + (1.2*fonts.info.size - fonts.info.size))
+													   		.attr("font-size", fonts.info.size)
+													   		.attr("font-weight", fonts.info.weight)
+													   		.attr("text-anchor", "middle")
+													   		.attr("fill", fonts.info.colour);
+											///// delivering all words with max global double letter value.
+										   		sankeyChart.select(".extra")
+															.select(".globalMax")
+															.on("click", function() {
+													   				sankeyChart.select(".extra").select(".globalMax").remove();
+																	dbLetterGlobalGroup = d3.group(linkGroups.filter(d => d[0][0] == d[1][0]), d => d[0][0]+d[1][0]);
+												   					dbLetterList = dbLetterGlobalMax.flatMap(a => dbLetterGlobalGroup.get(a[0]));
+												   					dbLetterWordList = dbLetterList.flatMap( a => a[2].flatMap(obj=>obj.word));
+											   						sankeyWords(dbLetterWordList,dbLetterWordList.length);
+													   		});
+												moveToFront(sankeyChart.select(".extra").node());
+											};
+
+											graphics.select(".sankeyWords").remove();
+
+
+										//////////////////////////////////////////////////////////// Extra facts for histogram
+											
+											/**
+											 * get the information from the tallest rect :  the length: d[0] & the position of rect : [xScaleHisto(d.x0)+rectWidth/2,yScaleHisto(d.length)-12]
+											 */
+											/**
+											 * getting the position information of the <rect>s with max frequency.
+											 *
+											 * @type       {Array} longest = [word length, x, y]
+											 */
+											histoChart.select(".histoRect")
+														.selectAll("rect")
+														.filter(d => d.length == d3.max(histo(allWords), b => b.length))
+														.each(d => longest = [d[0], xScaleHisto(d.x0)+rectWidth/2,yScaleHisto(d.length)-12])
+														.attr("fill" , colours.histoMax);
+											/**
+											 * getting the position information of the <rect>s with zero frequency.
+											 *
+											 * @type       {Array} longest = [x, ...]
+											 */
+											let zero = [];
+										   	histoChart.select(".histoRect")
+														.selectAll("rect")
+														.filter(d => (d.length == 0))
+														.each(d => zero.push(d.x0));
+											/**
+											 * getting the position information of the <rect>s with a few frequency. 
+											 * 
+											 * @type       {Array} few = [x, ...]
+											 * @hint Can be useful because of the scale problem they can interpreted as zero frequency. this way I can separate them QUALITATIVELY from zero frequency lengths.*
+											 */
+											let few = [];
+										   	histoChart.select(".histoRect")
+														.selectAll("rect")
+														.filter(d => ((d.length/allWords.length)<= 0.01))
+														.each(d => few.push(d.x0));
+
+
+											///// delivering the frequency information
+											if (!histoChart.select(".extra").select("rect").node()) {
+												///// the most frequent length
+												histoChart.select(".extra")
+															.append("rect")
+														   	.attr("x", longest[1] - rectWidth/2)
+													      	.attr("y", longest[2]- (18 + 20/2 + 1.2*(fonts.info.size-4) - (fonts.info.size-4)))
+													      	.attr("height", 20)
+													      	.attr("width", 240)
+														   	.attr("fill", bgColour);
+
+												histoChart.select(".extra")
+															.append("text")
+															.html(`&#8595; Most of the words are <tspan>${longest[0]}</tspan> letter long.`)
+															.attr("x", longest[1])
+													      	.attr("y", longest[2]-18)
+													   		.attr("font-size", fonts.info.size-4)
+													   		.attr("font-weight", fonts.info.weight)
+													   		.attr("text-anchor", "start")
+													   		.attr("fill", fonts.info.colour);
+
+												
+												/////  the zero frequent lengths
+												let textBoxDataZero = [
+															  {text: `No words with <tspan>${d3.map(zero, n => " " + n)}</tspan> letter long.`}
+															];
+												
+												if (zero.length>0) {
+													histoChart.select(".extra")
+															.append("svg")
+															.attr("id", "wrapRectZero")
+														   	.attr("x", xScaleHisto.range()[1] - histoWidth/2)
+													      	.attr("y", 2*yScaleHisto.range()[0]/3 - (18 + 48/2 + 1.2*(fonts.info.size-4) - (fonts.info.size-4)))
+													      	.attr("width", histoWidth/2);
+
+													new d3plus.TextBox()
+															  .data(textBoxDataZero)
+															  .fontFamily("hatch")
+															  .fontSize(fonts.info.size-4)
+															  .fontWeight(fonts.info.weight)
+															  .fontColor(fonts.info.colour)
+															  .textAnchor("start")
+															  .width(histoWidth/2)
+															  .height(48)
+															  .x(0)
+															  .y(0)
+															  .select("#wrapRectZero")
+															  .render();
+												};
+
+												
+										   		///// a few frequent lengths
+										   		let textBoxDataFew = [
+									   						{text: `Words with <tspan>${d3.map(d3.difference(few,zero), n => " " + n)}</tspan> letter long are each less than 1% of the total words.`}
+														];
+												if (few.length>0) {
+													histoChart.select(".extra")
+															.append("svg")
+															.attr("id", "wrapRectFew")
+														   	.attr("x", xScaleHisto.range()[1] - histoWidth/2)
+													      	.attr("y", yScaleHisto.range()[0]/3 - (18 + 48/2 + 1.2*(fonts.info.size-4) - (fonts.info.size-4)))
+													      	.attr("width", histoWidth/2);
+
+													new d3plus.TextBox()
+															  .data(textBoxDataFew)
+															  .fontFamily("hatch")
+															  .fontSize(fonts.info.size-4)
+															  .fontWeight(fonts.info.weight)
+															  .fontColor(fonts.info.colour)
+															  .textAnchor("start")
+															  .width(histoWidth/2)
+															  .height(48)
+															  .x(0)
+															  .y(0)
+															  .select("#wrapRectFew")
+															  .render();
+												};
+											};
+
+
+					});
+
+				///// hide facts interactivity
+				d3.select("#special")
+					.selectAll(".factOff")
+					.on("click", function() {
+											factON = false;
+											/**
+											 * reset the appearance of radio buttons appearance
+											 */
+											d3.select("#special")
+												.select("div.factOn")
+												.node()
+												.style.backgroundColor = colours.radioOff;
+											d3.select("#special")
+												.select("div.factOff")
+												.node()
+												.style.backgroundColor = colours.radioOn;
+
+
+											/**
+											 * Remove all extra information
+											 */
+											graphics.selectAll(".extra").selectAll("*").remove();
+											graphics.select(".sankeyWords").remove();
+
+
+											/**
+											 * Reset Sankey
+											 */
+											sankeyChart.select(".links")
+														.selectAll("path")
+														.attr("stroke", colours.link)
+														.attr("stroke-opacity", linkOpacity);
+
+											/**
+											 * Reset Histogram
+											 */
+											histoChart.select(".histoRect")
+														.selectAll("rect")
+														.attr("fill" , colours.histo);
+					});
+			
+
+			
+//////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+//////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+//////////////////////////////////////////////////////////// Sankey Data Preperation
+//////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+//////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+				
+
+				/**
+				 * prepares data for Sankey diagram
+				 *
+				 * @param      {array}  inputData  an array of words
+				 * @return     {Object} data for Sankey {data: data, L: L} in which data = {nodes: array of nodes ,links: array of links}
+				 */
+				function prepareData(inputData) {					
+
+					L = d3.max(inputData, word => word.length); // the length of the longest word	
+
+					//////////////////////////////////////////////////////////// Nodes
+					/**
+					 * @hint using Set() prevents to have redundent nodes. 
+					 */
+					nodesSet = new Set(); 
+					
+					
+					d3.map(inputData, word => { for (let i=0; i<word.length; i++) {
+														nodesSet.add(word[i]+(i+1));
+													}
+												});
+
+
+					nodes = d3.map(nodesSet, n => { return {
+															name: n, // word[i]+(i+1)
+															sortCode: alphabet.indexOf(n.match(/\w/).toString())+1,
+														}
+													});
+					
+
+					//////////////////////////////////////////////////////////// Links
+					
+					linksSet = new Set();
+					/**
+					 * @hint using Set() prevents redundency. 
+					 * @BUG the same does not work for links. WHY?
+					 */
+					d3.map(inputData, word => { for (let i=0; i<word.length-1; i++) {
+														linksSet.add([word[i]+(i+1), word[(i+1)]+(i+2), word]);
+													}
+												});
+
+					links = d3.map(linksSet, l => { return { 
+															source : l[0], // word[i]+(i+1)
+															target : l[1], //word[(i+1)]+(i+2)
+															word : l[2]
+														}
+													});
+					/**
+					 * how many? specific link at specific position.
+					 */
+					linkValues = d3.rollup(links, g => g.length, l => l.source+l.target);
+					linkGroups = d3.flatGroup(links, l => l.source, l => l.target);
+					/**
+					 * @HACK to get rid of redundency in links
+					 */
+					links = d3.map(linkGroups, g => { return { 
+																source : g[0],
+																target : g[1],
+																value : linkValues.get(g[0]+g[1]) // or g[2].length
+																}
+													});
+
+					//////////////////////////////////////////////////////////// nodes & links information for Sankey
+					let data = {
+								nodes : nodes.map(d => Object.assign({}, d)),
+								links : links.map(d => Object.assign({}, d))
+							};
+					
+					return {
+							data : data,
+							L : L
+							};
+				};
+
+
+//////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+//////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+//////////////////////////////////////////////////////////// HeatMap Data Preparation
+//////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+//////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+				/**
+				 * prepares data for Heatmap
+				 *
+				 * @param      {array}  inputData  an array of words
+				 * @return     {Object} data for Heatmap {heatmapData : heatmapData, heatmapDataFirstL : heatmapDataFirstLetter, heatmapDataLastL : heatmapDataLastLetter}
+				 */
+				function heatmapInfo(inputData) {
+					heatmapData = d3.flatGroup(inputData, w => w[0]+w[w.length-1]);
+
+					heatmapDataFirstLetter = d3.group(inputData, w => w[0]);
+					heatmapDataLastLetter = d3.group(inputData, w => w[w.length-1]);
+					
+					return { 
+							heatmapData : heatmapData,
+					 		heatmapDataFirstL : heatmapDataFirstLetter,
+					 		heatmapDataLastL : heatmapDataLastLetter
+					 	};
+
+				};
+
+				
+//////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+//////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+//////////////////////////////////////////////////////////// Sankey Generator
+//////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+//////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+
+
+				let sankeyHeight = 660 - margin.top - margin.bottom - 3*deltaAxis; //height*1.2;
+				let sankeyWidth = width - margin.left - margin.right;
+
+				/**
+				 * generates nodes and links for Sankey
+				 *
+				 * @param      {Array}  inputData   an array of words
+				 * @return     {Object} nodes  to be used at drawing step
+				 * @return     {Object} links  to be used at drawing step
+				 * 
+				 * @hint it's better to call prepareData inside this function. data still will be available at global scope. and you have control on updating sankey generator based on the filtered data.
+				 */
+				function generateSankey(inputData) { 
+					
+					/**
+					 * // console.log("data in generateSankey scope", data);
+					 * @hint here data and L are not defined yet. 
+					 * @description next two lines are the first time you gonna define data & L. they will be at available at global scope.
+					 */
+					data = prepareData(inputData).data;
+					L = prepareData(inputData).L; 
+					
+					/**
+					 * @description Sort nodes based on the key's numeric part (either 2 digits, if null then 1 digit). this would be enough. no need to include alphabetic part of the keys. because I will use this sorting to determine the x position for letter index axis. 
+					 */
+					sortDigitNodes = data.nodes.sort((a,b) =>  ((a.name.match(/\d+/)) - (b.name.match(/\d+/)) ));
+
+					nodes = [];
+
+					for (j=1; j<=L; j++) {
+						indexNodes = sortDigitNodes.filter(node => node.name.match(/\d+/) == j);
+
+						sortLetterNodes = indexNodes.sort((a,b) => ((a.sortCode) - (b.sortCode)));
+						
+						nodes =  nodes.concat(sortLetterNodes);
+
+					};
+
+					data.nodes = nodes;
+
+
+					/**
+					 * // console.log("data & L in generateSankey scope", data, L);
+					 * @description OK, now data is defined. and so is L :)
+					 */
+					
+
+					///// Sankey generator function
+					sankey = d3.sankey()
+						    	.nodeId(d => d.name)
+						      	.nodeAlign(d3.sankeyJustify)
+						      	.nodeWidth(((sankeyWidth/(L+1))/3))
+						      	.nodePadding(0)
+						      	.nodeSort((node1,node2) => d3.ascending(node1.sortCode, node2.sortCode))
+						      	.extent([[1,1], [sankeyWidth- 1, sankeyHeight- 1]]);
+					///// Give data to sankey generator function
+					sankey(data);
+					
+
+
+
+
+					///// Fix the position of a..z nodes
+					/**
+					 * @description nodes have equal width. they will be aligned in parallel lines with fixed x (at each letter index) and are separated with equal distance
+					 */
+					distance = sankeyWidth/(L+1);
+					nodeWidth = distance/3;
+					nodeHeight= sankeyHeight/alphabet.length;
+
+
+					nodes = nodes.filter(node => alphabet.includes(node.name.match(/\w/).toString()));
+
+					nodes = d3.map(nodes, node => { 
+
+											node.x0 = (node.depth+1)*distance-(nodeWidth/2);
+											node.x1 = node.x0+nodeWidth;
+											
+											node.y0 = (node.sortCode-1)*nodeHeight;
+											node.y1 = node.y0 + nodeHeight;
+
+											node.targetLeftValue = d3.sum(node.targetLinks, target => target.value);
+											node.sourceRightValue = d3.sum(node.sourceLinks, source => source.value);
+										
+
+											return node;
+										}
+									);
+					
+
+					///// Fix the position of links
+					/**
+					 * @description All links between two specific nodes are overlapping. Each node only encodes the item. and nothing related to its value.
+					 */
+					links = d3.map(data.links, link => { 
+												link.y0 = (link.source.y0+link.source.y1)/2;
+												link.y1 = (link.target.y0+link.target.y1)/2;
+												return link;
+											}
+									);
+
+				};
+
+
+//////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+//////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+//////////////////////////////////////////////////////////// Histogram Generator
+//////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+//////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+			  
+				/**
+				 * generates bins for Histogram
+				 *
+				 * @param      {Array}  inputData	an array of words
+				 * @return     {Object} bins 	to be used at drawing step 
+				 */
+				function histo(inputData) {
+					lengthValues = d3.map(inputData, w => w.length);
+					binCount = d3.max(inputData, w => w.length);
+					const thresholds = d3.range(1, binCount+1, 1);
+					buckets = d3.bin()
+								.thresholds(thresholds);
+					/**
+					 * @hint	.thresholds(L) does not gaurantee to recieve L buckets!!! like d3.ticks. 
+					 * @HACK	you can define your own function>>  .thresholds((w, min, max) => [...new Set(data.map(w => w[0]))].sort()) this example classifies words with respect to their initial letters if the values are inputData=words. 
+					 * // histogram = d3.histogram()
+					 * 			     	.thresholds((w, min, max) => [...new Set(data.map(w => w[0]))].sort());
+					 * @BUG BUT WHY d3.histogram does not work?!?!?!?
+					 * @hint 	by default the domain is the extend of inputData
+					 * // console.log(buckets.domain()(lengthValues));
+					 */
+					return buckets(lengthValues);
+				};
+
+
+
+//////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+//////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+//////////////////////////////////////////////////////////// Graphics
+//////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+//////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+				
+				const graphics = d3.select("#graphics");
+
+//////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+//////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+//////////////////////////////////////////////////////////// Draw Sakney
+//////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+//////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+
+				const sankeyChart = graphics.append("svg")
+										.classed("sankey", true)
+										.attr("viewBox", [0, 0, sankeyWidth + margin.left + margin.right , sankeyHeight + 2*margin.top + margin.bottom + 3*deltaAxis]);
+				
+				
+				/**
+				 * Draws Sankey Diagram
+				 *
+				 * @param      {Array}  inputData   an array of words
+				 * @param      {boolean}  clicked  True if a node/link has been already clicked; otherwise false;
+				 * @return     draws sankey & handles its interactivity
+				 */
+				function drawSankey(inputData, clicked, chainDrag) {
+					
+					min = d3.select("#minLength").node().getAttribute("value");
+					max = d3.select("#maxLength").node().getAttribute("value");
+					if (min-max<=0) { 
+						words = filterbyLength(inputData, min, max);
+						generateSankey(words);
+
+						/**
+						 * @description if a node/link has been already clicked, the nextFilterData won't be reset to "words" each time the drawSankey is called to draw an updated diagram based on the most recent inputData. As the user clicks a node/link consecutively, inputData will be filtered more & more and it will be continually shrinking.
+						 * 
+						 * to combine both chained clicking & dragging, I used d3.intersection(); d3.map() is for converting Set to Array.
+						 */
+						!clicked ? nextFilteredData = words : nextFilteredData = d3.map(d3.intersection(letterExcludeData, nextFilteredData), w => w);
+						!chainDrag ? letterExcludeData = nextFilteredData : letterExcludeData = d3.map(d3.intersection(letterExcludeData, nextFilteredData), w => w);
+
+						chainDrag = false;
+						dragging = false;
+						
+
+						/**
+						 * @description Define a stroke weight scale to encode link values.
+						 */
+						linkHeight= sankeyHeight/alphabet.length;
+						linkValueScale = d3.scaleLinear()
+											.domain(d3.extent(links, link => link.value))
+											.range([1, linkHeight]);
+
+						//////////////////////////////////////////////////////////// Draw Links
+					    sankeyChart.append("g")
+								    .attr("class", "links")
+									.attr("transform", "translate(" + margin.left + "," + (2*margin.top + deltaAxis) + ")")
+								    .selectAll("path")
+								    .data(links)
+								    .join("path")
+								    .attr("d", d3.sankeyLinkHorizontal())
+								    .attr("fill", "none")
+								    .attr("stroke", d => ((d.y0 == d.y1)&&(factON == true)) ? colours.dbLetter : colours.link) // (d.y0 == d.y1) ? colours.dbLetter : colours.link)
+								    .attr("stroke-width", d => linkValueScale(d.value))
+								    .attr("stroke-opacity", linkOpacity)
+								    .on("mouseover", function(event, link) { 
+								    								/**
+								    								 * @hint 	"link" is the data bind to the "event" >> link data
+								    								 * @hint 	"this" is link.node() meaning the <path>
+								    								 */
+															    	/** 
+															    	 * @description 	move the highlighted link to front:
+															    	 */
+																   	moveToFront(this);
+																	
+																   	if (factON === true) {
+																   		d3.select(".links")
+																	   		.selectAll("path")
+																	   		.attr("stroke", p => ((link.source.name==p.source.name) && (link.target.name==p.target.name) && (p.y0 == p.y1)) ? colours.dbLetterH : ((link.source.name==p.source.name) && (link.target.name==p.target.name) && ((p.y0 != p.y1)))  ?  colours.linkH : ((link.source.name!=p.source.name) || (link.target.name!=p.target.name)) && (p.y0 == p.y1) ? colours.dbLetter : colours.link)
+																	   		.attr("stroke-opacity", p => ((link.source.name==p.source.name) && (link.target.name==p.target.name) )? 1 : linkOpacity);
+
+																	   	/** 
+																    	 * @description  keeping the dbMax coloured when showing facts
+																    	 */
+																		d3.map(dbLetterGlobalMax, p => {
+																										sankeyChart.select(".links")
+																													.selectAll("path")
+																													.filter( d => (d.source.name[0]+d.target.name[0] == p[0]) && (d.y0 == d.y1))
+																													.attr("stroke", colours.dbLetterMaxG);});
+			
+																		d3.select(".links")
+																			.selectAll("path")
+																			.filter(d => d.y0 == d.y1)
+																			.filter(d => d.value == d3.max(links.filter(l=>l.y0==l.y1), l => l.value))
+																			.attr("stroke",  colours.dbLetterMax);
+																	   	} else {
+																   		d3.select(".links")
+																	   		.selectAll("path")
+																	   		.attr("stroke", p => ((link.source.name==p.source.name) && (link.target.name==p.target.name)) ? colours.linkH : colours.link)
+																	   		.attr("stroke-opacity", p => ((link.source.name==p.source.name) && (link.target.name==p.target.name) )? 1 : linkOpacity);
+																	   	};
+
+									    							
+																   	
+															    	node1 = link.source;
+															    	node2 = link.target;	
+															    	highlightNodes(node1,node2);
+
+															    	d3.select(".nodesLabel")
+										      							.append("text")
+										      							.attr("class", "temporary")
+										      							.text(`${link.source.name.match(/\w/)}`)
+										      							.attr("x", (link.source.x0+link.source.x1)/2)
+																      	.attr("y", (link.source.y0+link.source.y1)/2 + (1.2*fonts.node.size)-fonts.node.size)
+																   		.attr("font-size", fonts.node.size)
+																   		.attr("font-weight", fonts.node.weight)
+																   		.attr("text-anchor", "middle")
+																   		.attr("fill", colours.nodeH.darken(0.5));
+
+																   	d3.select(".nodesLabel")
+										      							.append("text")
+										      							.attr("class", "temporary")
+										      							.text(`${link.target.name.match(/\w/)}`)
+										      							.attr("x", (link.target.x0+link.target.x1)/2)
+																      	.attr("y", (link.target.y0+link.target.y1)/2 +(1.2*fonts.node.size)-fonts.node.size)
+																   		.attr("font-size", fonts.node.size)
+																   		.attr("font-weight", fonts.node.weight)
+																   		.attr("text-anchor", "middle")
+																   		.attr("fill", colours.nodeH.darken(0.5));
+
+																   	///// Generating the tooltip only for the link that's been mourseover-ed!
+																   	tipX = (link.source.x0+link.target.x0)/2 + ((sankeyWidth/(L+1))/12) + margin.left;
+																   	tipY = Math.min(link.y0, link.y1) + 2*margin.top + deltaAxis - linkHeight/2 + tooltipBoxSize ;
+																   	sankeyChart.append("g")
+																			   	.attr("class", "linkTooltip")
+																			   	.append("rect")
+																			   	.attr("x", tipX)
+																		      	.attr("y", tipY)
+																		      	.attr("height", tooltipBoxSize)
+																		      	.attr("width", tooltipBoxSize)
+																			   	.attr("fill", colours.tooltipbg);
+																	sankeyChart.select(".linkTooltip")
+																			   	.append("text")
+																			   	/**
+																			   	 * @hint I'm not binding any data, and I'm using the data already bind to the event (which is node data), so there's no need for the usual style of d => d.value`
+																			   	 */
+																				.text(`${link.value}`)  
+																				.attr("x", tipX + tooltipBoxSize/2)
+																		      	.attr("y", tipY + tooltipBoxSize/2  + (1/2-(1-1.2))*fonts.tooltip.size )
+																		   		.attr("font-size", fonts.link.size)
+																		   		.attr("font-weight", fonts.link.weight) 
+																		   		.attr("text-anchor", "middle")
+																		   		.attr("fill", fonts.tooltip.colour2);
+																})
+								    .on("mouseout", function(event, link) {
+
+																	if (factON === true) {
+																   		d3.select(".links")
+									    									.selectAll("path")
+									    									.attr("stroke", p => (p.y0 == p.y1) ? colours.dbLetter : colours.link)
+																	   		.attr("stroke-opacity", linkOpacity);
+																   		/** 
+																    	 * @description  keeping the dbMax coloured when showing facts
+																    	 */
+																		d3.map(dbLetterGlobalMax, p => {
+																										sankeyChart.select(".links")
+																													.selectAll("path")
+																													.filter( d => (d.source.name[0]+d.target.name[0] == p[0]) && (d.y0 == d.y1))
+																													.attr("stroke", colours.dbLetterMaxG)
+																													.attr("stroke-opacity", 1);});
+																		d3.select(".links")
+																			.selectAll("path")
+																			.filter(d => d.y0 == d.y1)
+																			.filter(d => d.value == d3.max(links.filter(l=>l.y0==l.y1), l => l.value))
+																			.attr("stroke",  colours.dbLetterMax);
+																   	} else {
+																   		d3.select(".links")
+									    									.selectAll("path")
+									    									.attr("stroke", colours.link)
+																	   		.attr("stroke-opacity", linkOpacity);
+																   	};
+
+															    	d3.select(".nodes")
+																		.selectAll("rect")
+																		.attr("fill", d => nodeValueScale(d.value));
+
+																	d3.selectAll(".temporary").remove();
+
+																	d3.select(".linkTooltip").remove();
+
+															
+															    })
+								   .on("dblclick", function(event, link) { 
+								    							node1 = link.source;
+														    	node2 = link.target;
+																	
+														    	/**
+														    	 * @description 	when clicked is true, it means a link has been clicked.
+														    	 */
+														    	// clicked = true; // I put it in dragging functions
+																prevFilteredData = nextFilteredData;
+																/**
+																 * @confusion 	I had to add Array.from here, comparing to click on a node. to have nextFilteredData in an array format. I could not figure out why the results are different when I click on node or link. anyway it's OK now :) even when nextFilteredData is a Set, the code & function works. the only problem is when you want to download the word list.
+																 */
+									      						nextFilteredData = Array.from(d3.intersection(filterbyNL(node1,prevFilteredData),filterbyNL(node2,prevFilteredData))); 
+
+									      						/**
+									      						 * @description 	Remove Sankey nodes & links & labels & axis & tooltips before generating and drawing a new one based on the newly filtered data
+									      						 */
+									      						sankeyChart.selectAll("*").remove();
+
+									      						/**
+									      						 * @description 	Remove all extra infromation
+									      						 */ 
+																graphics.selectAll(".extra").selectAll("*").remove();
+																graphics.select(".heatMapWords").remove();
+
+
+									      						/**
+																 * @description 	this part may be useful if you want the %info given in the information besides slider to change based on the clicks on nodes/link & filtered data. currently I want to deactivate this part.
+									      						 * d3.select("#information")
+																	.select("span")
+																	.html((min==max) ? `<tspan>${(100*nextFilteredData.length/inputData.length).toFixed(2)}%</tspan> of the words (i.e. ${nextFilteredData.length} words) are <tspan>${min}</tspan> letter long.` : `<tspan>${(100*nextFilteredData.length/inputData.length).toFixed(2)}%</tspan> of the words (i.e. ${nextFilteredData.length} words) are between <tspan>${min}</tspan> and <tspan>${max}</tspan> letter long.`);
+																 */
+									      						
+
+									      						/**
+									      						 * @description at each click on a link a new sankey is generated & drawn for the newly filtered words.
+									      						 * @hint "data" in global scope is affected when prepareData function inside generateSankey is called at each click.
+									      						 * @BUG   is this true: the problem is that nextFilteredData is set to words each time sankeyDraw is called.
+									      						 */
+									      						drawSankey(nextFilteredData, clicked);
+
+									      						///// List the newly filtered words 
+																sankeyWords(nextFilteredData);
+
+																/**
+									      						 * @description 	Reset radio buttons to hide facts & their appearance
+									      						 */
+							    								factON = false;
+																d3.select("#special")
+																	.select("div.factOn")
+																	.node()
+																	.style.backgroundColor = colours.radioOff;
+																d3.select("#special")
+																	.select("div.factOff")
+																	.node()
+																	.style.backgroundColor = colours.radioOn;
+																
+
+																/**
+									      						 * @description 	Reset Sankey appearance if opacity Scale is in use.
+																 * sankeyChart.select(".links")
+																			.selectAll("path")
+																			.attr("stroke", colours.link)
+																			.attr("stroke-opacity", linkOpacity);
+									      						 */ 
+																
+																/**
+									      						 * @description 	Reset Histogram appearance
+									      						 */ 
+																histoChart.select(".histoRect")
+																			.selectAll("rect")
+																			.attr("fill" , colours.histo);
+								    });
+
+						
+						
+						/**
+						 * @description Define a colour scale to encode node values.
+						 */
+
+						nodeValueScale = d3.scaleLinear()
+											.domain([0, d3.max(nodes, node => node.value)])
+											.range([`${bgColour}`, `${colours.node}`]);	
+						/**
+						 * @hint 	draw the nodes after drawing the links to place the nodes on top of the links
+						 */
+						//////////////////////////////////////////////////////////// Draw Nodes
+						sankeyChart.append("g")
+									.attr("class", "nodes")
+									.attr("transform", "translate(" + margin.left + "," + (2*margin.top + deltaAxis) + ")")
+							    	.selectAll("text")
+							    	/**
+							    	 * @hint since nodes with value=0 (meaning with no links) has already been filtered in generateSankey function, instead of using data.nodes and drawing nodes with this condition: d => (d.value!=0) ? d.x0 : 100, simply use "nodes" and get rid of such a condition at each step of data binding)
+							    	 */
+							    	.data(nodes) 
+							    	.join("rect")
+							     	.attr("x", d => d.x0)
+							      	.attr("y", d => d.y0)
+							      	.attr("height", d => (d.y1 - d.y0))
+							      	.attr("width", d => (d.x1 - d.x0))
+							      	.attr("fill", d => nodeValueScale(d.value))
+							      	.attr("stroke", colours.node)
+							      	.on("mouseover", function(event, node) {
+											      		/**
+					    								 * @hint 	"node" is the data bind to the "event" >> node data
+					    								 * @hint 	"this" is node.node() meaning the <rect>
+					    								 */
+												    	/** 
+												    	 * @description 	move the highlighted adjacent links (links that are related to this node) to front:
+												    	 */
+							      						linkPaths = d3.select(".links")
+					      												.selectAll("path")
+					      												.nodes();
+					      								linkHighlights = d3.filter(linkPaths, path => ((path.__data__.source.name == node.name) || (path.__data__.target.name == node.name)));
+					      								d3.map(linkHighlights, path => moveToFront(path));
+
+
+					      								highlightNodes(node);
+					      								highlightLinks(node, factON);
+
+							      						d3.select(".nodesLabel")
+							      							.append("text")
+							      							.attr("class", "temporary")
+							      							.text(`${node.name.match(/\w/)}`)
+							      							.attr("x", (node.x0+node.x1)/2)
+													      	.attr("y", (node.y0+node.y1)/2 + (1.2*fonts.node.size)-fonts.node.size)
+													   		.attr("font-size", fonts.node.size)
+													   		.attr("font-weight", fonts.node.weight)
+													   		.attr("text-anchor", "middle")
+													   		.attr("fill", fonts.node.colour.darken(0.5));
+							      						
+							      						/** 
+												    	 * @description  keeping the dbMax coloured when showing facts
+												    	 */
+														if (factON === true) {
+															d3.map(dbLetterGlobalMax, p => {
+																							sankeyChart.select(".links")
+																										.selectAll("path")
+																										.filter( d => (d.source.name[0]+d.target.name[0] == p[0]) && (d.y0 == d.y1))
+																										.attr("stroke", colours.dbLetterMaxG);});
+															d3.select(".links")
+																.selectAll("path")
+																.filter(d => d.y0 == d.y1)
+																.filter(d => d.value == d3.max(links.filter(l=>l.y0==l.y1), l => l.value))
+																.attr("stroke",  colours.dbLetterMax);
+														};
+
+														/** 
+												    	 * @description  Node Tooltip
+												    	 */
+												    	
+												    	
+
+												    	sankeyChart.append("g")
+																   	.attr("class", "nodeTooltip")
+																   	.attr("transform", `translate(${(node.x0+node.x1)/2 + margin.left} , ${(node.y0+node.y1)/2 + margin.top})`)
+																   	.append("rect")
+																   	.attr("x", `${-3*tooltipBoxSize/2}`)
+															      	.attr("y", 0)
+															      	.attr("height", tooltipBoxSize)
+															      	.attr("width", 3*tooltipBoxSize)
+																   	.attr("fill", colours.tooltipbg);
+
+														
+
+													   	sankeyChart.select(".nodeTooltip")
+														    		.append("text")
+														    		.text(String.fromHtmlEntities("&#8592;") +`${node.targetLeftValue}` + String.fromHtmlEntities("&#8195;&#8195;&#8195;") + `${node.sourceRightValue}` + String.fromHtmlEntities("&#8594;"))
+														    		.attr("x", 0)
+															      	.attr("y", `${tooltipBoxSize/2  + (1/2-(1-1.2))*fonts.tooltip.size}`)
+															   		.attr("font-size", fonts.node.size)
+															   		.attr("font-weight", fonts.node.weight) 
+															   		.attr("text-anchor", "middle")
+															   		.attr("fill", fonts.tooltip.colour2);  
+												    	
+												    	
+											      	})
+							      	.on("mouseout", function(event, node){
+							      						d3.select(this)
+							      							.attr("fill", d => nodeValueScale(d.value))
+							      							.attr("stroke", colours.node);
+
+							      						d3.select(".temporary")
+															.remove();
+
+														unhighlightLinks(node, factON);
+
+														/** 
+												    	 * @description  keeping the dbMax coloured when showing facts
+												    	 */
+														if (factON === true) {
+															d3.map(dbLetterGlobalMax, p => {
+																							sankeyChart.select(".links")
+																										.selectAll("path")
+																										.filter( d => (d.source.name[0]+d.target.name[0] == p[0]) && (d.y0 == d.y1))
+																										.attr("stroke", colours.dbLetterMaxG)
+																										.attr("stroke-opacity", 1);});
+															d3.select(".links")
+																.selectAll("path")
+																.filter(d => d.y0 == d.y1)
+																.filter(d => d.value == d3.max(links.filter(l=>l.y0==l.y1), l => l.value))
+																.attr("stroke",  colours.dbLetterMax);
+														};
+
+														d3.select(".nodeTooltip").remove();
+											      	})
+							      	.on("dblclick", function (event, node) {
+							      						// clicked = true; // I put it in dragging functions
+														prevFilteredData = nextFilteredData;
+							      						nextFilteredData = filterbyNL(node,prevFilteredData);
+							      						
+
+							      						/**
+							      						 * @description 	Remove Sankey nodes & links & labels & axis & tooltips before generating and drawing a new one based on the newly filtered data
+							      						 */
+							      						sankeyChart.selectAll("*").remove();
+
+							      						/**
+							      						 * @description 	Remove all extra infromation
+							      						 */ 
+														graphics.selectAll(".extra").selectAll("*").remove();
+														graphics.select(".heatMapWords").remove();
+
+							      						/**
+														 * @description 	this part may be useful if you want the %info given in the information besides slider to change based on the clicks on nodes/link & filtered data. currently I want to deactivate this part.
+							      						 * d3.select("#information")
+															.select("span")
+															.html((min==max) ? `<tspan>${(100*nextFilteredData.length/inputData.length).toFixed(2)}%</tspan> of the words (i.e. ${nextFilteredData.length} words) are <tspan>${min}</tspan> letter long.` : `<tspan>${(100*nextFilteredData.length/inputData.length).toFixed(2)}%</tspan> of the words (i.e. ${nextFilteredData.length} words) are between <tspan>${min}</tspan> and <tspan>${max}</tspan> letter long.`);
+														 */
+
+							      						drawSankey(nextFilteredData, clicked);
+							      						
+
+							      						sankeyWords(nextFilteredData);
+
+
+					    								factON = false;
+
+														d3.select("#special")
+															.select("div.factOn")
+															.node()
+															.style.backgroundColor = colours.radioOff;
+														d3.select("#special")
+															.select("div.factOff")
+															.node()
+															.style.backgroundColor = colours.radioOn;
+
+														sankeyChart.select(".links")
+																	.selectAll("path")
+																	.attr("stroke", colours.link)
+																	.attr("stroke-opacity", linkOpacity);
+
+														histoChart.select(".histoRect")
+																	.selectAll("rect")
+																	.attr("fill" , colours.histo);
+									});
+
+
+
+						//////////////////////////////////////////////////////////// Dragging of Nodes & Links
+
+						
+						dragNode = d3.drag()
+										.on("start", dragstarted)
+								    	.on("drag", dragged)
+								    	.on("end", dragendedN);
+
+
+						dragLink = d3.drag()
+										.on("start", dragstarted)
+								    	.on("drag", dragged)
+								    	.on("end", dragendedL);
+
+
+						sankeyChart.select(".nodes")
+						 			.selectAll("rect")
+			      					.call(dragNode);
+
+      					sankeyChart.select(".links")
+						 			.selectAll("path")
+			      					.call(dragLink);
+
+
+
+
+									
+										  
+										
+
+						//////////////////////////////////////////////////////////// Node Labels
+				    	sankeyChart.append("g")
+							    	.attr("class", "nodesLabel")
+									.attr("transform", "translate(" + margin.left + "," + (2*margin.top + deltaAxis) + ")")
+									.selectAll("text")
+									.data(nodes)
+									.join("text")
+									.text(d => (d.value != 0) ? `${d.name.match((/\w/))}`: "")  
+									.attr("x", d => d.x0+((sankeyWidth/(L+1))/6)) // = x0 + nodeWidth/2
+							      	.attr("y", d => (d.y0+d.y1)/2 + (1.2*fonts.node.size)-fonts.node.size) // +2 is because of the following>> lineheight(set equal to 1.2*fonfonts.tooltip.size at the *{} style.css file) - labelfonfonts.tooltip.size = 12 - 10 = 2
+							   		.attr("font-size", fonts.node.size)
+							   		.attr("font-weight", fonts.node.weight)
+							   		.attr("text-anchor", "middle")
+							   		.attr("fill", fonts.node.colour);
+
+						
+				    
+					  	/**
+						 * @todo 	do sth for this problem : adding the node labels after drawing the nodes places them on top of nodes. so they prevent clicking on nodes. specially at mobile size. 
+					  	 * the problem is when mouse is on node rect and then moves on label <text>. mouseout of <rect> & mouseover of <text> somehow are not working well.
+					  	 * @HACK how about using <text> instead of <rect> at first place when drawing nodes ? :)
+						 */
+
+					
+						//////////////////////////////////////////////////////////// Letter Index Scale & Axis
+						/**
+						 * @decription the first node is nodes[0] & the last node is nodes[nodes.length-1]
+						 * nodes has already been sorted in generateSankey 
+						 */
+						range = [(nodes[0].x0 + nodes[0].x1)/2  , (nodes[nodes.length-1].x0+nodes[nodes.length-1].x1)/2];
+						letterIndexScale = d3.scaleLinear()
+											.domain([1, L]) // in which L = d3.max(inputData, w => w.length])
+										  	.range(range);
+
+						
+						///// Generate the axis function
+						letterIndexAxis = d3.axisBottom(letterIndexScale)
+											/**
+											 * @hint explicitly determining tick values & determining their format with 1 digit precision. this prevents the problem of encountering ticks like 1.5 (which is meaningless as a letter index!) when L is small.
+											 */
+											.tickValues([...Array(L+1).keys()].slice(1,L+1))
+											.tickFormat(d3.format("0.2"))
+											.tickSizeOuter(0)
+											.tickSizeInner(0)
+											.tickPadding(0);
+						///// Draw the axis & axis labels
+						sankeyChart.append("g")
+									.attr("class", "axis")
+									.attr("transform", "translate(" + margin.left + "," + 2*margin.top + ")")
+									.call(letterIndexAxis)
+									.attr("font-family", "hatch")
+									.attr("font-size", fonts.index.size)
+									.attr("font-weight", fonts.index.weight)
+									.attr("color", fonts.index.colour)
+									.select("path")
+									.attr("stroke-opacity", 0);
+
+						sankeyChart.select(".axis")
+									.append("g")
+									.attr("class", "axisLabel")
+									.append("text")
+							        .attr("x", (range[0]+range[1])/2)
+							        .attr("y", -15)
+							        .attr("fill", fonts.index.colour)
+							        .attr("font-size", fonts.index.size)
+							        .attr("font-weight", fonts.index.weight)
+							        .attr("text-anchor", "middle")
+							        .text("LETTER INDEX");
+
+						///// create a <g> to put extra information about Sankey when required.
+						sankeyChart.append("g")
+								    .attr("class", "extra")
+									.attr("transform", "translate(" + margin.left + "," + (sankeyHeight + margin.top+ deltaAxis) + ")");
+
+					
+						//////////////////////////////////////////////////////////// Draw Legend
+						
+						// legendSankey = d3.select("#legendSankey")
+						// 					.append("svg")
+						// 					.classed("legendSankey", true)
+						// 					.attr("width", "100%")
+						// 					.attr("height", 60);
+
+
+						legendSankey = sankeyChart.append("g")
+													.attr("class", "legend")
+													.attr("transform", `translate(${margin.left + sankeyWidth/3}, ${sankeyHeight + margin.top + 2*deltaAxis})`); //the reason behind 3* deltaAxis in sankeyHeight. 1 from indexletter axis & 2 from bottom legend
+						/**
+						 * the legendScaleSankeyN is basicly the same as nodeValueScale :))
+						 */
+
+						legendScaleSankeyN = d3.scaleLinear()
+												.domain(nodeValueScale.domain())
+												.range(nodeValueScale.range());
+
+						
+						legendSankeyN = d3.legendColor()
+										  .shapeWidth(42)// not wise to use nodeWidth because it will change by each filteration/selection on sliders or heatmap!!! use nodeWidth@length btw 3&10 >> 41.8182px
+										  .shapeHeight(18)// // not wise to use nodeHeight because it will change by each filteration/selection on sliders or heatmap!!! use nodeHeight@length btw 3&10 >> 18.8462px
+										  .orient('horizontal')
+										  // .cells(7)
+										  .labelAlign("middle")
+										  .labelFormat(d3.format("0.1s"))
+										  .labelOffset(deltaAxis/3-18/2)
+										  .shapePadding(fonts.index.size)
+										  .scale(legendScaleSankeyN)
+										  .title("WORD COUNT")
+
+
+						legendSankey.append("g")
+									.attr("class", "legendN")
+									.call(legendSankeyN)
+								    .attr("fill", colours.nodeH)
+								    .attr("font-size", fonts.index.size)
+								    .attr("font-weight", fonts.index.weight)
+								    .attr("transform", `translate(${-sankeyWidth/8}, 0)`);
+								 
+
+
+						legendSankey.select(".legendN")
+									.select(".legendCells")
+									.selectAll(".cell")
+									.selectAll(".label")
+									.attr("fill", colours.linkH)
+									.attr("stroke", "none")
+
+						legendSankey.select(".legendN")
+									.select(".legendTitle")
+									.attr("fill", colours.linkH)
+									.attr("stroke", "none")
+									.attr("font-size", fonts.index.size*1.2)
+									.attr("font-weight", fonts.index.weight)
+									.attr("transform", `translate(${-42*2.4-margin.left}, ${deltaAxis})`); //`translate(${-42-margin.left}, ${deltaAxis + fonts.index.size})`); //.attr("transform", `translate(0, ${deltaAxis/3})`);
+
+
+
+						
+
+						/**
+						 * the legendScaleSankeyL is basicly the same as linkValueScale :))
+						 */
+						
+						legendScaleSankeyL = d3.scaleLinear()
+												.domain(linkValueScale.domain())
+												.range(linkValueScale.range());
+
+						/**
+						 * @todo   cells ?! quantity & label?
+						 */
+						
+						legendSankeyL = d3.legendSize()
+									      .shape("line")
+									      .orient("horizontal")
+									      // .cells([10, 100, 1000, 10000])
+									      // .labels(["tiny testing at the beginning","small", "medium", "large", "grand, all the way long label"])
+									      .shapeWidth(125/2)   //distance@length btw 3&10 >> 125.45454545454545) cannot use distance variable directly because it depends on dataset filteration/selection //linkValueScale.range()[1]*4)
+									      .labelAlign("middle")
+									      .labelFormat(d3.format("0.1s"))
+										  .labelOffset(deltaAxis/3)
+									      .shapePadding(42/2) //nodeWidth@length btw 3&10 >> 41.8182) cannot use nodeWidth variable directly because it depends on dataset filteration/selection)//deltaAxis/2)
+										  .scale(legendScaleSankeyL)
+										  .title("WORD COUNT");
+
+						legendSankey.append("g")
+									.attr("class", "legendL")
+									.call(legendSankeyL)
+									.attr("stroke", colours.link)
+								    .attr("font-size", fonts.index.size)
+								    .attr("font-weight", fonts.index.weight)
+								    .attr("transform", `translate(${sankeyWidth/4}, 0)`);
+								    // .attr("transform", `translate(${margin.left + sankeyWidth/2}, ${sankeyHeight + margin.top + 2*deltaAxis})`); //the reason behind 3* deltaAxis in sankeyHeight. 1 from indexletter axis & 2 from bottom legend
+
+						legendSankey.select(".legendL")
+									.select(".legendCells")
+									.selectAll(".cell")
+									.selectAll(".label")
+									.attr("fill", colours.linkH)
+									.attr("stroke", "none");
+
+						legendSankey.select(".legendL")
+									.select(".legendTitle")
+									.attr("fill", colours.linkH)
+									.attr("stroke", "none")
+									.attr("font-size", fonts.index.size*1.2)
+									.attr("font-weight", fonts.index.weight)
+									.attr("transform", `translate(${-42*2.4-margin.left}, ${deltaAxis})`); //`translate(${-42-margin.left}, ${deltaAxis + fonts.index.size})`); //.attr("transform", `translate(0, ${deltaAxis/3})`);
+
+
+
+					} else {
+						alert("Please select a valid range of word length. (min <= max)");
+					};
+				
+					// d3.select("body").classed("waiting", false);
+
+
+				};
+
+				drawSankey(allWords);
+
+
+//////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+//////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+//////////////////////////////////////////////////////////// Draw Heatmap
+//////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+//////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+
+				var heatMapWidth = 660/3 - margin.left - margin.right;
+				var heatMapHeight = heatMapWidth; 
+
+				
+
+				const heatmapChart = graphics.append("svg")
+											.classed("heatmap", true)
+											.attr("viewBox", [0, 0, heatMapWidth + margin.left + margin.right, heatMapHeight + margin.top + margin.bottom]);
+							
+				/**
+				 * Draws Heatmap 
+				 *
+				 * @param      {Array}  inputData   an array of words
+				 * @return     draws heatmap & handles its interactivity
+				 */
+
+				function drawHeatMap(inputData) {
+					min = d3.select("#minLength").node().getAttribute("value");
+					max = d3.select("#maxLength").node().getAttribute("value");
+
+					words = filterbyLength(inputData, min, max);
+
+					heatmapData = heatmapInfo(words).heatmapData;
+					
+					config = {
+							  paddingInner: 0,
+							  paddingOuter: 0,
+							  round: false,
+							  align: 0.5,
+							};
+
+					xAlphabetScale = d3.scaleBand()
+										.domain(d3.map(heatmapData, d => d[0][1]).sort(d3.ascending))
+									  	.range([0, heatMapWidth])
+									 	.paddingInner(config.paddingInner)
+									  	.paddingOuter(config.paddingOuter)
+									  	.align(config.align)
+									  	.round(config.round);
+
+					yAlphabetScale = d3.scaleBand()
+										.domain(d3.map(heatmapData, d => d[0][0]).sort(d3.descending))
+									  	.range([heatMapWidth, 0])
+									 	.paddingInner(config.paddingInner)
+									  	.paddingOuter(config.paddingOuter)
+									  	.align(config.align)
+									  	.round(config.round);
+
+					/**
+					 * @description  this colour scale encodes how many of each word with a specific first&last letters.
+					 */
+					colourScale = d3.scaleLinear()
+									.domain(d3.extent(heatmapData, info => info[1].length))
+									.range(heatmapColour);
+
+					//////////////////////////////////////////////////////////// Draw Rects
+					heatmapChart.append("g")
+								.attr("class", "heatmapRects")
+								.attr("transform", `translate(${margin.left}, ${margin.top})`)
+								.selectAll("rect")
+								.data(heatmapData)
+								.join("rect")
+						   		.attr("x", d => xAlphabetScale(d[0][1]))
+								.attr("width", xAlphabetScale.bandwidth())
+								.attr("y", d => yAlphabetScale(d[0][0]))
+								.attr("height", yAlphabetScale.bandwidth())
+								.attr("fill", d => colourScale(d[1].length))
+								.attr("stroke", "none")
+								.attr("opacity", 1)
+								.on("mouseover", function(event, d) {
+																/**
+																 * @description 	highlights the hovered <rect> & shows the related tooltip & adds leading lines to make finding corresponding axis tick labels easier
+																 */
+																d3.select(this)
+																	.attr("fill", colours.heatmapH);
+
+																heatmapChart.select(".tooltip")
+																			.selectAll("text")
+																			.attr("font-size", t => (t[0] == d[0]) ? fonts.tooltip.size : 0)
+																			.attr("opacity",  t => (t[0] == d[0]) ? 1 : 0); // t is data bind to <text>
+																
+																x1 = xAlphabetScale.range()[0] ;
+																x2 = xAlphabetScale(d[0][1]) + xAlphabetScale.bandwidth()/2;
+																y1 = yAlphabetScale(d[0][0]) + yAlphabetScale.bandwidth()/2;
+																y2 = yAlphabetScale.range()[0];
+																
+																d3.select(".heatmapRects")
+																	.append("line")
+																	.classed("temporary", true)
+																	.attr("x1", x1)
+																	.attr("x2", x2)
+																	.attr("y1", y1)
+																	.attr("y2", y1)
+																	.attr("stroke", fonts.axis.colour)
+																	.attr("stroke-width", 0.3)
+																	.attr("opacity", 0.5);
+																d3.select(".heatmapRects")
+																	.append("line")
+																	.classed("temporary", true)
+																	.attr("x1", x2)
+																	.attr("x2", x2)
+																	.attr("y1", y1)
+																	.attr("y2", y2)
+																	.attr("stroke", fonts.axis.colour)
+																	.attr("stroke-width", 0.3)
+																	.attr("opacity", 0.5);
+
+																heatmapChart.select(".xAxis")
+																			.selectAll(".tick")
+																			.select("text")
+																			.filter(l => l == d[0][1])
+																			.attr("fill", chroma(fonts.axis.colour).darken(2))
+																			.attr("font-weight",  fonts.axis.weight+200);
+																heatmapChart.select(".yAxis")
+																			.selectAll(".tick")
+																			.select("text")
+																			.filter(l => l == d[0][0])
+																			.attr("fill", chroma(fonts.axis.colour).darken(2))
+																			.attr("font-weight",  fonts.axis.weight+200);
+								})
+								.on("mouseout", function(event, d) {
+																/**
+																 * @HACK one option is to use the fonfonts.tooltip.size=0 when you want to have a text with zero opacity not to take any space in your drawing. (without removing it)
+																 */
+																heatmapChart.select(".tooltip")
+																			.selectAll("text")
+																	   		.attr("font-size", 0)
+																			.attr("opacity", 0);
+
+
+																d3.select(this)
+																	.attr("fill" , d => colourScale(d[1].length));
+
+																heatmapChart.selectAll(".temporary").remove();
+
+
+																heatmapChart.select(".xAxis")
+																			.selectAll(".tick")
+																			.select("text")
+																			.attr("fill", fonts.axis.colour)
+																			.attr("font-weight", fonts.axis.weight);
+																heatmapChart.select(".yAxis")
+																			.selectAll(".tick")
+																			.select("text")
+																			.attr("fill", fonts.axis.colour)
+																			.attr("font-weight", fonts.axis.weight);
+								})
+								.on("click", function(event, d) {
+															d3.select(this)
+																	.attr("fill", colours.heatmapH);
+
+															keyWordList = d[1];
+															heatMapWords(keyWordList); 
+
+															graphics.select(".heatMapWords")
+																	.select(".close")
+																	.select(".info")
+																	.html((keyWordList.length>1) ? `<tspan>${d[1].length}</tspan> words start with <tspan>${d[0][0]}</tspan> and end in <tspan>${d[0][1]}</tspan>` : `<tspan>${d[1].length}</tspan> word starts with <tspan>${d[0][0]}</tspan> and ends in <tspan>${d[0][1]}</tspan>`);
+
+
+								      						sankeyChart.selectAll("*").remove();
+								      						drawSankey(keyWordList);
+								      						sankeyWords(keyWordList);
+								      						graphics.select(".sankeyWords").remove();
+
+															graphics.selectAll(".extra").selectAll("*").remove();
+
+
+															factON = false;
+															d3.select("#special")
+																.select("div.factOn")
+																.node()
+																.style.backgroundColor = colours.radioOff;
+															d3.select("#special")
+																.select("div.factOff")
+																.node()
+																.style.backgroundColor = colours.radioOn;
+
+
+
+															sankeyChart.select(".links")
+																		.selectAll("path")
+																		.attr("stroke", colours.link)
+																		.attr("stroke-opacity", linkOpacity);
+
+															histoChart.select(".histoRect")
+																		.selectAll("rect")
+																		.attr("fill" , colours.histo);
+								});
+					
+					//////////////////////////////////////////////////////////// Tooltips
+					heatmapChart.append("g")
+								.attr("class", "tooltip")
+								.attr("transform", `translate(${margin.left + xAlphabetScale.bandwidth()/2}, ${margin.top - Math.min(yAlphabetScale.bandwidth()/2, margin.top/2)})`)
+								.selectAll("text")
+								.data(heatmapData)
+								.join("text")
+								.html(d => `[ ${d[0][0]} ] ` + `<tspan>${d[1].length} words</tspan>` + ` [ ${d[0][1]} ]`)  // (d[1].length == 1) ? `only ${d[1].length} word starts with ${d[0][0].toUpperCase()} and ends in ${d[0][1].toUpperCase()}` : `${d[1].length} words start with ${d[0][0].toUpperCase()} and end in ${d[0][1].toUpperCase()}`)   !!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!?????????????????????
+								.attr("x", d => xAlphabetScale(d[0][1]))
+						      	.attr("y", d => yAlphabetScale(d[0][0]))
+						      	/**
+						      	 * @HACK  	deliberately fonfonts.tooltip.size=0. to have a .tooltip<g> with 0x0 size that takes no space. So it won't cover up the <rect>s preventing mouseover on them.
+						      	 */
+						   		.attr("font-size", 0)
+						   		.attr("font-weight", fonts.tooltip.weight-200)
+						   		.attr("text-anchor", "middle")
+						   		.attr("fill", colours.heatmapH.darken(0.5))
+						   		.attr("opacity", 0);
+					
+								
+
+					//////////////////////////////////////////////////////////// Axis
+					
+					///// Generate the x-axis function
+					xAxisHeatMap = d3.axisBottom(xAlphabetScale)
+										.tickValues(xAlphabetScale.domain())
+										.tickSizeInner(0)
+										.tickSizeOuter(0)
+										.tickPadding(6)
+
+									
+					///// Draw the x-axis & axis labels
+					heatmapChart.append("g")
+								.attr("class", "xAxis")
+								.attr("transform", `translate(${margin.left}, ${heatMapHeight+margin.top})`)
+								.call(xAxisHeatMap)
+								.attr("font-family", "hatch")
+								.attr("font-size", fonts.tick.size)
+								.attr("font-weight", fonts.tick.weight)
+								.attr("color", fonts.axis.colour);
+
+					heatmapChart.select(".xAxis")
+								.append("g")
+								.attr("class", "axisLabel")
+								.append("text")
+						        .attr("x", xAlphabetScale.range()[1])
+						        .attr("y", labelDist)
+						        .attr("fill", fonts.axis.colour)
+						        .attr("font-size", fonts.axis.size) // if you want to set font size related to margin :)) `${margin.right/6}`
+						        .attr("font-weight", fonts.axis.weight)
+						        .attr("text-anchor", "end")
+						        .text("LAST LETTER");
+
+
+			        ///// Generate the y-axis function
+			        yAxisHeatMap = d3.axisLeft(yAlphabetScale)
+									.tickValues(yAlphabetScale.domain())
+									.tickSizeInner(0)
+									.tickSizeOuter(0)
+									.tickPadding(6); // 2/3*12(leading) -2
+
+					///// Draw the y-axis & axis labels
+					heatmapChart.append("g")
+								.attr("class", "yAxis")
+								.attr("transform", `translate(${margin.left}, ${margin.top})`)
+								.call(yAxisHeatMap)
+								.attr("font-family", "hatch")
+								.attr("font-size", fonts.tick.size+2)
+								.attr("font-weight", fonts.tick.weight)
+								.attr("color", fonts.axis.colour)
+								.select("path")
+								.attr("stroke-opacity", 0.5);;
+
+					heatmapChart.select(".yAxis")
+								.append("g")
+								.attr("class", "axisLabel")
+								.append("text")
+						        .attr("x", 0)
+						        .attr("y", yAlphabetScale.range()[1]-labelDist/3)
+						        .attr("fill", fonts.axis.colour)
+						        .attr("font-size", fonts.axis.size)
+						        .attr("font-weight", fonts.axis.weight)
+						        .attr("text-anchor", "middle")
+						        .text("FIRST LETTER");
+
+					///// Axis interactivity
+					heatmapChart.select(".xAxis")
+								.selectAll(".tick")
+								.select("text")
+								.on("mouseover", function(event, d) {
+															d3.select(this)
+																.attr("fill", chroma(fonts.axis.colour).darken(2))
+																.attr("font-weight", fonts.axis.weight+200);
+
+															
+															/**
+															 * @description   d is data bind to .tick <text>
+															 * d = [ firstLetterlastLetter(I call it key) , array of words with this key]
+															 */
+															heatmapChart.select(".heatmapRects")
+																		.selectAll("rect")
+																		.filter(key => key[0][1] == d )
+																		.attr("fill", key => chroma(colourScale(key[1].length)).darken(0.8));
+								})
+								.on("mouseout", function(event, d) {
+															d3.select(this)
+																.attr("fill", fonts.axis.colour)
+																.attr("font-weight", fonts.axis.weight);;
+
+															heatmapChart.select(".heatmapRects")
+																		.selectAll("rect")
+																		.filter(key => key[0][1] == d )
+																		.attr("fill", key => colourScale(key[1].length));
+								})
+								.on("click", function(event, d) {
+												min = d3.select("#minLength").node().getAttribute("value");
+												max = d3.select("#maxLength").node().getAttribute("value");
+												words = filterbyLength(inputData, min, max);
+
+												keyWordList = endLetter(inputData, d);
+												heatMapWords(keyWordList);
+
+												heatmapDataLastL = heatmapInfo(words).heatmapDataLastL;
+
+												graphics.select(".heatMapWords")
+														.select(".close")
+														.select(".info")
+														.html(`<tspan>${heatmapDataLastL.get(d).length}</tspan> words end in <tspan>${d}</tspan>`);
+
+
+					      						sankeyChart.selectAll("*").remove();
+					      						drawSankey(keyWordList);
+					      						sankeyWords(keyWordList);
+					      						/**
+					      						 * @description 	I want to be able to download keyWordList. But I don't want the words to show up on the screen. So .sankeyWords should be removed.
+					      						 */
+					      						graphics.select(".sankeyWords").remove();
+
+
+												factON = false;
+												d3.select("#special")
+													.select("div.factOn")
+													.node()
+													.style.backgroundColor = colours.radioOff;
+												d3.select("#special")
+													.select("div.factOff")
+													.node()
+													.style.backgroundColor = colours.radioOn;
+
+												graphics.selectAll(".extra").selectAll("*").remove();
+
+												sankeyChart.select(".links")
+															.selectAll("path")
+															.attr("stroke", colours.link)
+															.attr("stroke-opacity", linkOpacity);
+
+												histoChart.select(".histoRect")
+															.selectAll("rect")
+															.attr("fill" , colours.histo);
+								});
+
+					heatmapChart.select(".yAxis")
+								.selectAll(".tick")
+								.select("text")
+								.on("mouseover", function(event, d) {
+															d3.select(this)
+																.attr("fill", chroma(fonts.axis.colour).darken(2))
+																.attr("font-weight",  fonts.axis.weight+200);
+
+															
+															/**
+															 * @description   d is data bind to .tick <text>
+															 * d = [ firstLetterlastLetter(I call it key) , array of words with this key]
+															 */
+															heatmapChart.select(".heatmapRects")
+																		.selectAll("rect")
+																		.filter(key => key[0][0] == d )
+																		.attr("fill", key => chroma(colourScale(key[1].length)).darken(0.8));
+								})
+								.on("mouseout", function(event, d) {
+															d3.select(this)
+																.attr("fill", fonts.axis.colour)
+																.attr("font-weight", fonts.axis.weight);;
+
+															heatmapChart.select(".heatmapRects")
+																		.selectAll("rect")
+																		.filter(key => key[0][0] == d )
+																		.attr("fill", key => colourScale(key[1].length));
+								})
+								.on("click", function(event, d) {
+												min = d3.select("#minLength").node().getAttribute("value");
+												max = d3.select("#maxLength").node().getAttribute("value");
+												words = filterbyLength(inputData, min, max);
+
+												keyWordList = startLetter(inputData, d);
+												heatMapWords(keyWordList);
+
+												heatmapDataFirstL = heatmapInfo(words).heatmapDataFirstL;
+
+												graphics.select(".heatMapWords")
+														.select(".close")
+														.select(".info")
+														.html(`<tspan>${heatmapDataFirstL.get(d).length}</tspan> words start with <tspan>${d}</tspan>`);
+
+
+												sankeyChart.selectAll("*").remove();
+					      						drawSankey(keyWordList);
+					      						sankeyWords(keyWordList);
+					      						graphics.select(".sankeyWords").remove();
+
+
+
+												///// Reset radio buttons
+												factON = false;
+												d3.select("#special")
+													.select("div.factOn")
+													.node()
+													.style.backgroundColor = colours.radioOff;
+												d3.select("#special")
+													.select("div.factOff")
+													.node()
+													.style.backgroundColor = colours.radioOn;
+												
+												///// Remove all extra facts
+												graphics.selectAll(".extra").selectAll("*").remove();
+
+
+												///// Reset Sankey
+												sankeyChart.select(".links")
+															.selectAll("path")
+															.attr("stroke", colours.link)
+															.attr("stroke-opacity", linkOpacity);
+
+												///// Reset Histogram
+												histoChart.select(".histoRect")
+															.selectAll("rect")
+															.attr("fill" , colours.histo);
+								});
+					//////////////////////////////////////////////////////////// Draw Legend
+					legendScaleHeatmap = d3.scaleLinear()
+											.domain(colourScale.domain())
+											.range(colourScale.range());
+
+					
+					
+					legendHeatmap = d3.legendColor()
+									  .shapeWidth(5)//xAlphabetScale.bandwidth()/1.618)
+									  .shapeHeight(5)//xAlphabetScale.bandwidth()/1.618)
+									  .orient('vertical')
+									  .shapePadding(-1.618*fonts.axis.size)
+									  // .cells(7)
+									  .labelAlign("start")
+									  .labelFormat(d3.format("0.1s"))
+									  .labelOffset(1.618*5/2)
+									  .scale(legendScaleHeatmap)
+									  // .title("Word Count")
+
+								  
+
+					heatmapChart.append("g")
+								.attr("class", "legend")
+								.call(legendHeatmap)
+								.attr("fill", fonts.axis.colour)
+							    .attr("font-size", fonts.axis.size/2.5)
+							    .attr("font-weight", fonts.axis.weight);
+
+					heatmapChart.select(".legend")
+								.select(".legendCells")
+								.selectAll(".cell")
+								.selectAll(".label")
+								.attr("transform", `translate(${5*1.618}, ${5})`);//`translate(${xAlphabetScale.bandwidth()}, ${xAlphabetScale.bandwidth()/1.618})`);
+
+
+					heatmapChart.select(".legend")
+								.append("text")
+								.attr("class", "legendTitle")
+								.attr("x", 0)
+						        .attr("y", -1.618*5*1.618)//-1.618*xAlphabetScale.bandwidth())
+						        .attr("text-anchor", "start")
+						        .text("WORD");
+
+					heatmapChart.select(".legend")
+						        .append("text")
+								.attr("class", "legendTitle")
+								.attr("x", 0)
+						        .attr("y", -fonts.axis.size)
+						        .attr("text-anchor", "start")
+						        .text("COUNT")
+
+					/**
+					 * if horizontal legend
+					 * heatmapChart.select(".legend")
+									.append("text")
+									.attr("class", "legendTitle")
+									.attr("x", -fonts.axis.size/1.618)
+							        .attr("y", xAlphabetScale.bandwidth()/1.618 + xAlphabetScale.bandwidth()/2 + 0.5*fonts.axis.size/2)
+							        .attr("text-anchor", "end")
+							        .text("word count");
+					 * 	rectLength = d3.select(".heatmapRects").select("rect").node().getAttribute("width");
+						legendX = margin.left + 26*rectLength - 7*xAlphabetScale.bandwidth()/1.618 - (7-1)*fonts.axis.size;  
+						legendY = margin.top - labelDist + xAlphabetScale.bandwidth()/2;
+						heatmapChart.select(".legend")
+									.attr("transform", `translate(${legendX}, ${legendY})`);
+
+
+
+					 */
+					
+					/**
+					 * if vertical legend
+					 */
+					
+					rectLength = d3.select(".heatmapRects").select("rect").node().getAttribute("width");
+					legendX = margin.left + xAlphabetScale.domain().length*rectLength + 5*1.618;  
+					legendY = margin.top  + 5*1.618 + 1.2*fonts.axis.size ;
+					// legendX = margin.left + xAlphabetScale.domain().length*rectLength + xAlphabetScale.bandwidth();  
+					// legendY = margin.top  + xAlphabetScale.bandwidth() + 1.2*fonts.axis.size ;
+					
+
+					heatmapChart.select(".legend")
+								.attr("transform", `translate(${legendX}, ${legendY})`);
+
+				};
+				
+
+				drawHeatMap(allWords);
+
+
+//////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+//////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+//////////////////////////////////////////////////////////// Draw Histogram
+//////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+//////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+				var histoHeight = heatMapHeight;
+				var histoWidth = (13/17)*heatMapWidth + ((13-17)/17)*(margin.left + margin.right); //(a/b)*heatMapWidth + ((a-b)/b)*(margin.left + margin.right); a+b=total column number(here 30); histogram >> grid-area: 2 / 18 / 3 / 31; where 31-18=13 & heatmap >> grid-area:  2 / 1 / 3 / 18;  where 18-1=17
+
+				const histoChart = graphics.append("svg")
+											.classed("histogram", true)
+											.attr("viewBox", [0, 0, histoWidth + margin.left + margin.right, histoHeight + margin.top + margin.bottom ]);
+
+				/**
+				 * Draws Histogram 
+				 *
+				 * @param      {Array}  inputData   an array of words
+				 * @return     draws histogram & handles its interactivity
+				 */
+
+				function drawHisto(inputData) {
+
+					bins = histo(inputData);
+					L = d3.max(inputData, w => w.length);
+					whiteSpace = 1; // the white space btw <rect> elements of histogram
+
+					///// Scales
+
+					xScaleHisto = d3.scaleLinear()
+								.domain([bins[0].x0, bins[bins.length-1].x0+1])
+						   		.range([0, histoWidth]);
+
+					yScaleHisto = d3.scaleLinear()
+							    .domain([0, d3.max(bins, bucket => bucket.length)]).nice()
+							    .range([histoHeight, 0]);
+					
+					//////////////////////////////////////////////////////////// Drawing Bins
+					histoChart.append("g")
+								.attr("class", "histoRect")
+								.attr("transform", `translate(${margin.left}, ${margin.top})`)
+								.selectAll("rect")
+								.data(bins)
+								.join("rect")
+						   		.attr("x", d => xScaleHisto(d.x0))
+						   		/**
+						   		 * @BUG .attr("width", d => Math.max(0, xScaleHisto(d.x1) - xScaleHisto(d.x0)-whiteSpace)) this eliminates the last <rect> for the last bin which has x0 = x1. 
+						   		 * knowing that my bins & ticks' step is +1, I can explicitly feed d.x0 + 1 to the xScaleHisto instead of d.x1
+						   		 * @HACK .attr("width", d => Math.max(0, xScaleHisto(d.x0 + 1) - xScaleHisto(d.x0)-whiteSpace))
+						   		 */
+								.attr("width", d => Math.max(0, xScaleHisto(d.x0 + 1) - xScaleHisto(d.x0)-whiteSpace))
+								.attr("y", d => yScaleHisto(d.length))
+								.attr("height", d => yScaleHisto(0) - yScaleHisto(d.length))
+								.attr("fill", colours.histo)
+								.on("mouseover", function(event, d) {
+																d3.select(this)
+																	.attr("fill" , colours.histoH);
+																histoChart.select(".tooltip")
+																			.selectAll("text")
+																			.attr("font-size", t => (t[0] == d[0]) ? fonts.tooltip.size : 0)
+																			.attr("opacity",  t => (t[0] == d[0]) ? 1 : 0); 
+								})
+								.on("mouseout", function(event, d) {
+																histoChart.select(".tooltip")
+																			.selectAll("text")
+																	   		.attr("font-size", 0)
+																			.attr("opacity", 0);
+
+																histoChart.select(".histoRect")
+																			.selectAll("rect")
+																			.attr("fill" ,  d => (d.length==d3.max(bins, b => b.length)) && (factON == true) ? colours.histoMax : colours.histo);
+
+																histoChart.selectAll(".temporary").remove();
+								});
+
+					//////////////////////////////////////////////////////////// Tooltip
+
+					rectWidth = d3.select(".histoRect").select("rect").node().getAttribute("width");
+
+					histoChart.append("g")
+							    	.attr("class", "tooltip")
+									.attr("transform", "translate(" + margin.left + "," + margin.top  + ")")
+									.selectAll("text")
+									.data(bins)
+									.join("text")
+									.text(d => d.length)  
+									.attr("x", d => xScaleHisto(d.x0)+rectWidth/2)
+							      	.attr("y", d => yScaleHisto(d.length)-labelDist/2)
+							   		.attr("font-size", 0)
+							   		.attr("font-weight", fonts.tooltip.weight)
+							   		.attr("text-anchor", "middle")
+							   		.attr("fill", fonts.tooltip.colour1)
+							   		.attr("opacity", 0);;
+					
+					//////////////////////////////////////////////////////////// Axis
+					
+					/**
+					 * @description explicitly determining the tick values. >> .tickValues([...Array(L+1).keys()].slice(2,L+1))
+					 * .slice(2,L+1) is for getting rid of tick=1 and no need to the following:
+					 * histoChart.select(".xAxis")
+					 *				.selectAll(".tick:first-of-type text")
+					 *	  			.remove();
+					 */
+					xAxisHisto = d3.axisBottom(xScaleHisto)
+									.tickValues([...Array(L+1).keys()].slice(2,L+1))
+									.tickSizeOuter(0)
+									.tickSizeInner(0)
+									.tickPadding(6)
+									.tickFormat(d3.format("0.2"))
+									
+
+					histoChart.append("g")
+								.attr("class", "xAxis")
+								.attr("transform", `translate(${margin.left}, ${histoHeight+margin.top})`)
+								.call(xAxisHisto)
+								.attr("font-family", "hatch")
+								.attr("font-size", fonts.tick.size)
+								.attr("font-weight", fonts.tick.weight)
+								.attr("color", fonts.axis.colour);
+
+					histoChart.select(".xAxis")
+								.selectAll(".tick")
+								.selectAll("text")
+								.attr("transform", `translate(${rectWidth/2}, ${0} )`);
+
+					histoChart.select(".xAxis")
+								.select("path")
+								.attr("stroke", "none");
+
+					histoChart.select(".xAxis")
+								.append("g")
+								.attr("class", "axisLabel")
+								.append("text")
+						        .attr("x", xScaleHisto.range()[1])
+						        .attr("y", labelDist)
+						        .attr("fill", fonts.axis.colour)
+						        .attr("font-size", fonts.axis.size)
+						        .attr("font-weight", fonts.axis.weight)
+						        .attr("text-anchor", "end")
+						        .text("LENGTH");
+
+
+					yAxisHisto = d3.axisLeft(yScaleHisto)
+									.tickSizeOuter(0)
+									.tickSizeInner(0)
+									.ticks(0);
+
+					histoChart.append("g")
+								.attr("class", "yAxis")
+								.attr("transform", `translate(${margin.left}, ${margin.top})`)
+								.call(yAxisHisto)
+								.attr("font-family", "hatch")
+								.attr("font-size", fonts.tick.size)
+								.attr("font-weight", fonts.tick.weight)
+								.attr("color", "grey")
+								.select("path")
+								.attr("stroke-opacity", 0.5);;
+
+					histoChart.select(".yAxis")
+								.append("g")
+								.attr("class", "axisLabel")
+								.append("text")
+						        .attr("x", 0)
+						        .attr("y", yScaleHisto.range()[1]-labelDist/3) //yScaleHisto.range()[1]-margin.top+12
+						        .attr("fill", fonts.axis.colour)
+						        .attr("font-size", fonts.axis.size)
+						        .attr("font-weight", fonts.axis.weight)
+						        .attr("text-anchor", "middle")
+						        .text("WORD")
+						        .text("COUNT");
+
+
+					histoChart.append("g")
+								.attr("class", "extra")
+								.attr("transform", "translate(" + margin.left + "," + margin.top  + ")");
+				};
+
+
+				drawHisto(allWords);
+
+
+
+//////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+//////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+//////////////////////////////////////////////////////////// Control Bar & Interactivity
+//////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+//////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+
+
+   				//////////////////////////////////////////////////////////// Show Info
+		
+
+
+   				allInfo = d3.select("#info").selectAll(".info")._groups[0];
+   				allInfo.forEach(div => setStylesOnElement({display: "none"}, div));
+   				
+   				allTitle = d3.select("#titles").selectAll(".info")._groups[0];
+   				allGraphs = d3.select("#graphics").selectAll("svg")._groups[0];
+				sliderNode = d3.select("#control-panel").node();
+				dataNode = d3.select("#userData").node();
+				buttonNode = d3.select("#resetSankey").node(); 
+
+   				
+   			
+
+				d3.select("h4.heatMap.info")
+					.on("click", function(event) {
+									allInfo.forEach(div => { if (div.className != this.className) {setStylesOnElement({display: "none"}, div)}});
+									elementON = d3.select("div.heatMap.info").node();
+									allTitle.forEach(h4 => setStylesOnElement({backgroundColor: whites[0]}, h4));
+									allGraphs.forEach(svg => setStylesOnElement({backgroundColor: whites[0]}, svg));
+									setStylesOnElement({backgroundColor: whites[0]}, dataNode);
+									setStylesOnElement({backgroundColor: whites[0]}, sliderNode);
+									setStylesOnElement({backgroundColor: whites[0]}, buttonNode);
+									(elementON.attributes[1].nodeValue == "display: none;") ? on = false : on = true; 
+					   				if (!on) {
+					   					setStylesOnElement({display: "block"}, elementON);
+										setStylesOnElement({backgroundColor: greens[4]}, this);
+										graphNode = d3.select("#graphics > svg.heatmap").node();
+									    setStylesOnElement({backgroundColor: greens[4]}, graphNode);
+									    graphNode.scrollIntoView({ behavior: "smooth", block: "center" });
+										on = true;
+									} else {
+										setStylesOnElement({display: "none"}, elementON);
+									};
+								});
+
+				d3.select("h4.histo.info")
+						.on("click", function(event) {
+									allInfo.forEach(div => { if (div.className != this.className) {setStylesOnElement({display: "none"}, div)}});
+									elementON = d3.select("div.histo.info").node();
+									allTitle.forEach(h4 => setStylesOnElement({backgroundColor: whites[0]}, h4));
+									allGraphs.forEach(svg => setStylesOnElement({backgroundColor: whites[0]}, svg));
+									setStylesOnElement({backgroundColor: whites[0]}, dataNode);
+									setStylesOnElement({backgroundColor: whites[0]}, sliderNode);
+									setStylesOnElement({backgroundColor: whites[0]}, buttonNode);
+									(elementON.attributes[1].nodeValue == "display: none;") ? on = false : on = true; 
+					   				if (!on) {
+										setStylesOnElement({display: "block"}, elementON);
+									    setStylesOnElement({backgroundColor: greens[4]}, this);
+									    graphNode = d3.select("#graphics > svg.histogram").node();
+									    setStylesOnElement({backgroundColor: greens[4]}, graphNode);
+									    graphNode.scrollIntoView({ behavior: "smooth", block: "center" });
+										on = true;
+									} else {
+										setStylesOnElement({display: "none"}, elementON);
+									};
+								});
+
+
+				d3.select("h4.sankey.info")
+					.on("click", function(event) {
+									allInfo.forEach(div => { if (div.className != this.className) {setStylesOnElement({display: "none"}, div)}});
+									elementON = d3.select("div.sankey.info").node();
+									allTitle.forEach(h4 => setStylesOnElement({backgroundColor: whites[0]}, h4));
+									allGraphs.forEach(svg => setStylesOnElement({backgroundColor: whites[0]}, svg));
+									setStylesOnElement({backgroundColor: whites[0]}, dataNode);
+									setStylesOnElement({backgroundColor: whites[0]}, sliderNode);
+									setStylesOnElement({backgroundColor: whites[0]}, buttonNode);
+									(elementON.attributes[1].nodeValue == "display: none;") ? on = false : on = true; 
+					   				if (!on) {
+										setStylesOnElement({display: "block"}, elementON);
+										setStylesOnElement({backgroundColor: greens[4]}, this);
+										graphNode = d3.select("#graphics > svg.sankey").node();
+									    setStylesOnElement({backgroundColor: greens[4]}, graphNode);
+									    graphNode.scrollIntoView({ behavior: "smooth", block: "center" });
+										on = true;
+									} else {
+										setStylesOnElement({display: "none"}, elementON);
+									};
+								});
+
+				d3.select("h4.sliders.info")
+					.on("click", function(event) {
+									allInfo.forEach(div => { if (div.className != this.className) {setStylesOnElement({display: "none"}, div)}});
+									elementON = d3.select("div.sliders.info").node();
+									allTitle.forEach(h4 => setStylesOnElement({backgroundColor: whites[0]}, h4));
+									allGraphs.forEach(svg => setStylesOnElement({backgroundColor: whites[0]}, svg));
+									setStylesOnElement({backgroundColor: whites[0]}, dataNode);
+									setStylesOnElement({backgroundColor: whites[0]}, buttonNode);
+									(elementON.attributes[1].nodeValue == "display: none;") ? on = false : on = true; 
+					   				if (!on) {
+										setStylesOnElement({display: "block"}, elementON);
+										setStylesOnElement({backgroundColor: greens[4]}, this);
+									    setStylesOnElement({backgroundColor: greens[4]}, sliderNode);
+									    sliderNode.scrollIntoView({ behavior: "smooth", block: "center" });
+										on = true;
+									} else {
+										setStylesOnElement({display: "none"}, elementON);
+									};
+								});
+
+				
+				d3.select("h4.buttons.info")
+					.on("click", function(event) {
+									allInfo.forEach(div => { if (div.className != this.className) {setStylesOnElement({display: "none"}, div)}});
+									elementON = d3.select("div.buttons.info").node();
+									allTitle.forEach(h4 => setStylesOnElement({backgroundColor: whites[0]}, h4));
+									allGraphs.forEach(svg => setStylesOnElement({backgroundColor: whites[0]}, svg));
+									setStylesOnElement({backgroundColor: whites[0]}, dataNode);
+									setStylesOnElement({backgroundColor: whites[0]}, sliderNode);
+									(elementON.attributes[1].nodeValue == "display: none;") ? on = false : on = true; 
+					   				if (!on) {
+										setStylesOnElement({display: "block"}, elementON);
+										setStylesOnElement({backgroundColor: greens[4]}, this);
+										setStylesOnElement({box_shadow: "1px 2px 3px blue"}, buttonNode);
+										buttonNode.scrollIntoView({ behavior: "smooth", block: "center" });
+										on = true;
+									} else {
+										setStylesOnElement({display: "none"}, elementON);
+									};
+								});
+
+				d3.select("h4.input.info")
+					.on("click", function(event) {
+									allInfo.forEach(div => { if (div.className != this.className) {setStylesOnElement({display: "none"}, div)}});
+									elementON = d3.select("div.input.info").node();
+									allTitle.forEach(h4 => setStylesOnElement({backgroundColor: whites[0]}, h4));
+									allGraphs.forEach(svg => setStylesOnElement({backgroundColor: whites[0]}, svg));
+									setStylesOnElement({backgroundColor: whites[0]}, sliderNode);
+									setStylesOnElement({backgroundColor: whites[0]}, buttonNode);
+									(elementON.attributes[1].nodeValue == "display: none;") ? on = false : on = true; 
+					   				if (!on) {
+										setStylesOnElement({display: "block"}, elementON);
+										setStylesOnElement({backgroundColor: greens[4]}, this);
+										setStylesOnElement({backgroundColor: greens[4]}, dataNode);
+										dataNode.scrollIntoView({ behavior: "smooth", block: "center" });
+										on = true;
+									} else {
+										setStylesOnElement({display: "none"}, elementON);
+									};
+								});
+
+				d3.select("a.button.info")
+					.on("click", function() {
+									allInfo.forEach(div => setStylesOnElement({display: "none"}, div));
+									allTitle.forEach(h4 => setStylesOnElement({backgroundColor: whites[0]}, h4));
+									allGraphs.forEach(svg => setStylesOnElement({backgroundColor: whites[0]}, svg));
+									setStylesOnElement({backgroundColor: whites[0]}, dataNode);
+									setStylesOnElement({backgroundColor: whites[0]}, sliderNode);
+									setStylesOnElement({backgroundColor: whites[0]}, buttonNode);
+
+								});
+
+
+
+
+
+				//////////////////////////////////////////////////////////// Slider
+				d3.select("#minLength")
+					.on("click", function() {
+											min = this.value;
+											max = d3.select("#maxLength").node().getAttribute("value");
+											(!d3.select("#data").node().value) ? sliderUpdate(min, max, allWords) : sliderUpdate(min, max, userWords) ;
+										});
+
+				d3.select("#maxLength")
+					.on("click", function() {
+											max = this.value;
+											min = d3.select("#minLength").node().getAttribute("value");
+											(!d3.select("#data").node().value) ? sliderUpdate(min, max, allWords) : sliderUpdate(min, max, userWords) ;
+										});
+
+					
+
+				//////////////////////////////////////////////////////////// Buttons
+				
+
+				d3.selectAll(".button")
+					.on("mouseover", function() {
+						button = d3.select(this);
+						darkerColour = chroma(getComputedStyle(button.node()).backgroundColor).darken(0.5);
+						button.node().style.backgroundColor = darkerColour;
+					})
+					.on("mouseout", function() {
+						button = d3.select(this);
+						lighterColour = chroma(getComputedStyle(button.node()).backgroundColor).brighten(0.5);
+						button.node().style.backgroundColor = lighterColour;
+					});
+
+
+
+					
+				 
+				 
+				///// RESET everything! data, graphs, selections, filtration, ... 
+				d3.select("#resetSankey")
+					.select(".button")
+					.on("click", function() {
+										if (!d3.select("#data").node().value) {
+											clicked=false;
+											chainDrag=false;
+											sliderUpdate(min, max);
+										} else {
+											clicked=false;
+											chainDrag=false;
+											sliderUpdate(min, max, userWords);
+											
+											histoChart.selectAll("*").remove();
+											drawHisto(userWords);
+										};
+									});
+
+				///// Get the excluded letters
+				// d3.select("#letterExclude")
+				// 	.select(".button")
+				// 	.on("click", function() {
+				// 						exclusion = d3.select("#letterExclude").selectAll("input").filter(.value;
+				// 						return exclusion;
+				// 						console.log(exclusion);
+				// 					});
+				
+
+				///// Load User Data
+				d3.select("#userData")
+					.select("#loadData")
+					.on("click", function(event) {
+											userWords = getUserData();
+											//////////////////////////////////////////////////////////// Slider settings
+											d3.select("#maxLength")
+												.node()
+												.setAttribute("max", d3.max(userWords, w => w.length));
+											d3.select("#minLength")
+												.node()
+												.setAttribute("max", d3.max(userWords, w => w.length));
+
+											d3.select("#minLength")
+												.node()
+												.setAttribute("min", d3.min(userWords, w => w.length));
+
+											d3.select("#maxLength")
+												.node()
+												.setAttribute("min", d3.min(userWords, w => w.length));
+
+								        	
+								        	clicked = false;
+								        	chainDrag = false;
+
+								        	/**
+											 * @description the userData will not be so much huge and heavy most probably. So use the complete dataset to draw sankey.
+								        	 * 
+											 * @description sliderUpdate includes Sankey & Heatmap updates
+											 */
+											
+											sliderUpdate(min, max, userWords);
+											
+
+											/**
+											 * @description update Histogram separately.
+											 * because basically I do not want histogram get updated each time slider is changed.
+											 */
+											histoChart.selectAll("*").remove();
+											drawHisto(userWords);
+
+										});
+
+					d3.select("#userData")
+						.select("#sowpodsData")
+						.on("click", function(event) {
+											/**
+											 * @HACK to resolve the #information update % in updateSlider
+											 */
+											d3.select("#data").node().value = null;
+
+											clicked=false;
+											chainDrag = false;
+											sliderUpdate(min, max, allWords);
+											//////////////////////////////////////////////////////////// Slider settings
+											d3.select("#maxLength")
+												.node()
+												.setAttribute("max", d3.max(allWords, w => w.length));
+											d3.select("#minLength")
+												.node()
+												.setAttribute("max", d3.max(allWords, w => w.length));
+
+											d3.select("#minLength")
+												.node()
+												.setAttribute("min", d3.min(allWords, w => w.length));
+
+											d3.select("#maxLength")
+												.node()
+												.setAttribute("min", d3.min(allWords, w => w.length));
+
+
+											histoChart.selectAll("*").remove();
+											drawHisto(allWords);
+
+											
+
+										});
+
+
+				///// DOWNLOAD the current word list
+				d3.select("#downloadSankey")
+					.select(".button")
+					.on("click", function() {
+									chainDrag ? conent = letterExcludeData : conent = nextFilteredData;
+									header = "data:text/plain;charset=utf-8,"
+									payload = header + encodeURIComponent(conent);
+									this.href = payload;
+								});
+
+
+				
+				///// General
+				/**
+				 * @description  	when click on the white empty space of the page, all temporary things GONE!
+				 * @BUG is it working?
+				 */
+				graphics.on("click", function(event) {
+											d3.selectAll(".temporary").remove();
+										});
+
+			}); // the END of .then(function(rawdata) {...  after loading data }
+		</script>
+	</body>
+</html>

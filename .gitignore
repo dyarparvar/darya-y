@@ -2,3 +2,17 @@
 # It holds internal Notion IDs and workflow instructions that should stay private.
 Claude.md
 CLAUDE.md
+
+# Deployment credentials — never commit
+sftp-config.json
+
+# OS / editor cruft
+.DS_Store
+*~
+
+# Design sources (Photoshop / Illustrator) — not needed to serve the site
+*.psd
+*.ai
+
+# Apple iWork
+*.numbers
