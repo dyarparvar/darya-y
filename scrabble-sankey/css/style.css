@@ -1,0 +1,1346 @@
+/************************************************************************************************** Neutralisation of default styles */
+
+/*! normalize.css v8.0.1 | MIT License | github.com/necolas/normalize.css */
+
+/* Document
+   ========================================================================== */
+
+/**
+ * 1. Correct the line height in all browsers.
+ * 2. Prevent adjustments of font size after orientation changes in iOS.
+ */
+
+html {
+  line-height: 1.15; /* 1 */
+  -webkit-text-size-adjust: 100%; /* 2 */
+}
+
+/* Sections
+   ========================================================================== */
+
+/**
+ * Remove the margin in all browsers.
+ */
+
+body {
+  margin: 0;
+}
+
+/**
+ * Render the `main` element consistently in IE.
+ */
+
+main {
+  display: block;
+}
+
+/**
+ * Correct the font size and margin on `h1` elements within `section` and
+ * `article` contexts in Chrome, Firefox, and Safari.
+ */
+
+h1 {
+  font-size: 2em;
+  /*margin: 0.67em 0;*/
+}
+
+/* Grouping content
+   ========================================================================== */
+
+/**
+ * 1. Add the correct box sizing in Firefox.
+ * 2. Show the overflow in Edge and IE.
+ */
+
+hr {
+  box-sizing: content-box; /* 1 */
+  height: 0; /* 1 */
+  overflow: visible; /* 2 */
+}
+
+/**
+ * 1. Correct the inheritance and scaling of font size in all browsers.
+ * 2. Correct the odd `em` font sizing in all browsers.
+ */
+
+pre {
+  font-family: monospace, monospace; /* 1 */
+  font-size: 1em; /* 2 */
+}
+
+/* Text-level semantics
+   ========================================================================== */
+
+/**
+ * Remove the gray background on active links in IE 10.
+ */
+
+a {
+  background-color: transparent;
+}
+
+/**
+ * 1. Remove the bottom border in Chrome 57-
+ * 2. Add the correct text decoration in Chrome, Edge, IE, Opera, and Safari.
+ */
+
+abbr[title] {
+  border-bottom: none; /* 1 */
+  text-decoration: underline; /* 2 */
+  -webkit-text-decoration: underline dotted;
+          text-decoration: underline dotted; /* 2 */
+}
+
+/**
+ * Add the correct font weight in Chrome, Edge, and Safari.
+ */
+
+b,
+strong {
+  font-weight: bolder;
+}
+
+/**
+ * 1. Correct the inheritance and scaling of font size in all browsers.
+ * 2. Correct the odd `em` font sizing in all browsers.
+ */
+
+code,
+kbd,
+samp {
+  font-family: monospace, monospace; /* 1 */
+  font-size: 1em; /* 2 */
+}
+
+/**
+ * Add the correct font size in all browsers.
+ */
+
+small {
+  font-size: 80%;
+}
+
+/**
+ * Prevent `sub` and `sup` elements from affecting the line height in
+ * all browsers.
+ */
+
+sub,
+sup {
+  font-size: 75%;
+  line-height: 0;
+  position: relative;
+  vertical-align: baseline;
+}
+
+sub {
+  bottom: -0.25em;
+}
+
+sup {
+  top: -0.5em;
+}
+
+/* Embedded content
+   ========================================================================== */
+
+/**
+ * Remove the border on images inside links in IE 10.
+ */
+
+img {
+  border-style: none;
+}
+
+/* Forms
+   ========================================================================== */
+
+/**
+ * 1. Change the font styles in all browsers.
+ * 2. Remove the margin in Firefox and Safari.
+ */
+
+button,
+input,
+optgroup,
+select,
+textarea {
+  font-family: inherit; /* 1 */
+  font-size: 100%; /* 1 */
+  line-height: 1.15; /* 1 */
+  margin: 0; /* 2 */
+}
+
+/**
+ * Show the overflow in IE.
+ * 1. Show the overflow in Edge.
+ */
+
+button,
+input { /* 1 */
+  overflow: visible;
+}
+
+/**
+ * Remove the inheritance of text transform in Edge, Firefox, and IE.
+ * 1. Remove the inheritance of text transform in Firefox.
+ */
+
+button,
+select { /* 1 */
+  text-transform: none;
+}
+
+/**
+ * Correct the inability to style clickable types in iOS and Safari.
+ */
+
+button,
+[type="button"],
+[type="reset"],
+[type="submit"] {
+  -webkit-appearance: button;
+}
+
+/**
+ * Remove the inner border and padding in Firefox.
+ */
+
+button::-moz-focus-inner,
+[type="button"]::-moz-focus-inner,
+[type="reset"]::-moz-focus-inner,
+[type="submit"]::-moz-focus-inner {
+  border-style: none;
+  padding: 0;
+}
+
+/**
+ * Restore the focus styles unset by the previous rule.
+ */
+
+button:-moz-focusring,
+[type="button"]:-moz-focusring,
+[type="reset"]:-moz-focusring,
+[type="submit"]:-moz-focusring {
+  outline: 1px dotted ButtonText;
+}
+
+/**
+ * Correct the padding in Firefox.
+ */
+
+fieldset {
+  padding: 0.35em 0.75em 0.625em;
+}
+
+/**
+ * 1. Correct the text wrapping in Edge and IE.
+ * 2. Correct the color inheritance from `fieldset` elements in IE.
+ * 3. Remove the padding so developers are not caught out when they zero out
+ *    `fieldset` elements in all browsers.
+ */
+
+legend {
+  box-sizing: border-box; /* 1 */
+  color: inherit; /* 2 */
+  display: table; /* 1 */
+  max-width: 100%; /* 1 */
+  padding: 0; /* 3 */
+  white-space: normal; /* 1 */
+}
+
+/**
+ * Add the correct vertical alignment in Chrome, Firefox, and Opera.
+ */
+
+progress {
+  vertical-align: baseline;
+}
+
+/**
+ * Remove the default vertical scrollbar in IE 10+.
+ */
+
+textarea {
+  overflow: auto;
+}
+
+/**
+ * 1. Add the correct box sizing in IE 10.
+ * 2. Remove the padding in IE 10.
+ */
+
+[type="checkbox"],
+[type="radio"] {
+  box-sizing: border-box; /* 1 */
+  padding: 0; /* 2 */
+}
+
+/**
+ * Correct the cursor style of increment and decrement buttons in Chrome.
+ */
+
+[type="number"]::-webkit-inner-spin-button,
+[type="number"]::-webkit-outer-spin-button {
+  height: auto;
+}
+
+/**
+ * 1. Correct the odd appearance in Chrome and Safari.
+ * 2. Correct the outline style in Safari.
+ */
+
+[type="search"] {
+  -webkit-appearance: textfield; /* 1 */
+  outline-offset: -2px; /* 2 */
+}
+
+/**
+ * Remove the inner padding in Chrome and Safari on macOS.
+ */
+
+[type="search"]::-webkit-search-decoration {
+  -webkit-appearance: none;
+}
+
+/**
+ * 1. Correct the inability to style clickable types in iOS and Safari.
+ * 2. Change font properties to `inherit` in Safari.
+ */
+
+::-webkit-file-upload-button {
+  -webkit-appearance: button; /* 1 */
+  font: inherit; /* 2 */
+}
+
+/* Interactive
+   ========================================================================== */
+
+/*
+ * Add the correct display in Edge, IE 10+, and Firefox.
+ */
+
+details {
+  display: block;
+}
+
+/*
+ * Add the correct display in all browsers.
+ */
+
+summary {
+  display: list-item;
+}
+
+/* Misc
+   ========================================================================== */
+
+/**
+ * Add the correct display in IE 10+.
+ */
+
+template {
+  display: none;
+}
+
+/**
+ * Add the correct display in IE 10.
+ */
+
+[hidden] {
+  display: none;
+}
+
+
+
+
+/*********************************************************************************************************************************************
+**********************************************************************************************************************************************
+**********************************************************************************************************************************************
+**********************************************************************************************************************************************
+**********************************************************************************************************************************************
+**********************************************************************************************************************************************
+********************************************************************************************************************************************** 
+********************************************************************************************************************************************** my Style __ START */
+
+
+* {
+  margin: 0;
+  padding: 0;
+  box-sizing: border-box !important;
+}
+
+a {
+  text-decoration: none;
+
+}
+
+
+
+
+/************************************************************************************************** Typeface & Font size */
+
+:root { 
+  /*font-family: henderson-slab-basic, serif;
+  font-weight: 200;*/
+  font-family: hatch, serif;
+  font-weight: 300;
+  font-size: 12pt; /*calc(0.15em + 2.5vmin);*/
+  line-height: 1.2;
+  color: var(--textBlack);
+}
+
+/************************************************************************************************** Colour Palette */
+
+:root {
+  --whiteBg: #F6F6F6;
+  --redBg: #b3412a;
+  --textBlack: #000020;
+  --purpleBg: #afa1f4;
+  --greyBg: #BDBDBD;
+
+  --defaultBlue:  rgb(12,90,250);
+
+  --textPurple: #4b4582;
+
+  --sankeyGreen: #dfff80;
+  --sowpodsRed: #e99990;
+  --buttonBlue: rgb(12,90,250);
+  --loadGrey: #BDBDBD;
+
+
+  
+  --buttonshadow: rgb(131, 131, 131);
+  --textshadow: #4b4582 ;
+
+  --border: #DCD8E3;
+
+
+ 
+
+}
+
+
+/*const pinks = ["#5b001f",
+              "#c80051",
+              "#b47789",
+              "#dec1c2"]; //dark to light
+
+      const greens = ["#6b8400",
+              "#8a9077",
+              "#bfb62e",
+              "#dfff80"]; //dark to light
+
+      const blues = ["#4b4582",
+              "#afa1f4", //dark to light purple 
+              "#0269ca",
+              "#8f9dff"]; //dark to light blue
+
+      const reds = ["#6b382b",
+              "#b3412a",
+              "#ff6457",
+              "#e99990", //**use this with care!
+              "#c1b2ac"]; //dark to light
+
+      const greys = ["#DCD8E3", //from blues
+              "#CDCFDE", //from blues
+              "#E7E7E7", //from reds
+              "#363636", //from greens
+              "#BDBDBD"]; //from greens
+
+      const whites = ["#F6F6F6", //from pinks
+              "#FDFDFD"]; //from greens
+
+      const blacks = ["#000020", //from blues
+              "#001500"]; //from greens
+*/
+
+
+/************************************************************************************************** Mouse & Display */
+
+
+
+.PointerCursor {cursor: pointer;}
+.NoCursor {cursor: none; }
+
+.unClickable {
+  pointer-events: none;
+}
+
+.hidden {
+  opacity: 0;
+}
+
+
+.waiting * {
+    cursor: progress;
+}
+
+/************************************************************************************************** Wrapper & Container */
+
+
+#wrapper {
+  width: 100%;
+  background-color: var(--whiteBg); /*WhiteSmoke;*/
+  padding: 0.5rem;
+
+
+}
+
+#container {
+  width: 98%;
+  /*height: 1000px;*/
+  margin: 0 auto 0 auto; /******************* this will successfully center your container inside body *******************/
+  padding: 0.5rem;
+  background-color: var(--whiteBg); /*WhiteSmoke;*/
+  /*box-shadow: 0 0 2px DarkSeaGreen;*/
+  /*overflow: hidden;*/
+  /*text-align: center;  /****************** this will successfully center your content inside container.*******************/
+}
+
+/************************************************************************************************** Grid */
+
+.grid {
+  display: -ms-grid;
+  display: grid;
+  width: 100%;
+  -ms-grid-columns: (1fr)[30];
+  grid-template-columns: repeat(30, 1fr);
+  -ms-grid-rows: auto;
+  grid-template-rows: auto;
+  grid-gap: 0.5rem;
+  justify-content: center;
+  align-content: center;
+  justify-items: stretch;
+  align-items: stretch;
+  grid-auto-columns: 1fr;
+
+} 
+
+
+#context, #userGuide, #info, #graphics, #userData, #resetSankey, #footnotes, #meanings {
+  -ms-grid-column-align: stretch;
+      justify-self: stretch;
+  -ms-grid-row-align: stretch;
+      align-self: stretch;
+}
+
+#context {
+  -ms-grid-row: 1;
+  -ms-grid-row-span: 1;
+  -ms-grid-column: 1;
+  -ms-grid-column-span: 30;
+  grid-area: 1 / 1 / 2 / 31 ;
+}
+
+#userGuide {
+  -ms-grid-row: 2;
+  -ms-grid-row-span: 1;
+  -ms-grid-column: 1;
+  -ms-grid-column-span: 30;
+  grid-area: 2 / 1 / 9 / 2 ;
+}
+
+#info {
+  -ms-grid-row: 3;
+  -ms-grid-row-span: 6;
+  -ms-grid-column: 2;
+  -ms-grid-column-span: 29;
+  grid-area: 3 / 2 / 9 / 31 ;
+}
+
+#graphics {
+  -ms-grid-row: 4;
+  -ms-grid-row-span: 1;
+  -ms-grid-column: 1;
+  -ms-grid-column-span: 30;
+  grid-area: 2 / 2 / 6 / 31 ;
+}
+
+
+#userData {
+  -ms-grid-row: 6;
+  -ms-grid-row-span: 1;
+  -ms-grid-column: 1;
+  -ms-grid-column-span: 30;
+  grid-area: 6 / 2 / 7 / 31 ;
+}
+
+
+
+#footnotes {
+  -ms-grid-row: 7;
+  -ms-grid-row-span: 1;
+  -ms-grid-column: 1;
+  -ms-grid-column-span: 30;
+  grid-area: 7 / 2 / 8 / 31 ;
+}
+
+#meanings {
+  -ms-grid-row: 8;
+  -ms-grid-row-span: 1;
+  -ms-grid-column: 1;
+  -ms-grid-column-span: 30;
+  grid-area: 8 / 2 / 9 / 31 ;
+}
+
+
+
+
+/************************************************** 
+************************************************ 
+*********************************************
+******************************************** Context
+********************************************* 
+************************************************ 
+***************************************************/
+
+
+
+h2 {
+  padding: 0.5rem;
+  font-size: 0.8rem;
+  font-weight: 400;
+}
+
+p {
+  padding: 0.25rem 0.5rem;
+  font-size: 1rem;
+  font-weight: 300;
+  display: block;
+}
+
+input {
+  margin: 0 0.5rem;
+}
+
+label {
+  padding: 0.5rem;
+  font-size: 0.7rem;
+  font-weight: 100;
+}
+
+
+
+.button {
+  display: inline-block;
+  background-color: var(--sankeyGreen);
+  border-radius: 3px;
+  box-shadow:  0px 0px 3px var(--buttonshadow);
+  cursor: pointer;
+  padding: 0.5rem;
+  font-size: 0.8rem;
+  font-weight: 500;
+  text-align: center;
+  color: var(--defaultBlue);
+}
+
+
+
+#context {
+  padding: 0.5rem;
+  background-color: var(--whiteBg);
+  box-shadow:  0px 0px 3px var(--textshadow);
+  border-radius: 3px;
+}
+
+
+    #context h1 {
+      padding: 0.5rem;
+      font-size: 1rem;
+      font-weight: 500;
+    }
+
+
+    #context p {
+      padding: 0.5rem;
+      font-size: 0.9rem;
+      font-weight: 300;
+      font-style: italic;
+      /*display: inline-block;*/
+      /*width: 75%;*/
+    }
+
+    /*#context div {
+      display: inline-block;
+      width: 25%;
+      height: 48px;
+      float: right;
+      background-size: contain;
+      background-repeat: no-repeat;
+      background-position: center;
+      padding: 0.5rem;
+      border-radius: 3px;
+      box-shadow:  0px 0px 3px var(--textshadow);
+    }*/
+
+
+
+#userGuide {
+  padding: 0.5rem;
+  background-color: var(--whiteBg);
+  box-shadow:  0px 0px 3px var(--textshadow);
+  border-radius: 3px;
+  /*align-self: start !important;*/
+  position: sticky;
+  top: 0%;  
+}
+
+    #userGuide #titles {
+      display: flex;
+      flex-direction: row;
+      flex-wrap: wrap;
+      gap: 1.5rem;
+      /*justify-content: space-between;*/
+      width: 100%;
+      padding: 0.5rem ;
+
+    }
+
+        #userGuide #titles h4 {
+          cursor: pointer;
+          padding: 0.5rem ;
+          font-size: 0.8rem;
+          font-weight: 400;
+          font-style: italic;
+          letter-spacing: 1px;
+          border-radius: 3px;
+          box-shadow:  0px 0px 3px var(--textshadow);
+        }
+        #userGuide #titles h4:hover {
+          box-shadow:  0px 0px 9px var(--textBlack);
+        }
+
+        #userGuide #titles a {
+          font-size: 1rem;
+        }
+
+    #info {
+      width: 100%;
+      padding: 0.5rem;
+    }
+
+
+        #info div {
+          height: fit-content;
+          width: 100%;
+          position: sticky;
+          top: 10%;
+        }
+
+       
+        #info div.buttons {
+          background-color: var(--sankeyGreen) !important;
+        }
+        
+            #info div div {
+              display: inline-block;
+              width: 100%;
+              padding: 0.5rem;
+              border-radius: 3px;
+/*              box-shadow:  0px 0px 200px var(--sankeyGreen);*/
+              background-color: var(--sankeyGreen);
+            }
+
+            #info .heatMap div {
+              float: right;
+              width: 48%;
+            }
+            #info .histo div {
+              float: left;
+              width: 54%;
+            }
+            
+
+                #info div div p {
+                  display: block;
+                }
+
+
+
+                    #info div div p a {
+                      background-color: var(--sowpodsRed);
+                      color: var(--textBlack);
+                      padding: 0 0.5rem;
+                    }
+
+
+
+
+
+      
+
+
+
+
+#userData {
+  padding: 0.5rem;
+  border-radius: 3px;
+}  
+
+
+
+#userData .button {
+  color:  var(--textBlack);
+  margin: 0.5rem;
+}
+#userData #loadData.button {
+  background-color: var(--loadGrey);
+}
+
+#userData #sowpodsData.button {
+  background-color: var(--sowpodsRed);
+}
+
+
+#userData textarea {
+  background-color: var(--loadGrey);
+  border: none;
+  border-radius: 3px;
+  width: 100%;
+  height: 48px;
+  resize: none;
+  padding: 0.5rem;
+  font-size: smaller;
+  font-weight: lighter;
+  
+} 
+
+
+#footnotes {
+  padding: 0.5rem;
+  background-color: var(--whiteBg);
+  box-shadow:  0px 0px 3px var(--textshadow);
+}
+
+
+#meanings div {
+  background-color: var(--greyBg);
+  text-align: center;
+  border: 1px solid var(--border);
+  width: 100%;
+  border-radius: 6px;
+  overflow-y: scroll; 
+  overflow-x: hidden; 
+  padding: 0.5rem;
+  display: flex;
+  flex-direction: row;
+  flex-wrap: wrap;
+  align-content: flex-start;
+  justify-content: space-evenly;
+  align-items: baseline;
+  gap: 0.5rem;
+}
+
+#meanings div text {
+  width: 100%;
+  padding: 0.5rem;
+  border: 1px solid var(--border);
+  border-radius: 3px;
+  background-color: var(--whiteBg);
+  font-size: 0.8rem;
+  font-weight: 400;
+  letter-spacing: 1px;
+}
+
+
+
+/************************************************** 
+************************************************ 
+*********************************************
+******************************************** Data Visualisation
+********************************************* 
+************************************************ 
+***************************************************/
+
+
+
+
+
+#graphics {
+  width: 100%;
+/*  background-color: var(--whiteBg);*/
+  /*box-shadow:  0px 0px 3px var(--textshadow);*/
+  border-radius: 3px;
+  align-content: stretch;
+}
+
+#graphics svg {
+  border-radius: 3px;
+}
+
+.tick text {
+  font-size: 0.25rem;
+}
+
+.axisLabel text {
+  font-size: 0.2rem;
+}
+
+
+#graphics .histogram {
+  width: 100%;
+  -ms-grid-row: 2;
+  -ms-grid-row-span: 1;
+  -ms-grid-column: 18;
+  -ms-grid-column-span: 13;
+  grid-area: 2 / 18 / 3 / 31;
+  -ms-grid-column-align: stretch;
+      justify-self: stretch;
+  -ms-grid-row-align: stretch;
+      align-self: stretch;
+}
+
+#graphics .histogram .extra tspan {
+  fill: Chocolate;
+  font-weight: 500;
+}
+
+
+#graphics .histogram rect {
+  shape-rendering: crispEdges;
+}
+
+
+#graphics .histogram .extra svg text tspan {
+  fill: Chocolate;
+}
+
+#graphics .histogram .xAxis path {
+  stroke-width: 0.03rem;
+}
+#graphics .histogram .yAxis path {
+  stroke-width: 0.03rem;
+}
+
+
+#graphics #control-panel {
+  position: -webkit-sticky;
+  position: sticky;
+  top: 0%;
+  -ms-grid-column: 1;
+  -ms-grid-column-span: 30;
+  grid-column: 1/32;
+  -ms-grid-row: 1;
+  grid-row: 1;
+  background-color: var(--whiteBg);
+  box-shadow:  0px 0px 3px var(--textshadow);
+  border-radius: 3px;
+  display: flex;
+  flex-direction: row; /*column;*/
+  flex-wrap: nowrap;
+  gap: 0.5rem;
+  -ms-grid-column-align: stretch;
+      justify-self: stretch;
+}
+
+      #graphics #control-panel .slider {
+        display: inline-flex;
+        padding: 0.5rem;
+      }
+      #graphics #control-panel .slider input {
+        cursor: -webkit-grabbing; 
+        cursor: grabbing;
+      }
+      #graphics #control-panel .slider label {
+        padding: 0.5rem;
+        font-size: 0.8rem;
+        font-weight: 300;
+      }
+      #graphics #control-panel .slider span {
+        font-size: 0.8rem;
+        font-weight: 500;
+        margin-right: 1rem !important;
+        padding: 0.5rem;
+        color: var(--defaultBlue);
+      }
+
+      
+      #information span {
+        font-size: 0.8rem;
+        font-weight: 300;
+        padding: 0.5rem;
+      }
+      #information span tspan {
+        font-size: 0.8rem;
+        font-weight: 500;
+        color: var(--defaultBlue);
+      }
+
+      #information {
+        display: inline-flex;
+        padding: 0.5rem;
+      }
+
+
+
+#graphics .heatmap {
+  width: 100%;
+  -ms-grid-row:  2;
+  -ms-grid-row-span:  1;
+  -ms-grid-column:  1;
+  -ms-grid-column-span:  17;
+  grid-area:  2 / 1 / 3 / 18; /*2 / 1 / 3  / 11;*/
+  -ms-grid-column-align: stretch;
+      justify-self: stretch;
+  -ms-grid-row-align: stretch;
+      align-self: stretch;
+}
+    
+
+      #graphics .heatmap .legendCells rect  {
+        cursor: auto;
+      }
+      #graphics .heatmap rect {
+        shape-rendering: crispEdges;
+        cursor: pointer;
+      }
+
+      #graphics .heatmap g .tick text {
+        cursor: pointer;
+      }
+
+
+      #graphics .heatmap .tooltip {
+        z-index: 100;
+      }
+      #graphics .heatmap .tooltip text tspan {
+        font-weight: 500;
+      }
+      #graphics .heatmap .xAxis path {
+        stroke-width: 0.03rem;
+      }
+      #graphics .heatmap .yAxis path {
+        stroke-width: 0.03rem;
+      }
+
+
+      
+
+#graphics .heatMapWords {
+    -ms-grid-row: 2;
+    -ms-grid-row-span: 1;
+    -ms-grid-column: 18;
+    -ms-grid-column-span: 13;
+    grid-area: 2 / 18 / 3 / 31;
+    background-color: var(--redBg);
+    box-shadow:  0px 0px 3px var(--textshadow);
+    border-radius: 3px;
+    text-align: center;
+    width: 100%;
+    -ms-grid-column-align: stretch;
+        justify-self: stretch;
+    -ms-grid-row-align: center;
+        align-self: center;
+    position: relative;
+    overflow-y: scroll; 
+    overflow-x: hidden; 
+    padding: 0 0.5rem 0.5rem 0.5rem;
+    display: flex;
+    flex-direction: row;
+    flex-wrap: wrap;
+    align-content: flex-start;
+    justify-content: center;
+    align-items: baseline;
+    gap: 0.5rem;
+
+}
+      #graphics .heatMapWords text {
+        min-width: 32%;
+        padding: 0.5rem;
+        border: 1px solid var(--border);
+        border-radius: 3px;
+        background-color: var(--whiteBg);
+        font-size: 0.8rem;
+        font-weight: 400;
+        letter-spacing: 1px;
+        cursor: pointer;
+      }
+
+     
+      #graphics .heatMapWords text tspan {
+        vertical-align: super;
+        font-size: smaller;
+        font-weight: bolder;
+      }
+
+      #graphics .heatMapWords .close {
+        width: 100%;
+        position: -webkit-sticky;
+        position: sticky;
+        top: 0%;
+        right: 0%;
+        display: block;
+        background-color: var(--redBg);
+        padding: 0.5rem 0;
+      }
+      #graphics .heatMapWords .close a {
+        display: inline-block;
+        cursor: pointer;
+        box-shadow:  0px 0px 3px black ;
+        background-color: var(--greyBg);
+        border-radius: 3px;
+        padding: 0.75rem;
+        font-size: 0.8rem;
+        text-align: center;
+        color: black;
+        font-weight: 300;
+      }
+
+
+      #graphics .heatMapWords .info {
+        color: black;
+        font-size: 0.8rem;
+        font-weight: 300;
+        background-color: none !important;
+      }
+      #graphics .heatMapWords span {
+        display: block;
+        padding: 0.5rem;
+        border: 1px solid var(--border);
+        border-radius: 3px;
+        background-color: var(--whiteBg); /*WhiteSmoke;*/
+        margin: 0.5rem 0; /*1.2%;*/
+        font-size: 0.8rem;
+        font-weight: 400;
+        letter-spacing: 1px;
+        color: var(--greyBg);
+      }
+
+      #graphics .heatMapWords .info tspan {
+        fill: black;
+        font-weight: 500;
+      }
+
+
+
+
+#graphics #resetSankey {
+  background-color: var(--whiteBg);
+  -ms-grid-column: 31;
+  grid-column: 31;
+  -ms-grid-row: 3;
+  grid-row: 3;
+  position: -webkit-sticky;
+  position: sticky;
+  top: 0;
+  z-index: 10;
+  height: fit-content;
+}
+
+#graphics #downloadSankey {
+  background-color: var(--whiteBg);
+  -ms-grid-column: 31;
+  grid-column: 31;
+  -ms-grid-row: 3;
+  grid-row: 3;
+  position: -webkit-sticky;
+  position: sticky;
+  top: 660px;
+  z-index: 10;
+}
+
+
+
+
+#graphics .sankey {
+  width: 100%;
+  -ms-grid-row:  3;
+  -ms-grid-row-span:  2;
+  -ms-grid-column:  1;
+  -ms-grid-column-span:  30;
+  grid-area:  3 / 1 / 5 / 31; /*3 / 1 / 6 / 30;*/
+  -ms-grid-column-align: stretch;
+      justify-self: stretch;
+  -ms-grid-row-align: stretch;
+      align-self: stretch;
+      border-radius: 3px;
+}
+      .sankey .axis .tick text {
+        font-size: 0.9rem;
+      }
+      
+      .sankey .axisLabel text {
+        font-size: 0.9rem;
+      }
+
+      #graphics .sankey .nodes {
+        cursor: pointer;
+      }
+
+      #graphics .sankey .links {
+        cursor: pointer;
+      }
+
+      #graphics .sankey .extra text tspan:first-of-type {
+        fill: SpringGreen;
+        font-weight: 500;
+      }
+      #graphics .sankey .extra text tspan:nth-of-type(2) {
+        fill: #688b00; /*MediumVioletRed;*/
+        font-weight: 500;
+      }
+      #graphics .sankey .extra text tspan:nth-of-type(3){
+        fill: SpringGreen;
+        font-weight: 500;
+      }
+
+
+      #graphics .sankey .extra g {
+        cursor: pointer;
+      }
+
+
+
+#graphics .sankeyWords { 
+  -ms-grid-row:  4; 
+  -ms-grid-row-span:  1; 
+  -ms-grid-column:  1; 
+  -ms-grid-column-span:  30; 
+  grid-area:  4 / 1 / 5 / 31;
+  -ms-grid-column-align: stretch;
+      justify-self: stretch;
+  -ms-grid-row-align: end;
+      align-self: end;
+  margin: 0 auto;
+  background-color: var(--purpleBg);
+  box-shadow:  0px 0px 3px var(--textshadow);
+  border-radius: 3px;
+  position: relative;
+  overflow-x: scroll;
+  overflow-y: hidden;
+  padding: 0.5rem;
+  display: flex;
+  flex-direction: row;
+  flex-wrap: nowrap;
+  align-items: baseline;
+  gap: 0.5rem;
+  z-index: 11;
+  /*height: fit-content;*/
+}
+      #graphics .sankeyWords text {
+        padding: 0.5rem;
+        border-radius: 3px;
+        background-color: var(--whiteBg);
+        font-size: 0.8rem;
+        font-weight: 500;
+        letter-spacing: 1px;
+        color: var(--textPurple);
+        cursor: pointer;
+      }
+
+      #graphics .sankeyWords text tspan {
+        vertical-align: super;
+        font-size: smaller;
+        font-weight: bolder;
+      }
+      
+      #graphics .sankeyWords .close {
+        position: -webkit-sticky;
+        position: sticky;
+        top: 0%;
+        left: 0%;
+        display: block;
+        padding: 0.5rem;
+        height: 100%;
+      }
+      #graphics .sankeyWords .close a {
+        display: inline-block;
+        cursor: pointer;
+        background-color: var(--greyBg) ;
+        box-shadow:  0px 0px 3px black ;
+        border-radius: 3px;
+        padding: 0.5rem;
+        font-size: 0.8rem;
+        text-align: center;
+        color: var(--textBlack);
+        font-weight: 300;
+      }
+
+
+
+/*#graphics #legendSankey {
+  grid-area:  5 / 1 / 6 / 31;
+  -ms-grid-column-align: stretch;
+      justify-self: stretch;
+  -ms-grid-row-align: start;
+      align-self: start;
+  margin: 0 auto;
+  background-color: var(--whiteBg);
+  box-shadow:  0px 0px 3px var(--buttonshadow);
+  z-index: 10;
+  border-radius: 3px;
+  padding: 0.5rem;
+  width: 100%;
+}*/
+
+
+
+#special, #fake {
+  -ms-grid-column-align: center;
+      justify-self: center;
+  -ms-grid-row-align: stretch;
+      align-self: stretch;
+  display: none;
+}
+
+#special, #fake {
+  -ms-grid-row: 4;
+  -ms-grid-row-span: 1;
+  -ms-grid-column: 1;
+  -ms-grid-column-span: 30;
+  grid-area: 4 / 1 / 5 / 31 ;
+  display: none;
+}
+
+#special {
+  position: relative;
+  padding: 0.5rem;
+  display: none;
+}
+
+      #special input {
+        display: inline-block !important; 
+        margin: 0 !important;
+      }
+
+      #special label {
+        display: inline-block !important; 
+        font-size: 0.8rem;
+        font-weight: 500;
+        margin-right: 1rem;
+        cursor: pointer;
+      }
+
+
+      #special div.factOn {
+        position: absolute;
+        top: 33%;
+        left: 3%;
+        display: inline-block;
+        width: 15px;
+        height: 15px;
+        background-color: var(--defaultBlue);
+        box-shadow:  0px 0px 4px var(--buttonshadow);
+        border-radius: 100%;
+        cursor: pointer;
+        margin: 0.5rem;
+
+       }
+
+      #special div.factOff {
+        position: absolute;
+        top: 33%;
+        left: 47%;
+        display: inline-block;
+        width: 15px;
+        height: 15px;
+        background-color: var(--defaultBlue);
+        box-shadow:  0px 0px 4px var(--buttonshadow);
+        border-radius: 100%;
+        cursor: pointer;
+        margin: 0.5rem;
+       }
+
+
+
